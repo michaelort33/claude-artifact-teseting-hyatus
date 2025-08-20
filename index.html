@@ -697,9 +697,21 @@
         async function checkForPasswordReset() {
             const hashParams = new URLSearchParams(window.location.hash.substring(1));
             const accessToken = hashParams.get('access_token');
+            const refreshToken = hashParams.get('refresh_token');
             const type = hashParams.get('type');
 
             if (accessToken && type === 'recovery') {
+                // Set the session with the tokens from the URL
+                const { data, error } = await supabase.auth.setSession({
+                    access_token: accessToken,
+                    refresh_token: refreshToken
+                });
+
+                if (error) {
+                    alert('Error setting up password reset session: ' + error.message);
+                    return;
+                }
+
                 // Show password reset modal
                 document.getElementById('resetModal').classList.add('active');
             }
@@ -721,13 +733,28 @@
             }
 
             try {
-                const { error } = await supabase.auth.updateUser({
+                // First check if we have a session
+                const { data: { session } } = await supabase.auth.getSession();
+                
+                if (!session) {
+                    alert('Session expired. Please request a new password reset link.');
+                    closeResetModal();
+                    return;
+                }
+
+                // Now update the password
+                const { data, error } = await supabase.auth.updateUser({
                     password: newPassword
                 });
 
                 if (error) throw error;
 
                 alert('Password updated successfully! Redirecting to admin login...');
+                
+                // Sign out to clear the session
+                await supabase.auth.signOut();
+                
+                // Redirect to admin
                 window.location.href = 'admin.html';
             } catch (error) {
                 alert('Error updating password: ' + error.message);
@@ -742,7 +769,9 @@
         }
 
         // Check for password reset on page load
-        checkForPasswordReset();
+        window.addEventListener('load', () => {
+            checkForPasswordReset();
+        });
     </script>
 </body>
 </html>
