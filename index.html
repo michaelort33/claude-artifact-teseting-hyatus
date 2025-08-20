@@ -327,6 +327,78 @@
             color: #4caf50;
             font-weight: 500;
         }
+
+        .admin-link {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: rgba(0,0,0,0.7);
+            color: white;
+            padding: 10px 15px;
+            border-radius: 5px;
+            text-decoration: none;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+
+        .admin-link:hover {
+            background: rgba(0,0,0,0.9);
+        }
+
+        .reset-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .reset-modal.active {
+            display: flex;
+        }
+
+        .reset-content {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            max-width: 400px;
+            width: 90%;
+        }
+
+        .reset-content h2 {
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .reset-content input {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 5px;
+        }
+
+        .reset-button {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 500;
+        }
+
+        .reset-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+        }
     </style>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
@@ -436,6 +508,23 @@
             <h2>Thank You!</h2>
             <p>Your reward claim has been submitted successfully.</p>
             <p>We'll process your payment within 24-48 hours.</p>
+        </div>
+    </div>
+
+    <!-- Admin Link -->
+    <a href="admin.html" class="admin-link">🔐 Admin Login</a>
+
+    <!-- Password Reset Modal -->
+    <div class="reset-modal" id="resetModal">
+        <div class="reset-content">
+            <h2>Reset Your Password</h2>
+            <p style="margin-bottom: 20px; color: #666;">Enter your new password below:</p>
+            <input type="password" id="newPassword" placeholder="New Password" minlength="6">
+            <input type="password" id="confirmPassword" placeholder="Confirm Password" minlength="6">
+            <button class="reset-button" onclick="resetPassword()">Update Password</button>
+            <p style="margin-top: 15px; text-align: center;">
+                <a href="#" onclick="closeResetModal()" style="color: #667eea;">Cancel</a>
+            </p>
         </div>
     </div>
 
@@ -603,6 +692,57 @@
                 submitButton.disabled = false;
             }
         });
+
+        // Check for password reset token in URL
+        async function checkForPasswordReset() {
+            const hashParams = new URLSearchParams(window.location.hash.substring(1));
+            const accessToken = hashParams.get('access_token');
+            const type = hashParams.get('type');
+
+            if (accessToken && type === 'recovery') {
+                // Show password reset modal
+                document.getElementById('resetModal').classList.add('active');
+            }
+        }
+
+        // Password reset function
+        async function resetPassword() {
+            const newPassword = document.getElementById('newPassword').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+
+            if (newPassword !== confirmPassword) {
+                alert('Passwords do not match!');
+                return;
+            }
+
+            if (newPassword.length < 6) {
+                alert('Password must be at least 6 characters long!');
+                return;
+            }
+
+            try {
+                const { error } = await supabase.auth.updateUser({
+                    password: newPassword
+                });
+
+                if (error) throw error;
+
+                alert('Password updated successfully! Redirecting to admin login...');
+                window.location.href = 'admin.html';
+            } catch (error) {
+                alert('Error updating password: ' + error.message);
+            }
+        }
+
+        // Close reset modal
+        function closeResetModal() {
+            document.getElementById('resetModal').classList.remove('active');
+            // Clear the URL hash
+            window.location.hash = '';
+        }
+
+        // Check for password reset on page load
+        checkForPasswordReset();
     </script>
 </body>
 </html>
