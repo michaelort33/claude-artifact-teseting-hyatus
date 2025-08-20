@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Claim Your Review Reward</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+            overflow: hidden;
+            animation: slideUp 0.5s ease-out;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 16px;
+        }
+
+        .form-container {
+            padding: 30px;
+        }
+
+        .section {
+            margin-bottom: 30px;
+        }
+
+        .section-title {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .step-number {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 12px;
+            font-weight: bold;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-weight: 500;
+        }
+
+        input[type="text"],
+        input[type="email"],
+        input[type="url"],
+        select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+
+        input:focus,
+        select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .payment-methods {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .payment-method {
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: white;
+        }
+
+        .payment-method:hover {
+            border-color: #667eea;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .payment-method.selected {
+            border-color: #667eea;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .tutorial-box {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .tutorial-title {
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: #333;
+        }
+
+        .demo-browser {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .browser-bar {
+            background: #e0e0e0;
+            padding: 10px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .browser-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #999;
+        }
+
+        .browser-content {
+            padding: 20px;
+            height: 200px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .demo-step {
+            position: absolute;
+            width: 100%;
+            opacity: 0;
+            animation: demoSlide 9s infinite;
+        }
+
+        .demo-step:nth-child(1) { animation-delay: 0s; }
+        .demo-step:nth-child(2) { animation-delay: 3s; }
+        .demo-step:nth-child(3) { animation-delay: 6s; }
+
+        @keyframes demoSlide {
+            0%, 33.33% { opacity: 0; }
+            33.34%, 66.66% { opacity: 1; }
+            66.67%, 100% { opacity: 0; }
+        }
+
+        .demo-review {
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 10px;
+        }
+
+        .demo-button {
+            background: #4285f4;
+            color: white;
+            padding: 8px 15px;
+            border-radius: 5px;
+            display: inline-block;
+            margin-top: 10px;
+        }
+
+        .or-divider {
+            text-align: center;
+            margin: 20px 0;
+            color: #999;
+            position: relative;
+        }
+
+        .or-divider::before,
+        .or-divider::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            width: 45%;
+            height: 1px;
+            background: #e0e0e0;
+        }
+
+        .or-divider::before { left: 0; }
+        .or-divider::after { right: 0; }
+
+        .file-upload {
+            border: 2px dashed #e0e0e0;
+            border-radius: 10px;
+            padding: 30px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .file-upload:hover {
+            border-color: #667eea;
+            background: #f8f9fa;
+        }
+
+        .file-upload.has-file {
+            border-color: #4caf50;
+            background: #f1f8e9;
+        }
+
+        .upload-icon {
+            font-size: 48px;
+            margin-bottom: 10px;
+        }
+
+        .submit-button {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .submit-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+        }
+
+        .submit-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .success-message {
+            display: none;
+            text-align: center;
+            padding: 40px;
+        }
+
+        .success-icon {
+            font-size: 72px;
+            margin-bottom: 20px;
+        }
+
+        .success-message h2 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .success-message p {
+            color: #666;
+        }
+
+        .error-message {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .error-message.show {
+            display: block;
+        }
+
+        input[type="file"] {
+            display: none;
+        }
+
+        .file-name {
+            margin-top: 10px;
+            color: #4caf50;
+            font-weight: 500;
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎉 Claim Your Review Reward</h1>
+            <p>Thank you for your review! Just two quick steps to receive your reward.</p>
+        </div>
+
+        <div class="form-container" id="formContainer">
+            <div class="error-message" id="errorMessage"></div>
+            
+            <form id="rewardForm">
+                <!-- Step 1: Payment Method -->
+                <div class="section">
+                    <div class="section-title">
+                        <div class="step-number">1</div>
+                        <h2>Payment Method</h2>
+                    </div>
+                    <div class="payment-methods">
+                        <div class="payment-method" data-method="venmo">
+                            <div>💳</div>
+                            <div>Venmo</div>
+                        </div>
+                        <div class="payment-method" data-method="zelle">
+                            <div>🏦</div>
+                            <div>Zelle</div>
+                        </div>
+                        <div class="payment-method" data-method="paypal">
+                            <div>💰</div>
+                            <div>PayPal</div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="paymentHandle" id="paymentLabel">Select a payment method above</label>
+                        <input type="text" id="paymentHandle" name="paymentHandle" required placeholder="Select payment method first" disabled>
+                    </div>
+                </div>
+
+                <!-- Step 2: Review Link -->
+                <div class="section">
+                    <div class="section-title">
+                        <div class="step-number">2</div>
+                        <h2>Share Your Review</h2>
+                    </div>
+
+                    <!-- Tutorial -->
+                    <div class="tutorial-box">
+                        <div class="tutorial-title">📱 How to Get Your Review Link:</div>
+                        <div class="demo-browser">
+                            <div class="browser-bar">
+                                <div class="browser-dot"></div>
+                                <div class="browser-dot"></div>
+                                <div class="browser-dot"></div>
+                            </div>
+                            <div class="browser-content">
+                                <div class="demo-step">
+                                    <strong>Step 1:</strong> Find your review on Google
+                                    <div class="demo-review">
+                                        <div>⭐⭐⭐⭐⭐</div>
+                                        <div>"Great service! Highly recommend..."</div>
+                                        <div style="color: #666; font-size: 12px;">Your Name</div>
+                                    </div>
+                                </div>
+                                <div class="demo-step">
+                                    <strong>Step 2:</strong> Click the three dots menu (⋮)
+                                    <div class="demo-review">
+                                        <div style="text-align: right;">⋮</div>
+                                    </div>
+                                    <div class="demo-button">Share</div>
+                                </div>
+                                <div class="demo-step">
+                                    <strong>Step 3:</strong> Click "Copy link"
+                                    <div class="demo-button">📋 Copy link</div>
+                                    <div style="margin-top: 10px; color: #4caf50;">✓ Link copied!</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="reviewLink">Paste Your Review Link</label>
+                        <input type="url" id="reviewLink" name="reviewLink" placeholder="https://g.page/r/...">
+                    </div>
+
+                    <div class="or-divider">OR</div>
+
+                    <div class="form-group">
+                        <label>Upload a Screenshot of Your Review</label>
+                        <div class="file-upload" id="fileUploadArea">
+                            <div class="upload-icon">📸</div>
+                            <div>Click to upload screenshot</div>
+                            <div style="color: #999; font-size: 14px; margin-top: 5px;">or drag and drop</div>
+                            <div class="file-name" id="fileName"></div>
+                        </div>
+                        <input type="file" id="reviewScreenshot" name="reviewScreenshot" accept="image/*">
+                    </div>
+                </div>
+
+                <button type="submit" class="submit-button" id="submitButton">Submit & Claim Reward</button>
+            </form>
+        </div>
+
+        <div class="success-message" id="successMessage">
+            <div class="success-icon">🎊</div>
+            <h2>Thank You!</h2>
+            <p>Your reward claim has been submitted successfully.</p>
+            <p>We'll process your payment within 24-48 hours.</p>
+        </div>
+    </div>
+
+    <script>
+        // Supabase configuration
+        const SUPABASE_URL = 'https://dugjgmwlzyjillkemzhz.supabase.co';
+        const SUPABASE_ANON_KEY = 'sb_publishable_J+DigjZwAwdZICiFgkn5Zw_NACd2I5J';
+
+        // Initialize Supabase client
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        // Payment method selection
+        const paymentMethods = document.querySelectorAll('.payment-method');
+        const paymentHandle = document.getElementById('paymentHandle');
+        const paymentLabel = document.getElementById('paymentLabel');
+        let selectedMethod = '';
+
+        paymentMethods.forEach(method => {
+            method.addEventListener('click', () => {
+                paymentMethods.forEach(m => m.classList.remove('selected'));
+                method.classList.add('selected');
+                selectedMethod = method.dataset.method;
+                
+                paymentHandle.disabled = false;
+                paymentHandle.value = '';
+                
+                if (selectedMethod === 'venmo') {
+                    paymentLabel.textContent = 'Venmo Username';
+                    paymentHandle.placeholder = '@username';
+                } else if (selectedMethod === 'zelle') {
+                    paymentLabel.textContent = 'Zelle Email or Phone';
+                    paymentHandle.placeholder = 'email@example.com or (555) 123-4567';
+                } else if (selectedMethod === 'paypal') {
+                    paymentLabel.textContent = 'PayPal Email';
+                    paymentHandle.placeholder = 'email@example.com';
+                }
+            });
+        });
+
+        // File upload
+        const fileUploadArea = document.getElementById('fileUploadArea');
+        const fileInput = document.getElementById('reviewScreenshot');
+        const fileName = document.getElementById('fileName');
+        let uploadedFile = null;
+
+        fileUploadArea.addEventListener('click', () => {
+            fileInput.click();
+        });
+
+        fileUploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            fileUploadArea.style.borderColor = '#667eea';
+            fileUploadArea.style.background = '#f8f9fa';
+        });
+
+        fileUploadArea.addEventListener('dragleave', () => {
+            fileUploadArea.style.borderColor = '#e0e0e0';
+            fileUploadArea.style.background = 'white';
+        });
+
+        fileUploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                fileInput.files = files;
+                handleFileSelect();
+            }
+        });
+
+        fileInput.addEventListener('change', handleFileSelect);
+
+        function handleFileSelect() {
+            if (fileInput.files.length > 0) {
+                uploadedFile = fileInput.files[0];
+                fileName.textContent = `✓ ${uploadedFile.name}`;
+                fileUploadArea.classList.add('has-file');
+            }
+        }
+
+        // Function to convert file to base64
+        function fileToBase64(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = () => resolve(reader.result);
+                reader.onerror = error => reject(error);
+            });
+        }
+
+        // Show error message
+        function showError(message) {
+            const errorDiv = document.getElementById('errorMessage');
+            errorDiv.textContent = message;
+            errorDiv.classList.add('show');
+            setTimeout(() => {
+                errorDiv.classList.remove('show');
+            }, 5000);
+        }
+
+        // Form submission
+        const form = document.getElementById('rewardForm');
+        const formContainer = document.getElementById('formContainer');
+        const successMessage = document.getElementById('successMessage');
+        const submitButton = document.getElementById('submitButton');
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const reviewLink = document.getElementById('reviewLink').value;
+            const hasScreenshot = fileInput.files.length > 0;
+            
+            // Validation
+            if (!selectedMethod) {
+                showError('Please select a payment method');
+                return;
+            }
+            
+            if (!paymentHandle.value) {
+                showError('Please enter your payment information');
+                return;
+            }
+            
+            if (!reviewLink && !hasScreenshot) {
+                showError('Please provide either a review link or upload a screenshot');
+                return;
+            }
+            
+            // Prepare submission data
+            submitButton.textContent = 'Submitting...';
+            submitButton.disabled = true;
+            
+            try {
+                let screenshotData = null;
+                
+                // Convert screenshot to base64 if provided
+                if (hasScreenshot) {
+                    screenshotData = await fileToBase64(uploadedFile);
+                }
+                
+                // Submit to Supabase
+                const { data, error } = await supabase
+                    .from('review_rewards')
+                    .insert([
+                        {
+                            payment_method: selectedMethod,
+                            payment_handle: paymentHandle.value,
+                            review_link: reviewLink || null,
+                            screenshot_url: screenshotData,
+                            status: 'pending'
+                        }
+                    ]);
+                
+                if (error) {
+                    throw error;
+                }
+                
+                // Show success message
+                formContainer.style.display = 'none';
+                successMessage.style.display = 'block';
+                
+            } catch (error) {
+                console.error('Error submitting:', error);
+                showError('There was an error submitting your claim. Please try again.');
+                submitButton.textContent = 'Submit & Claim Reward';
+                submitButton.disabled = false;
+            }
+        });
+    </script>
+</body>
+</html>
