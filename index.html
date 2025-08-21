@@ -473,6 +473,129 @@
             transform: translateY(-2px);
             box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
         }
+
+        /* User auth + dashboard additions */
+        .user-link {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 10px 15px;
+            border-radius: 5px;
+            text-decoration: none;
+            font-size: 14px;
+            transition: all 0.3s;
+            z-index: 1100;
+        }
+
+        .user-link:hover {
+            background: rgba(0, 0, 0, 0.9);
+        }
+
+        .auth-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1200;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .auth-modal.active {
+            display: flex;
+        }
+
+        .auth-content {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            max-width: 420px;
+            width: 92%;
+        }
+
+        .auth-content h2 {
+            margin-bottom: 12px;
+            color: #333;
+        }
+
+        .auth-content .form-group input {
+            width: 100%;
+            padding: 10px 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 15px;
+        }
+
+        .auth-actions-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 10px;
+        }
+
+        .link-btn {
+            background: none;
+            border: none;
+            color: #667eea;
+            cursor: pointer;
+            font-size: 14px;
+            padding: 0;
+        }
+
+        .my-submissions {
+            margin-top: 20px;
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            overflow: hidden;
+            display: none;
+        }
+
+        .my-submissions h3 {
+            padding: 16px 20px;
+            border-bottom: 1px solid #f0f0f0;
+            color: #333;
+        }
+
+        .my-submissions table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .my-submissions th,
+        .my-submissions td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #f5f5f5;
+            font-size: 14px;
+        }
+
+        .status-chip {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 999px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .status-chip.pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .status-chip.awarded {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-chip.rejected {
+            background: #f8d7da;
+            color: #721c24;
+        }
     </style>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
@@ -584,6 +707,12 @@
 
                 <button type="submit" class="submit-button" id="submitButton">Submit & Claim Reward</button>
             </form>
+
+            <!-- My Submissions (visible when signed in) -->
+            <div class="my-submissions" id="mySubmissions">
+                <h3>My Submissions</h3>
+                <div id="mySubmissionsContent"></div>
+            </div>
         </div>
 
         <div class="success-message" id="successMessage">
@@ -596,6 +725,8 @@
 
     <!-- Admin Link -->
     <a href="admin.html" class="admin-link">🔐 Admin Login</a>
+    <!-- User Auth Link -->
+    <a href="#" class="user-link" id="userAuthLink">Sign In</a>
 
     <!-- Password Reset Modal -->
     <div class="reset-modal" id="resetModal">
@@ -611,6 +742,29 @@
         </div>
     </div>
 
+    <!-- Auth Modal -->
+    <div class="auth-modal" id="authModal">
+        <div class="auth-content">
+            <h2 id="authTitle">Sign In</h2>
+            <div id="authError" class="error-message" style="display:none;"></div>
+            <div class="form-group">
+                <label for="authEmail">Email</label>
+                <input type="email" id="authEmail" placeholder="you@example.com">
+            </div>
+            <div class="form-group" id="passwordGroup">
+                <label for="authPassword">Password</label>
+                <input type="password" id="authPassword" placeholder="Your password">
+            </div>
+            <button class="submit-button" id="authSubmitBtn">Sign In</button>
+            <div class="auth-actions-row">
+                <button class="link-btn" id="toggleAuthMode">Create an account</button>
+                <button class="link-btn" id="forgotPasswordBtn">Forgot password?</button>
+            </div>
+            <p style="margin-top:10px; color:#666; font-size:13px;">By continuing you agree to receive emails for
+                account access. You can sign out anytime.</p>
+        </div>
+    </div>
+
     <script>
         // Supabase configuration
         const SUPABASE_URL = 'https://dugjgmwlzyjillkemzhz.supabase.co';
@@ -618,6 +772,8 @@
 
         // Initialize Supabase client
         const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        let currentUser = null;
 
         // Toggle tutorial visibility
         function toggleTutorial() {
@@ -718,6 +874,16 @@
         const formContainer = document.getElementById('formContainer');
         const successMessage = document.getElementById('successMessage');
         const submitButton = document.getElementById('submitButton');
+        const userAuthLink = document.getElementById('userAuthLink');
+        const authModal = document.getElementById('authModal');
+        const authTitle = document.getElementById('authTitle');
+        const authError = document.getElementById('authError');
+        const authEmail = document.getElementById('authEmail');
+        const authPassword = document.getElementById('authPassword');
+        const authSubmitBtn = document.getElementById('authSubmitBtn');
+        const toggleAuthModeBtn = document.getElementById('toggleAuthMode');
+        const forgotPasswordBtn = document.getElementById('forgotPasswordBtn');
+        let authMode = 'signin'; // or 'signup'
 
         form.addEventListener('submit', async (e) => {
             e.preventDefault();
@@ -753,7 +919,11 @@
                     screenshotData = await fileToBase64(uploadedFile);
                 }
 
-                // Submit to Supabase
+                // Fetch current user (if logged in)
+                const { data: userResp } = await supabase.auth.getUser();
+                const userId = userResp?.user?.id || null;
+
+                // Submit to Supabase (include user_id when available)
                 const { data, error } = await supabase
                     .from('review_rewards')
                     .insert([
@@ -762,7 +932,8 @@
                             payment_handle: paymentHandle.value,
                             review_link: reviewLink || null,
                             screenshot_url: screenshotData,
-                            status: 'pending'
+                            status: 'pending',
+                            user_id: userId
                         }
                     ]);
 
@@ -781,6 +952,172 @@
                 submitButton.disabled = false;
             }
         });
+
+        // ---------- Auth + User Dashboard ----------
+        function openAuthModal() {
+            authModal.classList.add('active');
+            authError.style.display = 'none';
+            authEmail.value = '';
+            authPassword.value = '';
+        }
+
+        function closeAuthModal() {
+            authModal.classList.remove('active');
+        }
+
+        function setAuthMode(mode) {
+            authMode = mode;
+            if (mode === 'signin') {
+                authTitle.textContent = 'Sign In';
+                authSubmitBtn.textContent = 'Sign In';
+                toggleAuthModeBtn.textContent = 'Create an account';
+            } else {
+                authTitle.textContent = 'Create Account';
+                authSubmitBtn.textContent = 'Create Account';
+                toggleAuthModeBtn.textContent = 'Have an account? Sign in';
+            }
+        }
+
+        userAuthLink.addEventListener('click', async (e) => {
+            e.preventDefault();
+            if (currentUser) {
+                // Sign out
+                await supabase.auth.signOut();
+                return;
+            }
+            setAuthMode('signin');
+            openAuthModal();
+        });
+
+        toggleAuthModeBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            setAuthMode(authMode === 'signin' ? 'signup' : 'signin');
+        });
+
+        authSubmitBtn.addEventListener('click', async () => {
+            authError.style.display = 'none';
+            const email = authEmail.value.trim();
+            const password = authPassword.value.trim();
+            if (!email || !password) {
+                authError.textContent = 'Please enter email and password';
+                authError.style.display = 'block';
+                return;
+            }
+
+            authSubmitBtn.disabled = true;
+            authSubmitBtn.textContent = authMode === 'signin' ? 'Signing In...' : 'Creating Account...';
+            try {
+                if (authMode === 'signin') {
+                    const { error } = await supabase.auth.signInWithPassword({ email, password });
+                    if (error) throw error;
+                } else {
+                    const { error } = await supabase.auth.signUp({ email, password });
+                    if (error) throw error;
+                    // Depending on Supabase settings, user may need to confirm email
+                }
+                closeAuthModal();
+            } catch (err) {
+                authError.textContent = err.message || 'Authentication error';
+                authError.style.display = 'block';
+            } finally {
+                authSubmitBtn.disabled = false;
+                authSubmitBtn.textContent = authMode === 'signin' ? 'Sign In' : 'Create Account';
+            }
+        });
+
+        forgotPasswordBtn.addEventListener('click', async (e) => {
+            e.preventDefault();
+            const email = authEmail.value.trim();
+            if (!email) {
+                authError.textContent = 'Enter your email above first to receive a reset link';
+                authError.style.display = 'block';
+                return;
+            }
+            authError.style.display = 'none';
+            try {
+                const { error } = await supabase.auth.resetPasswordForEmail(email, {
+                    redirectTo: window.location.origin + window.location.pathname
+                });
+                if (error) throw error;
+                authError.textContent = 'Password reset email sent. Check your inbox.';
+                authError.style.display = 'block';
+                authError.style.background = '#d4edda';
+                authError.style.color = '#155724';
+            } catch (err) {
+                authError.textContent = err.message || 'Failed to send reset email';
+                authError.style.display = 'block';
+                authError.style.background = '#f8d7da';
+                authError.style.color = '#721c24';
+            }
+        });
+
+        // Close auth modal on outside click
+        authModal.addEventListener('click', (e) => {
+            if (e.target === authModal) closeAuthModal();
+        });
+
+        function updateAuthUI() {
+            if (currentUser) {
+                userAuthLink.textContent = currentUser.email + ' • Sign Out';
+                document.getElementById('mySubmissions').style.display = 'block';
+                loadMySubmissions();
+            } else {
+                userAuthLink.textContent = 'Sign In';
+                document.getElementById('mySubmissions').style.display = 'none';
+            }
+        }
+
+        async function loadMySubmissions() {
+            if (!currentUser) return;
+            const { data, error } = await supabase
+                .from('review_rewards')
+                .select('*')
+                .eq('user_id', currentUser.id)
+                .order('created_at', { ascending: false });
+            if (error) {
+                // silently ignore if column/policy not ready
+                return;
+            }
+            renderMySubmissions(data || []);
+        }
+
+        function renderMySubmissions(rows) {
+            const containerId = 'mySubmissionsContent';
+            let wrapper = document.getElementById(containerId);
+            if (!wrapper) return;
+            if (!rows.length) {
+                wrapper.innerHTML = '<div style="padding:16px; color:#666;">No submissions yet. Submit your first reward claim above.</div>';
+                return;
+            }
+            const header = `
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Payment</th>
+                            <th>Handle</th>
+                            <th>Type</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+            const rowsHtml = rows.map(r => {
+                const date = new Date(r.created_at).toLocaleString();
+                const type = r.review_link ? 'Link' : 'Screenshot';
+                return `
+                    <tr>
+                        <td>${date}</td>
+                        <td>${(r.payment_method || '').toUpperCase()}</td>
+                        <td>${r.payment_handle || ''}</td>
+                        <td>${type}</td>
+                        <td><span class="status-chip ${r.status}">${(r.status || '').toUpperCase()}</span></td>
+                    </tr>
+                `;
+            }).join('');
+            const footer = '</tbody></table>';
+            wrapper.innerHTML = header + rowsHtml + footer;
+        }
 
         // Check for password reset token in URL
         async function checkForPasswordReset() {
@@ -843,8 +1180,8 @@
                 // Sign out to clear the session
                 await supabase.auth.signOut();
 
-                // Redirect to admin
-                window.location.href = 'admin.html';
+                // Redirect to site home (not admin)
+                window.location.href = 'index.html';
             } catch (error) {
                 alert('Error updating password: ' + error.message);
             }
@@ -857,8 +1194,21 @@
             window.location.hash = '';
         }
 
+        // Auth state + initial session
+        async function initAuth() {
+            const { data: { user } } = await supabase.auth.getUser();
+            if (user) currentUser = user;
+            updateAuthUI();
+        }
+
+        supabase.auth.onAuthStateChange((_event, session) => {
+            currentUser = session?.user || null;
+            updateAuthUI();
+        });
+
         // Check for password reset on page load
         window.addEventListener('load', () => {
+            initAuth();
             checkForPasswordReset();
         });
     </script>
