@@ -314,14 +314,14 @@
         <!-- Auth Card -->
         <div class="card" id="authCard">
             <div class="tabs">
-                <div class="tab active" id="tabSign">Sign in with Reservation ID</div>
-                <div class="tab" id="tabCode">Don't know your reservation?</div>
+                <div class="tab active" id="tabSign">Sign in</div>
+                <div class="tab" id="tabCode">Don’t have my reservation ID or password?</div>
             </div>
             <div class="card-body">
                 <p class="muted" style="margin: 6px 0 12px;">
-                    <strong>Sign in</strong> uses your Email + Reservation ID + Password. If you don’t know your
-                    reservation ID,
-                    switch to “Don’t know your reservation?” to get a login link and create a password.
+                    Use your <strong>email + password</strong>, or your <strong>email + reservation ID</strong>. If you
+                    have neither,
+                    request a one‑time login link on the next tab and set a password.
                 </p>
                 <div id="authError" class="error"></div>
                 <div id="authSuccess" class="success"></div>
@@ -343,13 +343,15 @@
                         </div>
                     </div>
                     <div class="row" style="margin-top:12px; align-items:center;">
-                        <button class="btn btn-primary" id="signInBtn">Sign In</button>
+                        <button class="btn btn-primary" id="signInPwdBtn">Sign in with Password</button>
+                        <button class="btn btn-primary" id="signInRidBtn">Sign in with Reservation ID</button>
                         <button class="btn btn-secondary" id="forgotBtn">Forgot password</button>
                         <span class="muted">or</span>
                         <button class="btn btn-secondary" id="sendCodeBtn">Email me a login code</button>
                     </div>
                     <p class="muted" style="margin-top:6px;">
-                        “Forgot password” and “Email me a login code” let you sign in <em>without</em> a reservation ID.
+                        Choose <strong>email + password</strong> or <strong>email + reservation ID</strong>. If neither
+                        is handy, request a login link.
                     </p>
                 </div>
                 <div id="codePane" class="hidden">
@@ -475,20 +477,32 @@
         qs('signOutBtn').onclick = async () => { await supabase.auth.signOut(); };
         qs('openClaimsBtn').onclick = () => { togglePop(); window.scrollTo({ top: document.getElementById('claimsList').offsetTop - 20, behavior: 'smooth' }); };
 
-        // Auth: sign-in with password (requires reservation check)
-        qs('signInBtn').onclick = async () => {
+        // Auth: sign-in with password (email + password)
+        qs('signInPwdBtn').onclick = async () => {
             qs('authError').style.display = 'none';
             const email = qs('email').value.trim();
-            const reservationId = qs('reservationId').value.trim();
             const password = qs('password').value;
-            if (!email || !reservationId || !password) { qs('authError').textContent = 'Enter email, reservation ID, and password'; qs('authError').style.display = 'block'; return; }
-
-            // Ensure claim account exists for this email + reservation
-            const { data: acct } = await supabase.from('claim_accounts').select('id').eq('email', email).eq('reservation_id', reservationId).maybeSingle();
-            if (!acct) { qs('authError').textContent = 'We could not find that reservation for this email.'; qs('authError').style.display = 'block'; return; }
+            if (!email || !password) { qs('authError').textContent = 'Enter email and password'; qs('authError').style.display = 'block'; return; }
 
             const { error } = await supabase.auth.signInWithPassword({ email, password });
             if (error) { qs('authError').textContent = 'Invalid email or password.'; qs('authError').style.display = 'block'; return; }
+        };
+
+        // Auth: sign-in with reservation (email + reservation ID)
+        qs('signInRidBtn').onclick = async () => {
+            qs('authError').style.display = 'none';
+            const email = qs('email').value.trim();
+            const reservationId = qs('reservationId').value.trim();
+            if (!email || !reservationId) { qs('authError').textContent = 'Enter email and reservation ID'; qs('authError').style.display = 'block'; return; }
+
+            // Validate claim account exists for this email + reservation
+            const { data: acct } = await supabase.from('claim_accounts').select('id').eq('email', email).eq('reservation_id', reservationId).maybeSingle();
+            if (!acct) { qs('authError').textContent = 'We could not find that reservation for this email.'; qs('authError').style.display = 'block'; return; }
+
+            // Send a one-time login link (passwordless) to proceed; upon click, user can set a password if desired
+            const { error } = await supabase.auth.signInWithOtp({ email, options: { emailRedirectTo: window.location.origin + '/claim/' } });
+            if (error) { qs('authError').textContent = error.message; qs('authError').style.display = 'block'; return; }
+            qs('authSuccess').textContent = 'We sent a secure link to your email.'; qs('authSuccess').style.display = 'block';
         };
 
         // Auth: forgot password (email-based)

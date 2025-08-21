@@ -12,17 +12,35 @@
             box-sizing: border-box;
         }
 
+        /* Dark palette */
+        :root {
+            --bg: #0f1115;
+            --surface: #15171c;
+            --surface-2: #1b1f27;
+            --border: #262a31;
+            --text: #e6e6e6;
+            --subtext: #9aa0a6;
+            --accent: #2f81f7;
+            --success: #3fb950;
+            --danger: #f85149;
+            --badge-open-bg: #3a2e00;
+            --badge-open-fg: #ffd866;
+            --badge-res-bg: #062d12;
+            --badge-res-fg: #56d364;
+        }
+
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
-            background: #f5f7fa;
+            background: var(--bg);
+            color: var(--text);
             min-height: 100vh;
         }
 
         .header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
+            background: var(--surface-2);
+            color: var(--text);
             padding: 20px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 1px 0 var(--border);
         }
 
         .header h1 {
@@ -43,9 +61,9 @@
         }
 
         .nav-tab {
-            background: #eef1ff;
-            color: #4a4a6a;
-            border: none;
+            background: var(--surface-2);
+            color: var(--subtext);
+            border: 1px solid var(--border);
             border-radius: 8px;
             padding: 8px 12px;
             font-weight: 600;
@@ -53,22 +71,24 @@
         }
 
         .nav-tab.active {
-            background: #ffffff;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+            background: var(--surface);
+            color: var(--text);
+            box-shadow: none;
         }
 
         .login-container {
             max-width: 400px;
             margin: 100px auto;
-            background: white;
+            background: var(--surface);
             padding: 40px;
             border-radius: 10px;
-            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
+            box-shadow: none;
+            border: 1px solid var(--border);
         }
 
         .login-container h2 {
             margin-bottom: 20px;
-            color: #333;
+            color: var(--text);
         }
 
         .form-group {
@@ -78,38 +98,43 @@
         .form-group label {
             display: block;
             margin-bottom: 5px;
-            color: #555;
+            color: var(--subtext);
             font-weight: 500;
         }
 
         .form-group input {
             width: 100%;
             padding: 10px;
-            border: 2px solid #e0e0e0;
+            border: 1px solid var(--border);
+            background: var(--surface-2);
+            color: var(--text);
             border-radius: 5px;
             font-size: 16px;
         }
 
         .form-group input:focus {
             outline: none;
-            border-color: #667eea;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(47, 129, 247, 0.15);
         }
 
         .btn {
             padding: 10px 20px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border: none;
+            background: var(--surface-2);
+            color: var(--text);
+            border: 1px solid var(--border);
             border-radius: 5px;
             cursor: pointer;
             font-size: 16px;
             font-weight: 500;
             transition: all 0.3s;
+            box-shadow: none;
         }
 
         .btn:hover {
             transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+            border-color: var(--accent);
         }
 
         .btn-full {
@@ -117,15 +142,21 @@
         }
 
         .btn-danger {
-            background: #dc3545;
+            background: #2a1515;
+            border-color: #3b1a1a;
+            color: var(--danger);
         }
 
         .btn-success {
-            background: #28a745;
+            background: #0f2a18;
+            border-color: #1d3a26;
+            color: var(--success);
         }
 
         .btn-secondary {
-            background: #6c757d;
+            background: var(--surface-2);
+            color: var(--subtext);
+            border-color: var(--border);
         }
 
         .dashboard {
@@ -147,14 +178,16 @@
         }
 
         .stat-card {
-            background: white;
+            background: var(--surface);
+            color: var(--text);
             padding: 25px;
             border-radius: 10px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            box-shadow: none;
+            border: 1px solid var(--border);
         }
 
         .stat-label {
-            color: #999;
+            color: var(--subtext);
             font-size: 14px;
             margin-bottom: 5px;
         }
@@ -162,14 +195,16 @@
         .stat-value {
             font-size: 32px;
             font-weight: bold;
-            color: #333;
+            color: var(--text);
         }
 
         .filter-bar {
-            background: white;
+            background: var(--surface);
+            color: var(--text);
             padding: 20px;
             border-radius: 10px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            box-shadow: none;
+            border: 1px solid var(--border);
             margin-bottom: 20px;
             display: flex;
             gap: 15px;
@@ -179,15 +214,19 @@
 
         .filter-bar select {
             padding: 8px 12px;
-            border: 2px solid #e0e0e0;
+            border: 1px solid var(--border);
+            background: var(--surface-2);
+            color: var(--text);
             border-radius: 5px;
             font-size: 14px;
         }
 
         .submissions-table {
-            background: white;
+            background: var(--surface);
+            color: var(--text);
             border-radius: 10px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            box-shadow: none;
+            border: 1px solid var(--border);
             overflow: hidden;
         }
 
@@ -197,21 +236,22 @@
         }
 
         th {
-            background: #f8f9fa;
+            background: var(--surface-2);
             padding: 15px;
             text-align: left;
             font-weight: 600;
-            color: #555;
-            border-bottom: 2px solid #e0e0e0;
+            color: var(--subtext);
+            border-bottom: 1px solid var(--border);
         }
 
         td {
             padding: 15px;
-            border-bottom: 1px solid #f0f0f0;
+            border-bottom: 1px solid var(--border);
+            color: var(--text);
         }
 
         tr:hover {
-            background: #f8f9fa;
+            background: var(--surface-2);
         }
 
         .status-badge {
@@ -220,32 +260,35 @@
             border-radius: 20px;
             font-size: 12px;
             font-weight: 600;
+            background: var(--surface-2);
+            color: var(--subtext);
+            border: 1px solid var(--border);
         }
 
         .status-pending {
-            background: #fff3cd;
-            color: #856404;
+            background: var(--badge-open-bg);
+            color: var(--badge-open-fg);
         }
 
         .status-awarded {
-            background: #d4edda;
-            color: #155724;
+            background: var(--badge-res-bg);
+            color: var(--badge-res-fg);
         }
 
         .status-rejected {
-            background: #f8d7da;
-            color: #721c24;
+            background: #2d1517;
+            color: #ff9b9b;
         }
 
         /* Claim statuses */
         .status-open {
-            background: #fff3cd;
-            color: #856404;
+            background: var(--badge-open-bg);
+            color: var(--badge-open-fg);
         }
 
         .status-resolved {
-            background: #d4edda;
-            color: #155724;
+            background: var(--badge-res-bg);
+            color: var(--badge-res-fg);
         }
 
         .action-buttons {
@@ -267,18 +310,21 @@
         }
 
         .btn-award {
-            background: #28a745;
-            color: white;
+            background: #0f2a18;
+            border-color: #1d3a26;
+            color: var(--success);
         }
 
         .btn-reject {
-            background: #dc3545;
-            color: white;
+            background: #2a1515;
+            border-color: #3b1a1a;
+            color: var(--danger);
         }
 
         .btn-view {
-            background: #007bff;
-            color: white;
+            background: #0f1a2a;
+            border-color: #153154;
+            color: var(--accent);
         }
 
         .modal {
@@ -299,13 +345,15 @@
         }
 
         .modal-content {
-            background: white;
+            background: var(--surface);
+            color: var(--text);
             padding: 30px;
             border-radius: 10px;
             max-width: 600px;
             width: 90%;
             max-height: 80vh;
             overflow-y: auto;
+            border: 1px solid var(--border);
         }
 
         .modal-header {
@@ -320,7 +368,7 @@
             border: none;
             font-size: 24px;
             cursor: pointer;
-            color: #999;
+            color: var(--subtext);
         }
 
         .detail-row {
@@ -331,19 +379,19 @@
         .detail-label {
             font-weight: 600;
             width: 150px;
-            color: #555;
+            color: var(--subtext);
         }
 
         .detail-value {
             flex: 1;
-            color: #333;
+            color: var(--text);
         }
 
         .screenshot-preview {
             max-width: 100%;
             margin-top: 10px;
             border-radius: 5px;
-            border: 1px solid #e0e0e0;
+            border: 1px solid var(--border);
         }
 
         .notes-input {
@@ -363,16 +411,16 @@
         }
 
         .error-message {
-            background: #f8d7da;
-            color: #721c24;
+            background: #3a1f20;
+            color: #ffb4b4;
             padding: 12px;
             border-radius: 5px;
             margin-bottom: 20px;
         }
 
         .success-message {
-            background: #d4edda;
-            color: #155724;
+            background: #12261a;
+            color: #7ee2a8;
             padding: 12px;
             border-radius: 5px;
             margin-bottom: 20px;
