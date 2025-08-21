@@ -63,6 +63,7 @@
                 radial-gradient(at 40% 40%, rgba(47, 129, 247, 0.02) 0%, transparent 50%);
             color: var(--text);
             min-height: 100vh;
+            min-height: 100dvh;
             padding: 15px;
             display: flex;
             align-items: center;
@@ -495,13 +496,21 @@
             color: var(--text);
             border: 1px solid var(--border);
             border-radius: 12px;
-            font-size: 17px;
+            font-size: 16px;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             position: relative;
             overflow: hidden;
             text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
+        }
+
+        @media (min-width: 768px) {
+            .submit-button {
+                font-size: 17px;
+            }
         }
 
         .submit-button:hover {
@@ -591,23 +600,7 @@
             font-weight: 600;
         }
 
-        .admin-link {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            background: var(--surface-2);
-            color: var(--text);
-            padding: 10px 15px;
-            border: 1px solid var(--border);
-            border-radius: 5px;
-            text-decoration: none;
-            font-size: 14px;
-            transition: all 0.3s;
-        }
-
-        .admin-link:hover {
-            border-color: var(--accent);
-        }
+        /* Remove old admin-link styling as it's now part of auth-buttons */
 
         .reset-modal {
             display: none;
@@ -669,24 +662,60 @@
         }
 
         /* User auth + dashboard additions */
-        .user-link {
+        /* Auth buttons container */
+        .auth-buttons {
             position: fixed;
-            top: 20px;
-            right: 20px;
-            background: var(--surface-2);
-            color: var(--text);
-            padding: 10px 15px;
-            border: 1px solid var(--border);
-            border-radius: 6px;
-            text-decoration: none;
-            font-size: 14px;
-            transition: all 0.3s;
+            top: 15px;
+            right: 15px;
+            display: flex;
+            gap: 10px;
             z-index: 1100;
         }
 
-        .user-link:hover {
-            border-color: var(--accent);
+        .user-link,
+        .admin-link-top {
+            background: rgba(21, 23, 28, 0.95);
+            backdrop-filter: blur(10px);
+            color: var(--text);
+            padding: 10px 16px;
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
         }
+
+        .user-link:hover,
+        .admin-link-top:hover {
+            border-color: var(--accent);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(47, 129, 247, 0.3);
+        }
+
+        @media (max-width: 480px) {
+            .auth-buttons {
+                top: 10px;
+                right: 10px;
+                gap: 6px;
+            }
+
+            .user-link,
+            .admin-link-top {
+                padding: 8px 12px;
+                font-size: 13px;
+            }
+
+            .auth-button-text {
+                display: none;
+            }
+        }
+
+
 
         .auth-modal {
             display: none;
@@ -708,14 +737,21 @@
         .auth-content {
             background: var(--surface);
             color: var(--text);
-            padding: 32px;
+            padding: 24px;
             border-radius: 16px;
             max-width: 420px;
             width: 92%;
+            max-height: 90vh;
+            overflow-y: auto;
             border: 1px solid var(--border);
             box-shadow: 0 30px 80px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.05) inset;
             position: relative;
-            overflow: hidden;
+        }
+
+        @media (min-width: 768px) {
+            .auth-content {
+                padding: 32px;
+            }
         }
 
         .auth-content::before {
@@ -1234,10 +1270,25 @@
         </div>
     </div>
 
-    <!-- Admin Link -->
-    <a href="admin.html" class="admin-link">🔐 Admin Login</a>
-    <!-- User Auth Link -->
-    <a href="#" class="user-link" id="userAuthLink">Sign In</a>
+    <!-- Auth Buttons -->
+    <div class="auth-buttons">
+        <a href="#" class="user-link" id="userAuthLink">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                <circle cx="12" cy="7" r="4"></circle>
+            </svg>
+            <span class="auth-button-text">Sign In</span>
+        </a>
+        <a href="admin.html" class="admin-link-top">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="11" width="18" height="10" rx="2" ry="2"></rect>
+                <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+            </svg>
+            <span class="auth-button-text">Admin</span>
+        </a>
+    </div>
 
     <!-- Password Reset Modal -->
     <div class="reset-modal" id="resetModal">
@@ -1587,12 +1638,26 @@
 
         function updateAuthUI() {
             if (currentUser) {
-                userAuthLink.textContent = currentUser.email;
+                // Update button to show user icon and email
+                userAuthLink.innerHTML = `
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                        <circle cx="12" cy="7" r="4"></circle>
+                    </svg>
+                    <span class="auth-button-text">${currentUser.email}</span>
+                `;
                 closeAuthModal();
                 closeProfilePopover();
                 loadMySubmissions();
             } else {
-                userAuthLink.textContent = 'Sign In';
+                // Show sign in button
+                userAuthLink.innerHTML = `
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                        <circle cx="12" cy="7" r="4"></circle>
+                    </svg>
+                    <span class="auth-button-text">Sign In</span>
+                `;
                 closeProfilePopover();
             }
         }
