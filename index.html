@@ -114,8 +114,8 @@
         }
 
         .step-number {
-            background: var(--accent);
-            color: var(--text);
+            background: radial-gradient(60% 60% at 50% 35%, rgba(47, 129, 247, 0.9) 0%, rgba(47, 129, 247, 0.6) 60%, rgba(47, 129, 247, 0.3) 100%);
+            color: #ffffff;
             width: 28px;
             height: 28px;
             border-radius: 50%;
@@ -125,6 +125,7 @@
             margin-right: 10px;
             font-weight: bold;
             font-size: 14px;
+            box-shadow: 0 0 0 3px var(--accent-soft);
         }
 
         .form-group {
@@ -157,7 +158,7 @@
         select:focus {
             outline: none;
             border-color: var(--accent);
-            box-shadow: 0 0 0 3px rgba(47, 129, 247, 0.15);
+            box-shadow: 0 0 0 3px var(--accent-soft);
         }
 
         .payment-methods {
@@ -785,7 +786,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.5);
+            background: rgba(0, 0, 0, 0.55);
             z-index: 1400;
             justify-content: center;
             align-items: center;
@@ -796,14 +797,16 @@
         }
 
         .submissions-content {
-            background: white;
+            background: var(--surface);
+            color: var(--text);
             padding: 22px;
             border-radius: 12px;
             max-width: 720px;
             width: 92%;
             max-height: 82vh;
             overflow-y: auto;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+            border: 1px solid var(--border);
+            box-shadow: 0 30px 80px rgba(0, 0, 0, 0.45), 0 0 0 3px var(--accent-soft);
         }
 
         .submissions-header {
@@ -812,30 +815,33 @@
             align-items: center;
             margin-bottom: 14px;
             padding-bottom: 8px;
-            border-bottom: 1px solid #f0f0f0;
+            border-bottom: 1px solid var(--border);
         }
 
         .submissions-title {
             font-size: 18px;
-            color: #333;
-            font-weight: 600;
+            color: var(--text);
+            font-weight: 700;
         }
 
         .submissions-close {
             background: none;
-            border: none;
-            font-size: 22px;
+            border: 1px solid var(--border);
+            font-size: 16px;
             cursor: pointer;
-            color: #999;
+            color: var(--text);
+            border-radius: 8px;
+            padding: 6px 10px;
         }
 
         .submissions-close:hover {
-            color: #666;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px var(--accent-soft);
         }
 
         /* Submissions table styles */
         .subs-table {
-            border: 1px solid #ededed;
+            border: 1px solid var(--border);
             border-radius: 10px;
             overflow: hidden;
         }
@@ -847,29 +853,31 @@
         }
 
         .subs-table thead th {
-            background: #f8f9fa;
+            background: var(--surface-2);
             padding: 12px 14px;
             text-align: left;
             font-weight: 600;
-            color: #555;
+            color: var(--subtext);
             position: sticky;
             top: 0;
             z-index: 1;
+            border-bottom: 1px solid var(--border);
         }
 
         .subs-table tbody td {
             padding: 12px 14px;
-            border-top: 1px solid #f3f3f3;
-            color: #333;
+            border-top: 1px solid var(--border);
+            color: var(--text);
         }
 
         .subs-table tbody tr:nth-child(even) td {
-            background: #fcfcfc;
+            background: var(--surface-3);
         }
 
         .handle {
             font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-            background: #f5f6fb;
+            background: rgba(47, 129, 247, 0.12);
+            color: var(--text);
             padding: 3px 8px;
             border-radius: 6px;
         }
