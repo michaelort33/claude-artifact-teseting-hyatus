@@ -477,32 +477,36 @@
         }
 
         .reset-content {
-            background: white;
+            background: var(--surface);
+            color: var(--text);
             padding: 30px;
             border-radius: 10px;
             max-width: 400px;
             width: 90%;
+            border: 1px solid var(--border);
         }
 
         .reset-content h2 {
             margin-bottom: 20px;
-            color: #333;
+            color: var(--text);
         }
 
         .reset-content input {
             width: 100%;
             padding: 10px;
             margin-bottom: 15px;
-            border: 2px solid #e0e0e0;
+            border: 1px solid var(--border);
+            background: var(--surface-2);
+            color: var(--text);
             border-radius: 5px;
         }
 
         .reset-button {
             width: 100%;
             padding: 12px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border: none;
+            background: var(--surface-2);
+            color: var(--text);
+            border: 1px solid var(--border);
             border-radius: 5px;
             cursor: pointer;
             font-size: 16px;
@@ -567,7 +571,11 @@
             color: var(--text);
         }
 
-        .auth-content .form-group input {
+        .auth-content .form-group input,
+        .reset-content input,
+        input::placeholder,
+        .auth-content .form-group input::placeholder,
+        .reset-content input::placeholder {
             width: 100%;
             padding: 10px 12px;
             border: 1px solid var(--border);
@@ -659,9 +667,11 @@
             position: fixed;
             top: 56px;
             right: 20px;
-            background: white;
+            background: var(--surface);
+            color: var(--text);
+            border: 1px solid var(--border);
             border-radius: 10px;
-            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
             width: 280px;
             z-index: 1300;
             display: none;
@@ -669,8 +679,8 @@
         }
 
         .profile-header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
+            background: var(--surface-2);
+            color: var(--text);
             padding: 16px;
         }
 
@@ -683,7 +693,7 @@
             justify-content: space-between;
             align-items: center;
             margin: 6px 0;
-            color: #333;
+            color: var(--text);
         }
 
         .profile-actions {
