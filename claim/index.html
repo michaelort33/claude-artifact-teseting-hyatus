@@ -529,7 +529,13 @@
             if (!email || !password) { qs('authError').textContent = 'Enter email and password'; qs('authError').style.display = 'block'; return; }
 
             const { error } = await supabase.auth.signInWithPassword({ email, password });
-            if (error) { qs('authError').textContent = 'Invalid email or password.'; qs('authError').style.display = 'block'; return; }
+            if (error) { qs('authError').textContent = error.message || 'Invalid email or password.'; qs('authError').style.display = 'block'; return; }
+            // Immediately reflect signed-in state
+            const { data: { user } } = await supabase.auth.getUser();
+            currentUser = user || null;
+            setAuthUI();
+            // Smoothly bring the app into view
+            setTimeout(() => { const card = qs('appCard'); if (card) card.scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 50);
         };
 
         // Auth: sign-in with reservation (email + reservation ID)
@@ -596,15 +602,18 @@
             qs('setupError').style.display = 'none';
             const rid = qs('setupReservation').value.trim();
             const p1 = qs('setupPass').value; const p2 = qs('setupPass2').value;
-            if (!rid || !p1 || p1 !== p2) { qs('setupError').textContent = 'Enter reservation ID and matching passwords'; qs('setupError').style.display = 'block'; return; }
+            if (!rid) { qs('setupError').textContent = 'Enter reservation ID'; qs('setupError').style.display = 'block'; return; }
+            if ((p1 || p2) && p1 !== p2) { qs('setupError').textContent = 'Passwords do not match'; qs('setupError').style.display = 'block'; return; }
             // Create or link claim account to user
             const { data: { user } } = await supabase.auth.getUser();
             if (!user) { qs('setupError').textContent = 'Session expired. Click your email link again.'; qs('setupError').style.display = 'block'; return; }
             // Upsert claim account
             await supabase.from('claim_accounts').upsert({ user_id: user.id, email: user.email, reservation_id: rid }, { onConflict: 'email,reservation_id' });
             // Set password
-            const { error } = await supabase.auth.updateUser({ password: p1 });
-            if (error) { qs('setupError').textContent = error.message; qs('setupError').style.display = 'block'; return; }
+            if (p1) {
+                const { error } = await supabase.auth.updateUser({ password: p1 });
+                if (error) { qs('setupError').textContent = error.message; qs('setupError').style.display = 'block'; return; }
+            }
             hide(qs('setupCard')); window.location.hash = '';
             await loadAccount();
         };
@@ -616,7 +625,13 @@
             if (!currentUser) { setAuthUI(); return; }
             // Find claim account for this user (latest)
             const { data: acct } = await supabase.from('claim_accounts').select('*').eq('email', currentUser.email).order('created_at', { ascending: false }).limit(1).maybeSingle();
-            if (acct) { currentReservation = acct.reservation_id; qs('activeReservation').value = currentReservation; qs('popRes').textContent = currentReservation; }
+            if (acct) {
+                currentReservation = acct.reservation_id; qs('activeReservation').value = currentReservation; qs('popRes').textContent = currentReservation;
+            } else {
+                currentReservation = null; qs('activeReservation').value = ''; qs('popRes').textContent = '—';
+                // Prompt user to link their reservation if none found
+                show(qs('setupCard'));
+            }
             await loadClaims();
         }
 
