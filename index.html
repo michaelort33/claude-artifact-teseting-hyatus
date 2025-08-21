@@ -826,11 +826,7 @@
                 <button type="submit" class="submit-button" id="submitButton">Submit & Claim Reward</button>
             </form>
 
-            <!-- My Submissions (visible when signed in) -->
-            <div class="my-submissions" id="mySubmissions">
-                <h3>My Submissions</h3>
-                <div id="mySubmissionsContent"></div>
-            </div>
+
         </div>
 
         <div class="success-message" id="successMessage">
@@ -1301,9 +1297,22 @@
             profilePopover.style.display = 'none';
         }
 
-        function openSubmissionsModal() {
+        async function openSubmissionsModal() {
             submissionsModal.classList.add('active');
             closeProfilePopover();
+            const wrapper = document.getElementById('mySubmissionsContent');
+            if (!currentUser) {
+                if (wrapper) {
+                    wrapper.innerHTML = '<div style="padding:16px; color:#666;">Please sign in to view your submissions.<br/><button class="btn-primary-small" id="modalSignInBtn" style="margin-top:10px;">Sign In</button></div>';
+                    const btn = document.getElementById('modalSignInBtn');
+                    if (btn) btn.onclick = () => { closeSubmissionsModal(); setAuthMode('signin'); openAuthModal(); };
+                }
+                return;
+            }
+            if (wrapper) wrapper.innerHTML = '<div style="padding:16px; color:#666;">Loading...</div>';
+            if (!mySubmissions.length) {
+                await loadMySubmissions();
+            }
             renderMySubmissions(mySubmissions);
         }
 
