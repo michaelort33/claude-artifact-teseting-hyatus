@@ -318,6 +318,11 @@
                 <div class="tab" id="tabCode">Don't know your reservation?</div>
             </div>
             <div class="card-body">
+                <p class="muted" style="margin: 6px 0 12px;">
+                    <strong>Sign in</strong> uses your Email + Reservation ID + Password. If you don’t know your
+                    reservation ID,
+                    switch to “Don’t know your reservation?” to get a login link and create a password.
+                </p>
                 <div id="authError" class="error"></div>
                 <div id="authSuccess" class="success"></div>
                 <div id="signPane">
@@ -343,6 +348,9 @@
                         <span class="muted">or</span>
                         <button class="btn btn-secondary" id="sendCodeBtn">Email me a login code</button>
                     </div>
+                    <p class="muted" style="margin-top:6px;">
+                        “Forgot password” and “Email me a login code” let you sign in <em>without</em> a reservation ID.
+                    </p>
                 </div>
                 <div id="codePane" class="hidden">
                     <label>Email</label>
