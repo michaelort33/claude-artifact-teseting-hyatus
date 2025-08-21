@@ -13,15 +13,17 @@
         }
 
         :root {
-            --bg: #0f1115;
-            --surface: #15171c;
-            --surface-2: #1b1f27;
-            --border: #262a31;
-            --text: #e6e6e6;
-            --subtext: #9aa0a6;
-            --accent: #2f81f7;
+            /* Softer, brighter dark theme */
+            --bg: #12161d;
+            --surface: #181d26;
+            --surface-2: #202736;
+            --border: #2e3644;
+            --text: #f2f4f8;
+            --subtext: #b5bcc9;
+            --accent: #3b82f6;
             --success: #3fb950;
             --danger: #f85149;
+            --ring: rgba(59, 130, 246, 0.25);
         }
 
         body {
@@ -52,7 +54,7 @@
             background: var(--surface);
             color: var(--text);
             border-radius: 14px;
-            box-shadow: none;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35), 0 1px 0 var(--border);
             border: 1px solid var(--border);
             overflow: hidden;
         }
@@ -109,6 +111,19 @@
             font-size: 15px;
         }
 
+        input::placeholder,
+        textarea::placeholder {
+            color: var(--subtext);
+            opacity: 0.9;
+        }
+
+        input:focus,
+        textarea:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px var(--ring);
+        }
+
         textarea {
             min-height: 120px;
             resize: vertical;
@@ -147,20 +162,22 @@
         }
 
         .error {
-            background: #fde8ea;
-            color: #8a2432;
+            background: rgba(248, 81, 73, 0.12);
+            color: #ffb4b4;
             padding: 10px 12px;
             border-radius: 8px;
             margin-bottom: 14px;
+            border: 1px solid rgba(248, 81, 73, 0.25);
             display: none;
         }
 
         .success {
-            background: #e6f4ea;
-            color: #0b6b3a;
+            background: rgba(63, 185, 80, 0.12);
+            color: #8ee6a2;
             padding: 10px 12px;
             border-radius: 8px;
             margin-bottom: 14px;
+            border: 1px solid rgba(63, 185, 80, 0.25);
             display: none;
         }
 
@@ -186,11 +203,25 @@
         }
 
         .filebox {
-            border: 2px dashed var(--border);
-            padding: 14px;
-            border-radius: 10px;
+            border: 1px dashed var(--border);
+            padding: 18px;
+            border-radius: 12px;
             text-align: center;
             cursor: pointer;
+            background: linear-gradient(180deg, rgba(32, 39, 54, 0.35) 0%, rgba(32, 39, 54, 0.15) 100%);
+            transition: border-color .2s ease, background .2s ease, transform .2s ease;
+            min-height: 96px;
+            color: var(--subtext);
+        }
+
+        .filebox:hover {
+            border-color: var(--accent);
+            transform: translateY(-1px);
+        }
+
+        .filebox.is-dragover {
+            border-color: var(--accent);
+            background: rgba(59, 130, 246, 0.08);
         }
 
         .claims-list {
@@ -227,7 +258,7 @@
 
         .timeline {
             height: 8px;
-            background: var(--surface-2);
+            background: #222a38;
             border-radius: 999px;
             overflow: hidden;
         }
@@ -486,6 +517,16 @@
 
         // File uploads
         qs('fileBox').onclick = () => qs('files').click();
+        qs('fileBox').addEventListener('dragover', (e) => { e.preventDefault(); qs('fileBox').classList.add('is-dragover'); });
+        qs('fileBox').addEventListener('dragleave', () => { qs('fileBox').classList.remove('is-dragover'); });
+        qs('fileBox').addEventListener('drop', (e) => {
+            e.preventDefault();
+            const files = e.dataTransfer.files;
+            if (files && files.length) { qs('files').files = files; }
+            qs('fileBox').classList.remove('is-dragover');
+            const names = Array.from(qs('files').files).map(f => f.name).join(', ');
+            qs('fileNames').textContent = names || '';
+        });
         qs('files').addEventListener('change', () => {
             const names = Array.from(qs('files').files).map(f => f.name).join(', ');
             qs('fileNames').textContent = names || '';

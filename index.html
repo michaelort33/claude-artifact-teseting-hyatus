@@ -197,7 +197,7 @@
 
         .tutorial-toggle {
             background: none;
-            border: 1px solid var(--accent);
+            border: 1px solid var(--border);
             color: var(--text);
             padding: 8px 15px;
             border-radius: 5px;
@@ -209,6 +209,12 @@
 
         .tutorial-toggle:hover {
             background: var(--surface-2);
+            border-color: var(--accent);
+        }
+
+        .tutorial-toggle:focus-visible {
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(47, 129, 247, 0.15);
             border-color: var(--accent);
         }
 
@@ -352,27 +358,62 @@
         }
 
         .file-upload {
-            border: 2px dashed var(--border);
-            border-radius: 10px;
-            padding: 25px;
+            position: relative;
+            border: 1px dashed var(--border);
+            border-radius: 12px;
+            padding: 20px;
             text-align: center;
             cursor: pointer;
-            transition: all 0.3s;
+            transition: border-color 0.2s ease, background 0.2s ease, transform 0.2s ease;
+            background: linear-gradient(180deg, rgba(27, 31, 39, 0.35) 0%, rgba(27, 31, 39, 0.15) 100%);
+            min-height: 140px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .file-upload:hover {
             border-color: var(--accent);
-            background: var(--surface-2);
+            transform: translateY(-1px);
+        }
+
+        .file-upload:focus-visible {
+            outline: 2px solid var(--accent);
+            outline-offset: 2px;
+        }
+
+        .file-upload.is-dragover {
+            border-color: var(--accent);
+            background: rgba(47, 129, 247, 0.08);
         }
 
         .file-upload.has-file {
-            border-color: #4caf50;
-            background: #f1f8e9;
+            border-color: var(--accent);
+            background: var(--surface-2);
         }
 
-        .upload-icon {
-            font-size: 40px;
-            margin-bottom: 8px;
+        .dz-content {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .dz-icon {
+            width: 36px;
+            height: 36px;
+            color: var(--accent);
+            opacity: 0.9;
+        }
+
+        .dz-title {
+            color: var(--text);
+            font-weight: 600;
+        }
+
+        .dz-hint {
+            color: var(--subtext);
+            font-size: 13px;
+            margin-top: 2px;
         }
 
         .submit-button {
@@ -437,8 +478,8 @@
 
         .file-name {
             margin-top: 10px;
-            color: #4caf50;
-            font-weight: 500;
+            color: var(--accent);
+            font-weight: 600;
         }
 
         .admin-link {
@@ -951,11 +992,22 @@
 
                     <div class="form-group">
                         <label>Upload Proof Screenshot</label>
-                        <div class="file-upload" id="fileUploadArea">
-                            <div class="upload-icon">📸</div>
-                            <div>Click to upload screenshot of your review</div>
-                            <div style="color: #999; font-size: 13px; margin-top: 5px;">or drag and drop</div>
-                            <div class="file-name" id="fileName"></div>
+                        <div class="file-upload" id="fileUploadArea" role="button" tabindex="0"
+                            aria-label="Upload screenshot of your review">
+                            <div class="dz-content">
+                                <svg class="dz-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"
+                                    aria-hidden="true">
+                                    <path d="M12 16V4m0 0l-4 4m4-4l4 4" stroke="currentColor" stroke-width="1.8"
+                                        stroke-linecap="round" stroke-linejoin="round" />
+                                    <path d="M4 14v3a3 3 0 003 3h10a3 3 0 003-3v-3" stroke="currentColor"
+                                        stroke-opacity="0.7" stroke-width="1.5" stroke-linecap="round" />
+                                </svg>
+                                <div class="dz-text">
+                                    <div class="dz-title">Click to upload screenshot of your review</div>
+                                    <div class="dz-hint">or drag and drop</div>
+                                    <div class="file-name" id="fileName"></div>
+                                </div>
+                            </div>
                         </div>
                         <input type="file" id="reviewScreenshot" name="reviewScreenshot" accept="image/*">
                     </div>
@@ -1085,19 +1137,18 @@
         const fileName = document.getElementById('fileName');
         let uploadedFile = null;
 
-        fileUploadArea.addEventListener('click', () => {
-            fileInput.click();
+        fileUploadArea.addEventListener('click', () => { fileInput.click(); });
+        fileUploadArea.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); fileInput.click(); }
         });
 
         fileUploadArea.addEventListener('dragover', (e) => {
             e.preventDefault();
-            fileUploadArea.style.borderColor = '#667eea';
-            fileUploadArea.style.background = '#f8f9fa';
+            fileUploadArea.classList.add('is-dragover');
         });
 
         fileUploadArea.addEventListener('dragleave', () => {
-            fileUploadArea.style.borderColor = '#e0e0e0';
-            fileUploadArea.style.background = 'white';
+            fileUploadArea.classList.remove('is-dragover');
         });
 
         fileUploadArea.addEventListener('drop', (e) => {
@@ -1107,6 +1158,7 @@
                 fileInput.files = files;
                 handleFileSelect();
             }
+            fileUploadArea.classList.remove('is-dragover');
         });
 
         fileInput.addEventListener('change', handleFileSelect);
