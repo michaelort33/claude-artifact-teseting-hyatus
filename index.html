@@ -1,13 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Claim Your Review Reward</title>
-    <!-- Cute favicon (inline SVG data URI) -->
-    <meta name="theme-color" content="#667eea">
-    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' x2='1'%3E%3Cstop offset='0' stop-color='%23667eea'/%3E%3Cstop offset='1' stop-color='%23764ba2'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='100%25' height='100%25' rx='12' fill='url(%23g)'/%3E%3Ctext x='50%25' y='58%25' font-size='36' text-anchor='middle' fill='white' font-family='Segoe UI Emoji, Apple Color Emoji, Noto Color Emoji'%3E%F0%9F%8E%89%3C/text%3E%3C/svg%3E" />
-    <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' x2='1'%3E%3Cstop offset='0' stop-color='%23667eea'/%3E%3Cstop offset='1' stop-color='%23764ba2'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='100%25' height='100%25' rx='12' fill='url(%23g)'/%3E%3Ctext x='50%25' y='58%25' font-size='36' text-anchor='middle' fill='white' font-family='Segoe UI Emoji, Apple Color Emoji, Noto Color Emoji'%3E%F0%9F%8E%89%3C/text%3E%3C/svg%3E" />
     <style>
         * {
             margin: 0;
@@ -19,15 +16,18 @@
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
-            padding: 20px;
+            padding: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .container {
-            max-width: 600px;
-            margin: 0 auto;
+            max-width: 580px;
+            width: 100%;
             background: white;
             border-radius: 20px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
             overflow: hidden;
             animation: slideUp 0.5s ease-out;
         }
@@ -37,6 +37,7 @@
                 opacity: 0;
                 transform: translateY(30px);
             }
+
             to {
                 opacity: 1;
                 transform: translateY(0);
@@ -46,57 +47,59 @@
         .header {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
-            padding: 30px;
+            padding: 25px;
             text-align: center;
         }
 
         .header h1 {
-            font-size: 28px;
-            margin-bottom: 10px;
+            font-size: 26px;
+            margin-bottom: 8px;
         }
 
         .header p {
             opacity: 0.9;
-            font-size: 16px;
+            font-size: 15px;
         }
 
         .form-container {
-            padding: 30px;
+            padding: 25px;
         }
 
         .section {
-            margin-bottom: 30px;
+            margin-bottom: 25px;
         }
 
         .section-title {
             display: flex;
             align-items: center;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
             color: #333;
         }
 
         .step-number {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
-            width: 30px;
-            height: 30px;
+            width: 28px;
+            height: 28px;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            margin-right: 12px;
+            margin-right: 10px;
             font-weight: bold;
+            font-size: 14px;
         }
 
         .form-group {
-            margin-bottom: 20px;
+            margin-bottom: 15px;
         }
 
         label {
             display: block;
-            margin-bottom: 8px;
+            margin-bottom: 6px;
             color: #555;
             font-weight: 500;
+            font-size: 14px;
         }
 
         input[type="text"],
@@ -104,10 +107,10 @@
         input[type="url"],
         select {
             width: 100%;
-            padding: 12px 15px;
+            padding: 10px 12px;
             border: 2px solid #e0e0e0;
             border-radius: 10px;
-            font-size: 16px;
+            font-size: 15px;
             transition: all 0.3s;
         }
 
@@ -122,23 +125,24 @@
             display: grid;
             grid-template-columns: repeat(3, 1fr);
             gap: 10px;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
         }
 
         .payment-method {
-            padding: 15px;
+            padding: 12px;
             border: 2px solid #e0e0e0;
             border-radius: 10px;
             text-align: center;
             cursor: pointer;
             transition: all 0.3s;
             background: white;
+            font-size: 14px;
         }
 
         .payment-method:hover {
             border-color: #667eea;
             transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
         }
 
         .payment-method.selected {
@@ -150,8 +154,46 @@
         .tutorial-box {
             background: #f8f9fa;
             border-radius: 10px;
-            padding: 20px;
+            padding: 15px;
             margin-bottom: 20px;
+        }
+
+        .tutorial-toggle {
+            background: none;
+            border: 1px solid #667eea;
+            color: #667eea;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            margin-bottom: 15px;
+            transition: all 0.3s;
+        }
+
+        .tutorial-toggle:hover {
+            background: #667eea;
+            color: white;
+        }
+
+        .tutorial-content {
+            display: none;
+        }
+
+        .tutorial-content.show {
+            display: block;
+            animation: slideDown 0.3s ease-out;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         .tutorial-title {
@@ -163,28 +205,28 @@
         .demo-browser {
             background: white;
             border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
             overflow: hidden;
         }
 
         .browser-bar {
             background: #e0e0e0;
-            padding: 10px;
+            padding: 8px;
             display: flex;
             align-items: center;
             gap: 5px;
         }
 
         .browser-dot {
-            width: 12px;
-            height: 12px;
+            width: 10px;
+            height: 10px;
             border-radius: 50%;
             background: #999;
         }
 
         .browser-content {
-            padding: 20px;
-            height: 200px;
+            padding: 15px;
+            height: 180px;
             position: relative;
             overflow: hidden;
         }
@@ -196,37 +238,60 @@
             animation: demoSlide 9s infinite;
         }
 
-        .demo-step:nth-child(1) { animation-delay: 0s; }
-        .demo-step:nth-child(2) { animation-delay: 3s; }
-        .demo-step:nth-child(3) { animation-delay: 6s; }
+        .demo-step:nth-child(1) {
+            animation-delay: 0s;
+        }
+
+        .demo-step:nth-child(2) {
+            animation-delay: 3s;
+        }
+
+        .demo-step:nth-child(3) {
+            animation-delay: 6s;
+        }
 
         @keyframes demoSlide {
-            0%, 33.33% { opacity: 0; }
-            33.34%, 66.66% { opacity: 1; }
-            66.67%, 100% { opacity: 0; }
+
+            0%,
+            33.33% {
+                opacity: 0;
+            }
+
+            33.34%,
+            66.66% {
+                opacity: 1;
+            }
+
+            66.67%,
+            100% {
+                opacity: 0;
+            }
         }
 
         .demo-review {
             background: #f8f9fa;
-            padding: 10px;
+            padding: 8px;
             border-radius: 5px;
-            margin-bottom: 10px;
+            margin-bottom: 8px;
+            font-size: 13px;
         }
 
         .demo-button {
             background: #4285f4;
             color: white;
-            padding: 8px 15px;
+            padding: 6px 12px;
             border-radius: 5px;
             display: inline-block;
-            margin-top: 10px;
+            margin-top: 8px;
+            font-size: 13px;
         }
 
         .or-divider {
             text-align: center;
-            margin: 20px 0;
+            margin: 15px 0;
             color: #999;
             position: relative;
+            font-size: 14px;
         }
 
         .or-divider::before,
@@ -239,13 +304,18 @@
             background: #e0e0e0;
         }
 
-        .or-divider::before { left: 0; }
-        .or-divider::after { right: 0; }
+        .or-divider::before {
+            left: 0;
+        }
+
+        .or-divider::after {
+            right: 0;
+        }
 
         .file-upload {
             border: 2px dashed #e0e0e0;
             border-radius: 10px;
-            padding: 30px;
+            padding: 25px;
             text-align: center;
             cursor: pointer;
             transition: all 0.3s;
@@ -262,18 +332,18 @@
         }
 
         .upload-icon {
-            font-size: 48px;
-            margin-bottom: 10px;
+            font-size: 40px;
+            margin-bottom: 8px;
         }
 
         .submit-button {
             width: 100%;
-            padding: 15px;
+            padding: 14px;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
             border: none;
             border-radius: 10px;
-            font-size: 18px;
+            font-size: 17px;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.3s;
@@ -336,7 +406,7 @@
             position: fixed;
             bottom: 20px;
             right: 20px;
-            background: rgba(0,0,0,0.7);
+            background: rgba(0, 0, 0, 0.7);
             color: white;
             padding: 10px 15px;
             border-radius: 5px;
@@ -346,7 +416,7 @@
         }
 
         .admin-link:hover {
-            background: rgba(0,0,0,0.9);
+            background: rgba(0, 0, 0, 0.9);
         }
 
         .reset-modal {
@@ -356,7 +426,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0,0,0,0.5);
+            background: rgba(0, 0, 0, 0.5);
             z-index: 1000;
             justify-content: center;
             align-items: center;
@@ -406,16 +476,17 @@
     </style>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
+
 <body>
     <div class="container">
         <div class="header">
             <h1>🎉 Claim Your Review Reward</h1>
-            <p>Thank you for your review! Just two quick steps to receive your reward.</p>
+            <p>Thank you for your review! Submit proof below to receive your reward.</p>
         </div>
 
         <div class="form-container" id="formContainer">
             <div class="error-message" id="errorMessage"></div>
-            
+
             <form id="rewardForm">
                 <!-- Step 1: Payment Method -->
                 <div class="section">
@@ -439,20 +510,28 @@
                     </div>
                     <div class="form-group">
                         <label for="paymentHandle" id="paymentLabel">Select a payment method above</label>
-                        <input type="text" id="paymentHandle" name="paymentHandle" required placeholder="Select payment method first" disabled>
+                        <input type="text" id="paymentHandle" name="paymentHandle" required
+                            placeholder="Select payment method first" disabled>
                     </div>
                 </div>
 
-                <!-- Step 2: Review Link -->
+                <!-- Step 2: Review Proof -->
                 <div class="section">
                     <div class="section-title">
                         <div class="step-number">2</div>
-                        <h2>Share Your Review</h2>
+                        <h2>Provide Review Proof</h2>
                     </div>
+                    <p style="color: #666; font-size: 14px; margin-bottom: 15px;">
+                        Show us your review to claim your reward - we just need to verify you left it.
+                    </p>
 
                     <!-- Tutorial -->
-                    <div class="tutorial-box">
-                        <div class="tutorial-title">📱 How to Get Your Review Link:</div>
+                    <button type="button" class="tutorial-toggle" onclick="toggleTutorial()">
+                        📱 Need help finding your review link? Click here
+                    </button>
+
+                    <div class="tutorial-box tutorial-content" id="tutorialContent">
+                        <div class="tutorial-title">How to Get Your Review Link:</div>
                         <div class="demo-browser">
                             <div class="browser-bar">
                                 <div class="browser-dot"></div>
@@ -485,18 +564,18 @@
                     </div>
 
                     <div class="form-group">
-                        <label for="reviewLink">Paste Your Review Link</label>
+                        <label for="reviewLink">Paste Your Google Review Link</label>
                         <input type="url" id="reviewLink" name="reviewLink" placeholder="https://g.page/r/...">
                     </div>
 
                     <div class="or-divider">OR</div>
 
                     <div class="form-group">
-                        <label>Upload a Screenshot of Your Review</label>
+                        <label>Upload Proof Screenshot</label>
                         <div class="file-upload" id="fileUploadArea">
                             <div class="upload-icon">📸</div>
-                            <div>Click to upload screenshot</div>
-                            <div style="color: #999; font-size: 14px; margin-top: 5px;">or drag and drop</div>
+                            <div>Click to upload screenshot of your review</div>
+                            <div style="color: #999; font-size: 13px; margin-top: 5px;">or drag and drop</div>
                             <div class="file-name" id="fileName"></div>
                         </div>
                         <input type="file" id="reviewScreenshot" name="reviewScreenshot" accept="image/*">
@@ -540,6 +619,12 @@
         // Initialize Supabase client
         const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
+        // Toggle tutorial visibility
+        function toggleTutorial() {
+            const tutorial = document.getElementById('tutorialContent');
+            tutorial.classList.toggle('show');
+        }
+
         // Payment method selection
         const paymentMethods = document.querySelectorAll('.payment-method');
         const paymentHandle = document.getElementById('paymentHandle');
@@ -551,10 +636,10 @@
                 paymentMethods.forEach(m => m.classList.remove('selected'));
                 method.classList.add('selected');
                 selectedMethod = method.dataset.method;
-                
+
                 paymentHandle.disabled = false;
                 paymentHandle.value = '';
-                
+
                 if (selectedMethod === 'venmo') {
                     paymentLabel.textContent = 'Venmo Username';
                     paymentHandle.placeholder = '@username';
@@ -636,38 +721,38 @@
 
         form.addEventListener('submit', async (e) => {
             e.preventDefault();
-            
+
             const reviewLink = document.getElementById('reviewLink').value;
             const hasScreenshot = fileInput.files.length > 0;
-            
+
             // Validation
             if (!selectedMethod) {
                 showError('Please select a payment method');
                 return;
             }
-            
+
             if (!paymentHandle.value) {
                 showError('Please enter your payment information');
                 return;
             }
-            
+
             if (!reviewLink && !hasScreenshot) {
                 showError('Please provide either a review link or upload a screenshot');
                 return;
             }
-            
+
             // Prepare submission data
             submitButton.textContent = 'Submitting...';
             submitButton.disabled = true;
-            
+
             try {
                 let screenshotData = null;
-                
+
                 // Convert screenshot to base64 if provided
                 if (hasScreenshot) {
                     screenshotData = await fileToBase64(uploadedFile);
                 }
-                
+
                 // Submit to Supabase
                 const { data, error } = await supabase
                     .from('review_rewards')
@@ -680,15 +765,15 @@
                             status: 'pending'
                         }
                     ]);
-                
+
                 if (error) {
                     throw error;
                 }
-                
+
                 // Show success message
                 formContainer.style.display = 'none';
                 successMessage.style.display = 'block';
-                
+
             } catch (error) {
                 console.error('Error submitting:', error);
                 showError('There was an error submitting your claim. Please try again.');
@@ -739,7 +824,7 @@
             try {
                 // First check if we have a session
                 const { data: { session } } = await supabase.auth.getSession();
-                
+
                 if (!session) {
                     alert('Session expired. Please request a new password reset link.');
                     closeResetModal();
@@ -754,10 +839,10 @@
                 if (error) throw error;
 
                 alert('Password updated successfully! Redirecting to admin login...');
-                
+
                 // Sign out to clear the session
                 await supabase.auth.signOut();
-                
+
                 // Redirect to admin
                 window.location.href = 'admin.html';
             } catch (error) {
@@ -778,4 +863,5 @@
         });
     </script>
 </body>
+
 </html>
