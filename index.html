@@ -1310,7 +1310,7 @@
             authError.style.display = 'none';
             try {
                 const { error } = await supabase.auth.resetPasswordForEmail(email, {
-                    redirectTo: window.location.origin + window.location.pathname
+                    redirectTo: (window.MAIN_BASE_URL || (window.location.origin + '/'))
                 });
                 if (error) throw error;
                 authError.textContent = 'Password reset email sent. Check your inbox.';

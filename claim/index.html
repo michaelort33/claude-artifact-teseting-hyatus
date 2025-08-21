@@ -299,9 +299,18 @@
     </style>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
-        const SUPABASE_URL = 'https://dugjgmwlzyjillkemzhz.supabase.co';
-        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR1Z2pnbXdsenlqaWxsa2Vtemh6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTU3MjE3MTIsImV4cCI6MjA3MTI5NzcxMn0.s9uM3exfI3hBvbiT3nZrC_whJ03IAy18202qmgJ4GOg';
-        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        // Claims app base URL for email magic link / password reset redirects
+        const CLAIMS_BASE_URL = window.CLAIMS_BASE_URL || 'https://feedback.hyatus.com/claim/';
+
+        // Use a separate Supabase project for claims (recommended).
+        // You can override these at runtime by setting window.CLAIMS_SUPABASE_URL and window.CLAIMS_SUPABASE_ANON_KEY
+        // before this script executes.
+        const CLAIMS_SUPABASE_URL = window.CLAIMS_SUPABASE_URL || 'https://dugjgmwlzyjillkemzhz.supabase.co';
+        const CLAIMS_SUPABASE_ANON_KEY = window.CLAIMS_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR1Z2pnbXdsenlqaWxsa2Vtemh6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTU3MjE3MTIsImV4cCI6MjA3MTI5NzcxMn0.s9uM3exfI3hBvbiT3nZrC_whJ03IAy18202qmgJ4GOg';
+
+        const supabase = window.supabase.createClient(CLAIMS_SUPABASE_URL, CLAIMS_SUPABASE_ANON_KEY, {
+            auth: { storageKey: 'sb-claims-auth-token' }
+        });
     </script>
 </head>
 
@@ -526,7 +535,8 @@
         // Auth: sign-in with reservation (email + reservation ID)
         qs('signInRidBtn').onclick = async () => {
             qs('authError').style.display = 'none';
-            const email = qs('email').value.trim();
+            const emailInput = qs('emailRid') || qs('email');
+            const email = (emailInput ? emailInput.value : '').trim();
             const reservationId = qs('reservationId').value.trim();
             if (!email || !reservationId) { qs('authError').textContent = 'Enter email and reservation ID'; qs('authError').style.display = 'block'; return; }
 
@@ -535,7 +545,7 @@
             if (!acct) { qs('authError').textContent = 'We could not find that reservation for this email.'; qs('authError').style.display = 'block'; return; }
 
             // Send a one-time login link (passwordless) to proceed; upon click, user can set a password if desired
-            const { error } = await supabase.auth.signInWithOtp({ email, options: { emailRedirectTo: window.location.origin + '/claim/' } });
+            const { error } = await supabase.auth.signInWithOtp({ email, options: { emailRedirectTo: CLAIMS_BASE_URL } });
             if (error) { qs('authError').textContent = error.message; qs('authError').style.display = 'block'; return; }
             qs('authSuccess').textContent = 'We sent a secure link to your email.'; qs('authSuccess').style.display = 'block';
         };
@@ -544,16 +554,17 @@
         qs('forgotBtn').onclick = async () => {
             const email = qs('email').value.trim();
             if (!email) { qs('authError').textContent = 'Enter your email first'; qs('authError').style.display = 'block'; return; }
-            const { error } = await supabase.auth.resetPasswordForEmail(email, { redirectTo: window.location.origin + '/claim/' });
+            const { error } = await supabase.auth.resetPasswordForEmail(email, { redirectTo: CLAIMS_BASE_URL });
             if (error) { qs('authError').textContent = error.message; qs('authError').style.display = 'block'; return; }
             qs('authSuccess').textContent = 'Password reset email sent. Check your inbox.'; qs('authSuccess').style.display = 'block';
         };
 
-        // Email me a login code / magic link
-        qs('sendCodeBtn').onclick = async () => {
-            const email = qs('email').value.trim();
+        // Deprecated: sendCodeBtn (replaced by paneCode -> requestCodeBtn). Keep guarded for backward compatibility.
+        const legacySendBtn = document.getElementById('sendCodeBtn');
+        if (legacySendBtn) legacySendBtn.onclick = async () => {
+            const email = (qs('email') || {}).value?.trim?.() || '';
             if (!email) { qs('authError').textContent = 'Enter your email first'; qs('authError').style.display = 'block'; return; }
-            const { error } = await supabase.auth.signInWithOtp({ email, options: { emailRedirectTo: window.location.origin + '/claim/' } });
+            const { error } = await supabase.auth.signInWithOtp({ email, options: { emailRedirectTo: CLAIMS_BASE_URL } });
             if (error) { qs('authError').textContent = error.message; qs('authError').style.display = 'block'; return; }
             qs('authSuccess').textContent = 'We sent a secure link to your email.'; qs('authSuccess').style.display = 'block';
         };
@@ -562,7 +573,7 @@
         qs('requestCodeBtn').onclick = async () => {
             const email = qs('codeEmail').value.trim();
             if (!email) { return; }
-            const { error } = await supabase.auth.signInWithOtp({ email, options: { emailRedirectTo: window.location.origin + '/claim/' } });
+            const { error } = await supabase.auth.signInWithOtp({ email, options: { emailRedirectTo: CLAIMS_BASE_URL } });
             if (error) { qs('authError').textContent = error.message; qs('authError').style.display = 'block'; return; }
             qs('authSuccess').textContent = 'We sent a secure link to your email.'; qs('authSuccess').style.display = 'block';
         };
