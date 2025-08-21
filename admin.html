@@ -377,6 +377,211 @@
             border-radius: 5px;
             margin-bottom: 20px;
         }
+
+        /* ===== Dark theme override (Cursor-like) ===== */
+        :root {
+            --bg: #0f1115;
+            --surface: #15171c;
+            --surface-2: #1b1f27;
+            --border: #262a31;
+            --text: #e6e6e6;
+            --subtext: #9aa0a6;
+            --accent: #2f81f7;
+            --success: #3fb950;
+            --danger: #f85149;
+            --badge-open-bg: #3a2e00;
+            --badge-open-fg: #ffd866;
+            --badge-res-bg: #062d12;
+            --badge-res-fg: #56d364;
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+        }
+
+        .header {
+            background: var(--surface-2);
+            color: var(--text);
+            box-shadow: 0 1px 0 var(--border);
+        }
+
+        .header h1 {
+            color: var(--text);
+        }
+
+        .nav-tab {
+            background: var(--surface-2);
+            color: var(--subtext);
+            border: 1px solid var(--border);
+        }
+
+        .nav-tab.active {
+            background: var(--surface);
+            color: var(--text);
+            box-shadow: none;
+        }
+
+        .login-container,
+        .stat-card,
+        .filter-bar,
+        .submissions-table,
+        .modal-content {
+            background: var(--surface);
+            color: var(--text);
+            box-shadow: none;
+            border: 1px solid var(--border);
+        }
+
+        .login-container h2,
+        .stat-value {
+            color: var(--text);
+        }
+
+        .stat-label,
+        th {
+            color: var(--subtext);
+            background: var(--surface-2);
+            border-bottom: 1px solid var(--border);
+        }
+
+        td {
+            border-bottom: 1px solid var(--border);
+            color: var(--text);
+        }
+
+        tr:hover {
+            background: var(--surface-2);
+        }
+
+        .form-group label {
+            color: var(--subtext);
+        }
+
+        .form-group input,
+        .filter-bar select,
+        .notes-input {
+            background: var(--surface-2);
+            border: 1px solid var(--border);
+            color: var(--text);
+        }
+
+        .form-group input:focus,
+        .filter-bar select:focus,
+        .notes-input:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(47, 129, 247, 0.15);
+        }
+
+        .btn {
+            background: var(--surface-2);
+            color: var(--text);
+            border: 1px solid var(--border);
+            box-shadow: none;
+        }
+
+        .btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+            border-color: var(--accent);
+        }
+
+        .btn-danger {
+            background: #2a1515;
+            border-color: #3b1a1a;
+            color: var(--danger);
+        }
+
+        .btn-success {
+            background: #0f2a18;
+            border-color: #1d3a26;
+            color: var(--success);
+        }
+
+        .btn-secondary {
+            background: var(--surface-2);
+            color: var(--subtext);
+            border-color: var(--border);
+        }
+
+        .btn-view {
+            background: #0f1a2a;
+            border-color: #153154;
+            color: var(--accent);
+        }
+
+        .btn-award {
+            background: #0f2a18;
+            border-color: #1d3a26;
+            color: var(--success);
+        }
+
+        .btn-reject {
+            background: #2a1515;
+            border-color: #3b1a1a;
+            color: var(--danger);
+        }
+
+        .status-badge {
+            background: var(--surface-2);
+            color: var(--subtext);
+            border: 1px solid var(--border);
+        }
+
+        .status-pending,
+        .status-open {
+            background: var(--badge-open-bg);
+            color: var(--badge-open-fg);
+        }
+
+        .status-awarded,
+        .status-resolved {
+            background: var(--badge-res-bg);
+            color: var(--badge-res-fg);
+        }
+
+        .status-rejected {
+            background: #2d1517;
+            color: #ff9b9b;
+        }
+
+        .modal {
+            background: rgba(0, 0, 0, 0.6);
+        }
+
+        .modal-close {
+            color: var(--subtext);
+        }
+
+        .detail-label {
+            color: var(--subtext);
+        }
+
+        .detail-value {
+            color: var(--text);
+        }
+
+        .screenshot-preview {
+            border: 1px solid var(--border);
+        }
+
+        .error-message {
+            background: #3a1f20;
+            color: #ffb4b4;
+        }
+
+        .success-message {
+            background: #12261a;
+            color: #7ee2a8;
+        }
+
+        /* Inline search input override */
+        #claimSearch {
+            background: var(--surface-2) !important;
+            color: var(--text) !important;
+            border: 1px solid var(--border) !important;
+        }
     </style>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
