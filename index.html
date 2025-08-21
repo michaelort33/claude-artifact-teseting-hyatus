@@ -626,18 +626,16 @@
             color: var(--text);
         }
 
+        /* Auth modal specific overrides */
         .auth-content .form-group input,
-        .reset-content input,
-        input::placeholder,
-        .auth-content .form-group input::placeholder,
-        .reset-content input::placeholder {
-            width: 100%;
-            padding: 10px 12px;
-            border: 1px solid var(--border);
-            background: var(--surface-2);
-            color: var(--text);
+        .reset-content input {
             border-radius: 8px;
-            font-size: 15px;
+        }
+
+        input::placeholder,
+        textarea::placeholder {
+            color: var(--subtext);
+            opacity: 0.9;
         }
 
         .auth-actions-row {
