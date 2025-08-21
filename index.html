@@ -688,7 +688,7 @@
             background: white;
             padding: 22px;
             border-radius: 12px;
-            max-width: 800px;
+            max-width: 720px;
             width: 92%;
             max-height: 82vh;
             overflow-y: auto;
@@ -700,19 +700,100 @@
             justify-content: space-between;
             align-items: center;
             margin-bottom: 14px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #f0f0f0;
         }
 
         .submissions-title {
             font-size: 18px;
             color: #333;
+            font-weight: 600;
         }
 
         .submissions-close {
             background: none;
             border: none;
-            font-size: 24px;
+            font-size: 22px;
             cursor: pointer;
             color: #999;
+        }
+
+        .submissions-close:hover {
+            color: #666;
+        }
+
+        /* Submissions table styles */
+        .subs-table {
+            border: 1px solid #ededed;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .subs-table table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+        }
+
+        .subs-table thead th {
+            background: #f8f9fa;
+            padding: 12px 14px;
+            text-align: left;
+            font-weight: 600;
+            color: #555;
+            position: sticky;
+            top: 0;
+            z-index: 1;
+        }
+
+        .subs-table tbody td {
+            padding: 12px 14px;
+            border-top: 1px solid #f3f3f3;
+            color: #333;
+        }
+
+        .subs-table tbody tr:nth-child(even) td {
+            background: #fcfcfc;
+        }
+
+        .handle {
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+            background: #f5f6fb;
+            padding: 3px 8px;
+            border-radius: 6px;
+        }
+
+        .pill {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 999px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .pill.venmo {
+            background: #e8f0fe;
+            color: #1967d2;
+        }
+
+        .pill.zelle {
+            background: #f0e9ff;
+            color: #6633cc;
+        }
+
+        .pill.paypal {
+            background: #e6f4ea;
+            color: #0b8043;
+        }
+
+        .pill.link {
+            background: #eaf2ff;
+            color: #1a73e8;
+        }
+
+        .pill.screenshot {
+            background: #fff4e5;
+            color: #b06f00;
         }
     </style>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -893,7 +974,7 @@
                 <div class="submissions-title">My Submissions</div>
                 <button class="submissions-close" id="closeSubmissionsModal">&times;</button>
             </div>
-            <div id="mySubmissionsContent"></div>
+            <div id="mySubmissionsContent" class="subs-table"></div>
         </div>
     </div>
 
@@ -1242,13 +1323,14 @@
             `;
             const rowsHtml = rows.map(r => {
                 const date = new Date(r.created_at).toLocaleString();
-                const type = r.review_link ? 'Link' : 'Screenshot';
+                const pm = (r.payment_method || '').toLowerCase();
+                const type = r.review_link ? 'link' : 'screenshot';
                 return `
                     <tr>
                         <td>${date}</td>
-                        <td>${(r.payment_method || '').toUpperCase()}</td>
-                        <td>${r.payment_handle || ''}</td>
-                        <td>${type}</td>
+                        <td><span class="pill ${pm}">${(r.payment_method || '').toUpperCase()}</span></td>
+                        <td><span class="handle">${r.payment_handle || ''}</span></td>
+                        <td><span class="pill ${type}">${type.toUpperCase()}</span></td>
                         <td><span class="status-chip ${r.status}">${(r.status || '').toUpperCase()}</span></td>
                     </tr>
                 `;
