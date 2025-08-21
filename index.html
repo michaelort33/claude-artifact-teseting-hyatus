@@ -656,6 +656,8 @@
 
         /* Auth modal specific overrides */
         .auth-content .form-group input,
+        .auth-content .form-group input[type="email"],
+        .auth-content .form-group input[type="password"],
         .reset-content input {
             border-radius: 8px;
             height: 44px !important;
@@ -663,12 +665,33 @@
             padding: 10px 12px !important;
             font-size: 15px !important;
             line-height: 1.5 !important;
+            background: var(--surface-2) !important;
+            border: 1px solid var(--border) !important;
+            color: var(--text) !important;
+        }
+
+        /* Ensure password inputs specifically get the dark theme */
+        input[type="password"] {
+            background-color: var(--surface-2) !important;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
         }
 
         input::placeholder,
         textarea::placeholder {
             color: var(--subtext);
             opacity: 0.9;
+        }
+
+        /* Ensure focus states work for all auth inputs */
+        .auth-content input:focus,
+        .auth-content input[type="email"]:focus,
+        .auth-content input[type="password"]:focus {
+            outline: none !important;
+            border-color: var(--accent) !important;
+            box-shadow: 0 0 0 3px var(--accent-soft) !important;
+            background: var(--surface-2) !important;
         }
 
         .auth-actions-row {
