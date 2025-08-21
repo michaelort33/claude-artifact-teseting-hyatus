@@ -596,6 +596,124 @@
             background: #f8d7da;
             color: #721c24;
         }
+
+        /* Compact upload area */
+        .file-upload {
+            padding: 14px;
+        }
+
+        .upload-icon {
+            font-size: 28px;
+            margin-bottom: 6px;
+        }
+
+        /* Profile popover */
+        .profile-popover {
+            position: fixed;
+            top: 56px;
+            right: 20px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+            width: 280px;
+            z-index: 1300;
+            display: none;
+            overflow: hidden;
+        }
+
+        .profile-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 16px;
+        }
+
+        .profile-body {
+            padding: 14px 16px;
+        }
+
+        .profile-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 6px 0;
+            color: #333;
+        }
+
+        .profile-actions {
+            padding: 12px 16px 16px 16px;
+            border-top: 1px solid #f0f0f0;
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn-secondary-small {
+            background: #6c757d;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 8px 10px;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        .btn-primary-small {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 8px 10px;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        /* Submissions modal */
+        .submissions-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1400;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .submissions-modal.active {
+            display: flex;
+        }
+
+        .submissions-content {
+            background: white;
+            padding: 22px;
+            border-radius: 12px;
+            max-width: 800px;
+            width: 92%;
+            max-height: 82vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+        }
+
+        .submissions-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 14px;
+        }
+
+        .submissions-title {
+            font-size: 18px;
+            color: #333;
+        }
+
+        .submissions-close {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #999;
+        }
     </style>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
@@ -720,6 +838,10 @@
             <h2>Thank You!</h2>
             <p>Your reward claim has been submitted successfully.</p>
             <p>We'll process your payment within 24-48 hours.</p>
+            <div style="margin-top: 18px; display: flex; gap: 10px; justify-content: center;">
+                <button class="btn-primary-small" id="viewMySubsBtn">View My Submissions</button>
+                <button class="btn-secondary-small" id="backHomeBtn">Back to Home</button>
+            </div>
         </div>
     </div>
 
@@ -762,6 +884,20 @@
             </div>
             <p style="margin-top:10px; color:#666; font-size:13px;">By continuing you agree to receive emails for
                 account access. You can sign out anytime.</p>
+        </div>
+    </div>
+
+    <!-- Profile Popover -->
+    <div class="profile-popover" id="profilePopover"></div>
+
+    <!-- My Submissions Modal -->
+    <div class="submissions-modal" id="submissionsModal">
+        <div class="submissions-content">
+            <div class="submissions-header">
+                <div class="submissions-title">My Submissions</div>
+                <button class="submissions-close" id="closeSubmissionsModal">&times;</button>
+            </div>
+            <div id="mySubmissionsContent"></div>
         </div>
     </div>
 
@@ -883,6 +1019,11 @@
         const authSubmitBtn = document.getElementById('authSubmitBtn');
         const toggleAuthModeBtn = document.getElementById('toggleAuthMode');
         const forgotPasswordBtn = document.getElementById('forgotPasswordBtn');
+        const profilePopover = document.getElementById('profilePopover');
+        const submissionsModal = document.getElementById('submissionsModal');
+        const closeSubmissionsModalBtn = document.getElementById('closeSubmissionsModal');
+        const viewMySubsBtn = document.getElementById('viewMySubsBtn');
+        const backHomeBtn = document.getElementById('backHomeBtn');
         let authMode = 'signin'; // or 'signup'
 
         form.addEventListener('submit', async (e) => {
@@ -981,12 +1122,11 @@
         userAuthLink.addEventListener('click', async (e) => {
             e.preventDefault();
             if (currentUser) {
-                // Sign out
-                await supabase.auth.signOut();
-                return;
+                toggleProfilePopover();
+            } else {
+                setAuthMode('signin');
+                openAuthModal();
             }
-            setAuthMode('signin');
-            openAuthModal();
         });
 
         toggleAuthModeBtn.addEventListener('click', (e) => {
@@ -1058,12 +1198,13 @@
 
         function updateAuthUI() {
             if (currentUser) {
-                userAuthLink.textContent = currentUser.email + ' • Sign Out';
-                document.getElementById('mySubmissions').style.display = 'block';
+                userAuthLink.textContent = currentUser.email;
+                closeAuthModal();
+                closeProfilePopover();
                 loadMySubmissions();
             } else {
                 userAuthLink.textContent = 'Sign In';
-                document.getElementById('mySubmissions').style.display = 'none';
+                closeProfilePopover();
             }
         }
 
@@ -1078,12 +1219,13 @@
                 // silently ignore if column/policy not ready
                 return;
             }
-            renderMySubmissions(data || []);
+            mySubmissions = data || [];
+            if (profilePopover.style.display === 'block') renderProfilePopover();
+            if (submissionsModal.classList.contains('active')) renderMySubmissions(mySubmissions);
         }
 
         function renderMySubmissions(rows) {
-            const containerId = 'mySubmissionsContent';
-            let wrapper = document.getElementById(containerId);
+            const wrapper = document.getElementById('mySubmissionsContent');
             if (!wrapper) return;
             if (!rows.length) {
                 wrapper.innerHTML = '<div style="padding:16px; color:#666;">No submissions yet. Submit your first reward claim above.</div>';
@@ -1118,6 +1260,83 @@
             const footer = '</tbody></table>';
             wrapper.innerHTML = header + rowsHtml + footer;
         }
+
+        function renderProfilePopover() {
+            if (!currentUser) return;
+            const count = mySubmissions.length;
+            profilePopover.innerHTML = `
+                <div class="profile-header">
+                    <div style="font-weight:600;">Profile</div>
+                    <div style="font-size:13px; opacity:0.9;">${currentUser.email}</div>
+                </div>
+                <div class="profile-body">
+                    <div class="profile-row">
+                        <div>Submissions</div>
+                        <div style="font-weight:600;">${count}</div>
+                    </div>
+                </div>
+                <div class="profile-actions">
+                    <button class="btn-primary-small" id="openMySubsBtn">My Submissions</button>
+                    <button class="btn-secondary-small" id="signOutBtn">Sign Out</button>
+                </div>
+            `;
+            document.getElementById('openMySubsBtn').onclick = () => {
+                openSubmissionsModal();
+            };
+            document.getElementById('signOutBtn').onclick = async () => {
+                await supabase.auth.signOut();
+            };
+        }
+
+        function toggleProfilePopover() {
+            if (profilePopover.style.display === 'block') {
+                closeProfilePopover();
+            } else {
+                renderProfilePopover();
+                profilePopover.style.display = 'block';
+            }
+        }
+
+        function closeProfilePopover() {
+            profilePopover.style.display = 'none';
+        }
+
+        function openSubmissionsModal() {
+            submissionsModal.classList.add('active');
+            closeProfilePopover();
+            renderMySubmissions(mySubmissions);
+        }
+
+        function closeSubmissionsModal() {
+            submissionsModal.classList.remove('active');
+        }
+
+        closeSubmissionsModalBtn.addEventListener('click', closeSubmissionsModal);
+        submissionsModal.addEventListener('click', (e) => {
+            if (e.target === submissionsModal) closeSubmissionsModal();
+        });
+
+        // Success actions
+        const viewBtn = document.getElementById('viewMySubsBtn');
+        if (viewBtn) viewBtn.addEventListener('click', () => {
+            openSubmissionsModal();
+        });
+        const homeBtn = document.getElementById('backHomeBtn');
+        if (homeBtn) homeBtn.addEventListener('click', () => {
+            // Reset to form view
+            successMessage.style.display = 'none';
+            formContainer.style.display = 'block';
+            submitButton.textContent = 'Submit & Claim Reward';
+            submitButton.disabled = false;
+            form.reset();
+            paymentMethods.forEach(m => m.classList.remove('selected'));
+            selectedMethod = '';
+            paymentHandle.disabled = true;
+            paymentHandle.value = '';
+            paymentLabel.textContent = 'Select a payment method above';
+            fileUploadArea.classList.remove('has-file');
+            fileName.textContent = '';
+        });
 
         // Check for password reset token in URL
         async function checkForPasswordReset() {
