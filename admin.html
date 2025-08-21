@@ -30,6 +30,33 @@
             margin: 0 auto;
         }
 
+        .nav-tabs {
+            max-width: 1200px;
+            margin: 10px auto 0 auto;
+            display: none;
+            gap: 8px;
+            padding: 0 20px;
+        }
+
+        .nav-tabs.active {
+            display: flex;
+        }
+
+        .nav-tab {
+            background: #eef1ff;
+            color: #4a4a6a;
+            border: none;
+            border-radius: 8px;
+            padding: 8px 12px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .nav-tab.active {
+            background: #ffffff;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+        }
+
         .login-container {
             max-width: 400px;
             margin: 100px auto;
@@ -210,6 +237,17 @@
             color: #721c24;
         }
 
+        /* Claim statuses */
+        .status-open {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .status-resolved {
+            background: #d4edda;
+            color: #155724;
+        }
+
         .action-buttons {
             display: flex;
             gap: 5px;
@@ -349,6 +387,12 @@
         <button class="btn logout-btn" id="logoutBtn" style="display: none;">Logout</button>
     </div>
 
+    <!-- Tabs (visible when logged in) -->
+    <div class="nav-tabs" id="navTabs">
+        <button class="nav-tab active" id="tabRewards">Rewards</button>
+        <button class="nav-tab" id="tabClaims">Claims</button>
+    </div>
+
     <!-- Login Form -->
     <div class="login-container" id="loginContainer">
         <h2>Admin Login</h2>
@@ -429,6 +473,38 @@
         </div>
     </div>
 
+    <!-- Claims Dashboard -->
+    <div class="dashboard" id="claimsDashboard" style="display:none;">
+        <div class="filter-bar">
+            <select id="claimStatusFilter">
+                <option value="all">All Status</option>
+                <option value="open">Open</option>
+                <option value="resolved">Resolved</option>
+            </select>
+            <input id="claimSearch" placeholder="Search email or reservation"
+                style="padding:8px 12px; border:2px solid #e0e0e0; border-radius:5px; font-size:14px;" />
+            <button class="btn" id="refreshClaimsBtn">Refresh</button>
+        </div>
+
+        <div class="submissions-table">
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Date</th>
+                        <th>Email</th>
+                        <th>Reservation</th>
+                        <th>Requested</th>
+                        <th>Resolution</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="claimsBody"></tbody>
+            </table>
+        </div>
+    </div>
+
     <!-- Detail Modal -->
     <div class="modal" id="detailModal">
         <div class="modal-content">
@@ -442,6 +518,17 @@
         </div>
     </div>
 
+    <!-- Claim Modal -->
+    <div class="modal" id="claimModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Claim Details</h2>
+                <button class="modal-close" onclick="closeClaimModal()">&times;</button>
+            </div>
+            <div id="claimModalBody"></div>
+        </div>
+    </div>
+
     <script>
         // Supabase configuration
         const SUPABASE_URL = 'https://dugjgmwlzyjillkemzhz.supabase.co';
@@ -450,11 +537,22 @@
         // Initialize Supabase client
         const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-        // Allowlisted admin emails (replace with your real admin emails)
+        // Allowlisted admin emails (replace with your real admin emails). Kept as fallback.
         const ADMIN_EMAILS = ['admin@example.com'];
 
         function isAdminEmail(email) {
             return ADMIN_EMAILS.includes((email || '').toLowerCase());
+        }
+
+        async function isAdminUser(user) {
+            if (!user) return false;
+            try {
+                // Prefer server-driven allowlist from public.admins
+                const { data, error } = await supabase.from('admins').select('email').eq('email', user.email).maybeSingle();
+                if (!error && data && data.email) return true;
+            } catch (_) { }
+            // Fallback to static list
+            return isAdminEmail(user.email);
         }
 
         function showLoginError(msg) {
@@ -470,7 +568,8 @@
         async function checkAuth() {
             const { data: { user } } = await supabase.auth.getUser();
             if (user) {
-                if (!isAdminEmail(user.email)) {
+                const ok = await isAdminUser(user);
+                if (!ok) {
                     showLoginError('You do not have admin access.');
                     await supabase.auth.signOut();
                     return;
@@ -494,7 +593,7 @@
 
                 if (error) throw error;
 
-                if (!isAdminEmail(email)) {
+                if (!(await isAdminUser({ email }))) {
                     showLoginError('You do not have admin access.');
                     await supabase.auth.signOut();
                     return;
@@ -521,6 +620,7 @@
             document.getElementById('loginContainer').style.display = 'none';
             document.getElementById('dashboard').classList.add('active');
             document.getElementById('logoutBtn').style.display = 'block';
+            document.getElementById('navTabs').classList.add('active');
             loadSubmissions();
         }
 
@@ -548,6 +648,101 @@
             submissions = data;
             updateStats(data);
             renderSubmissions(data);
+        }
+
+        // ------- Claims Admin -------
+        let claims = [];
+
+        async function loadClaimsAdmin() {
+            const status = document.getElementById('claimStatusFilter').value;
+            const search = document.getElementById('claimSearch').value.trim().toLowerCase();
+            let query = supabase.from('claims').select('*').order('created_at', { ascending: false });
+            if (status !== 'all') query = query.eq('status', status);
+            const { data, error } = await query;
+            if (error) { console.error('Error loading claims:', error); return; }
+            claims = (data || []).filter(c => {
+                if (!search) return true;
+                const hay = `${(c.email || '').toLowerCase()} ${(c.reservation_id || '').toLowerCase()}`;
+                return hay.includes(search);
+            });
+            renderClaimsAdmin(claims);
+        }
+
+        function renderClaimsAdmin(list) {
+            const tbody = document.getElementById('claimsBody');
+            tbody.innerHTML = '';
+            if (!list.length) { tbody.innerHTML = '<tr><td colspan="8" style="text-align:center; color:#999;">No claims found</td></tr>'; return; }
+            list.forEach(c => {
+                const row = document.createElement('tr');
+                const date = new Date(c.created_at).toLocaleString();
+                row.innerHTML = `
+                    <td>#${c.id}</td>
+                    <td>${date}</td>
+                    <td>${c.email}</td>
+                    <td>${c.reservation_id}</td>
+                    <td>$${Number(c.amount_requested || 0).toFixed(2)}</td>
+                    <td>${c.resolution_amount != null ? `$${Number(c.resolution_amount).toFixed(2)}` : '—'}</td>
+                    <td><span class="status-badge status-${c.status}">${(c.status || 'OPEN').toUpperCase()}</span></td>
+                    <td>
+                        <div class="action-buttons">
+                            <button class="action-btn btn-view" onclick="viewClaim(${c.id})">View</button>
+                            ${c.status === 'open' ? `<button class="action-btn btn-award" onclick="resolveClaim(${c.id})">Resolve</button>` : `<button class="action-btn btn-view" onclick="resolveClaim(${c.id})">Update</button>`}
+                        </div>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        function viewClaim(id) {
+            const c = claims.find(x => x.id === id);
+            if (!c) return;
+            const body = document.getElementById('claimModalBody');
+            body.innerHTML = `
+                <div class="detail-row"><div class="detail-label">Claim ID:</div><div class="detail-value">#${c.id}</div></div>
+                <div class="detail-row"><div class="detail-label">Email:</div><div class="detail-value">${c.email}</div></div>
+                <div class="detail-row"><div class="detail-label">Reservation:</div><div class="detail-value">${c.reservation_id}</div></div>
+                <div class="detail-row"><div class="detail-label">Created:</div><div class="detail-value">${new Date(c.created_at).toLocaleString()}</div></div>
+                <div class="detail-row"><div class="detail-label">Requested:</div><div class="detail-value">$${Number(c.amount_requested || 0).toFixed(2)}</div></div>
+                ${c.resolution_amount != null ? `<div class="detail-row"><div class="detail-label">Resolution:</div><div class="detail-value">$${Number(c.resolution_amount).toFixed(2)}</div></div>` : ''}
+                <div class="detail-row"><div class="detail-label">Status:</div><div class="detail-value"><span class="status-badge status-${c.status}">${(c.status || 'OPEN').toUpperCase()}</span></div></div>
+                <div class="detail-row"><div class="detail-label">Description:</div><div class="detail-value" style="white-space:pre-wrap;">${(c.description || '').replace(/[&<>]/g, s => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;" }[s]))}</div></div>
+                ${Array.isArray(c.image_urls) && c.image_urls.length ? `<div class="detail-row"><div class="detail-label">Images:</div><div class="detail-value">${c.image_urls.map(u => `<img src="${u}" class="screenshot-preview" style="max-width:120px; margin-right:6px; margin-bottom:6px;"/>`).join('')}</div></div>` : ''}
+            `;
+            document.getElementById('claimModal').classList.add('active');
+        }
+
+        function closeClaimModal() { document.getElementById('claimModal').classList.remove('active'); }
+
+        async function resolveClaim(id) {
+            const c = claims.find(x => x.id === id);
+            if (!c) return;
+            const amount = prompt('Enter resolution amount (leave blank to accept requested):', c.amount_requested);
+            if (amount === null) return;
+            const parsed = amount === '' ? c.amount_requested : Number(amount);
+            if (isNaN(parsed)) { alert('Invalid amount'); return; }
+            const { error } = await supabase.from('claims').update({ resolution_amount: parsed, status: 'resolved' }).eq('id', id);
+            if (error) { alert('Error resolving claim: ' + error.message); return; }
+            loadClaimsAdmin();
+        }
+
+        // Tabs logic
+        function switchTab(which) {
+            const rewardsTab = document.getElementById('dashboard');
+            const claimsTab = document.getElementById('claimsDashboard');
+            const btnRewards = document.getElementById('tabRewards');
+            const btnClaims = document.getElementById('tabClaims');
+            if (which === 'claims') {
+                rewardsTab.classList.remove('active'); rewardsTab.style.display = 'none';
+                claimsTab.style.display = 'block'; claimsTab.classList.add('active');
+                btnRewards.classList.remove('active'); btnClaims.classList.add('active');
+                loadClaimsAdmin();
+            } else {
+                claimsTab.classList.remove('active'); claimsTab.style.display = 'none';
+                rewardsTab.style.display = 'block'; rewardsTab.classList.add('active');
+                btnClaims.classList.remove('active'); btnRewards.classList.add('active');
+                loadSubmissions();
+            }
         }
 
         // Update statistics
@@ -709,6 +904,13 @@
 
         // Initialize on load
         checkAuth();
+
+        // Tabs events
+        document.getElementById('tabRewards').addEventListener('click', () => switchTab('rewards'));
+        document.getElementById('tabClaims').addEventListener('click', () => switchTab('claims'));
+        document.getElementById('refreshClaimsBtn').addEventListener('click', loadClaimsAdmin);
+        document.getElementById('claimStatusFilter').addEventListener('change', loadClaimsAdmin);
+        document.getElementById('claimSearch').addEventListener('input', () => { loadClaimsAdmin(); });
 
         // Set up filters
         document.getElementById('statusFilter').addEventListener('change', loadSubmissions);

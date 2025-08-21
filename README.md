@@ -61,3 +61,86 @@ for each row execute function public.set_user_id();
 
 - If email confirmation is enabled, users must confirm before appearing signed in.
 - The admin dashboard (`admin.html`) continues to query `review_rewards` and is intended to be used with an admin account or a service role that can read all rows under RLS.
+
+## Claims app (parallel app at /claim)
+
+This app provides a reservation-based claims flow with its own account concept. Users sign in with email + reservation ID and can submit/view claims. Accessible at `/claim/`.
+
+### Database schema
+
+```sql
+-- Claim accounts (links an auth user to a reservation id)
+create table if not exists public.claim_accounts (
+  id bigint primary key generated always as identity,
+  user_id uuid references auth.users(id) on delete cascade,
+  email text not null,
+  reservation_id text not null,
+  created_at timestamptz default now(),
+  unique(email, reservation_id)
+);
+
+-- Claims
+create table if not exists public.claims (
+  id bigint primary key generated always as identity,
+  user_id uuid references auth.users(id) on delete cascade,
+  email text not null,
+  reservation_id text not null,
+  description text not null,
+  amount_requested numeric(10,2) default 0,
+  resolution_amount numeric(10,2),
+  status text default 'open' check (status in ('open','resolved')),
+  image_urls jsonb default '[]'::jsonb,
+  expected_resolution_at timestamptz not null,
+  created_at timestamptz default now()
+);
+
+create index if not exists claims_user_id_idx on public.claims(user_id);
+create index if not exists claim_accounts_user_idx on public.claim_accounts(user_id);
+```
+
+### RLS policies
+
+```sql
+alter table public.claim_accounts enable row level security;
+alter table public.claims enable row level security;
+
+-- claim_accounts: users can upsert their own row (by email+reservation)
+drop policy if exists "claim_accounts_insert" on public.claim_accounts;
+create policy "claim_accounts_insert" on public.claim_accounts for insert to authenticated with check (auth.uid() = user_id);
+
+drop policy if exists "claim_accounts_select" on public.claim_accounts;
+create policy "claim_accounts_select" on public.claim_accounts for select to authenticated using (auth.uid() = user_id);
+
+drop policy if exists "claim_accounts_update" on public.claim_accounts;
+create policy "claim_accounts_update" on public.claim_accounts for update to authenticated using (auth.uid() = user_id) with check (auth.uid() = user_id);
+
+-- claims: users manage their own claims
+drop policy if exists "claims_insert" on public.claims;
+create policy "claims_insert" on public.claims for insert to authenticated with check (auth.uid() = user_id);
+
+drop policy if exists "claims_select" on public.claims;
+create policy "claims_select" on public.claims for select to authenticated using (auth.uid() = user_id);
+
+drop policy if exists "claims_update" on public.claims;
+create policy "claims_update" on public.claims for update to authenticated using (auth.uid() = user_id) with check (auth.uid() = user_id);
+
+-- Optional: admin policies (match your admin email(s))
+drop policy if exists "claims_admin_select" on public.claims;
+create policy "claims_admin_select" on public.claims for select to authenticated using (auth.jwt() ->> 'email' = any (array['admin@example.com']));
+
+drop policy if exists "claims_admin_update" on public.claims;
+create policy "claims_admin_update" on public.claims for update to authenticated using (auth.jwt() ->> 'email' = any (array['admin@example.com'])) with check (auth.jwt() ->> 'email' = any (array['admin@example.com']));
+```
+
+### Admin handling
+
+- Extend `admin.html` to list and resolve claims by setting `resolution_amount` and switching `status` to `resolved`.
+- Resolution logic: if admin enters an amount (can match or differ from requested), save it and mark `status='resolved'`.
+
+### Frontend
+
+- New `claim/index.html` handles:
+  - Sign-in with email + reservation ID + password.
+  - Magic link flow when reservation ID is unknown; prompts to set password and enter reservation ID once.
+  - Create a claim with description, optional images, requested amount.
+  - Shows timeline toward a 14-day expected resolution date.

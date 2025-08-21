@@ -1,0 +1,630 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>File a Claim</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: linear-gradient(135deg, #6a85f1 0%, #7f6bff 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 980px;
+            margin: 0 auto;
+        }
+
+        .header {
+            color: white;
+            text-align: center;
+            margin-bottom: 18px;
+        }
+
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 6px;
+        }
+
+        .card {
+            background: #fff;
+            border-radius: 14px;
+            box-shadow: 0 16px 40px rgba(0, 0, 0, 0.15);
+            overflow: hidden;
+        }
+
+        .card-body {
+            padding: 20px;
+        }
+
+        .tabs {
+            display: flex;
+            background: #f5f7ff;
+        }
+
+        .tab {
+            flex: 1;
+            text-align: center;
+            padding: 12px;
+            cursor: pointer;
+            font-weight: 600;
+            color: #666;
+        }
+
+        .tab.active {
+            background: white;
+            color: #333;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        label {
+            font-size: 14px;
+            color: #444;
+            font-weight: 600;
+            margin-bottom: 6px;
+            display: inline-block;
+        }
+
+        input[type="text"],
+        input[type="email"],
+        input[type="password"],
+        input[type="number"],
+        textarea {
+            width: 100%;
+            padding: 10px 12px;
+            border: 2px solid #e4e6f0;
+            border-radius: 10px;
+            font-size: 15px;
+        }
+
+        textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+
+        .btn {
+            padding: 12px 16px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: transform .15s ease, box-shadow .2s ease;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #fff;
+        }
+
+        .btn-secondary {
+            background: #e9ecef;
+            color: #333;
+        }
+
+        .btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.08);
+        }
+
+        .row {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .error {
+            background: #fde8ea;
+            color: #8a2432;
+            padding: 10px 12px;
+            border-radius: 8px;
+            margin-bottom: 14px;
+            display: none;
+        }
+
+        .success {
+            background: #e6f4ea;
+            color: #0b6b3a;
+            padding: 10px 12px;
+            border-radius: 8px;
+            margin-bottom: 14px;
+            display: none;
+        }
+
+        .section-title {
+            font-weight: 700;
+            margin: 14px 0 10px;
+            color: #333;
+        }
+
+        .inline {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .right {
+            float: right;
+        }
+
+        .muted {
+            color: #667;
+            font-size: 13px;
+        }
+
+        .filebox {
+            border: 2px dashed #e4e6f0;
+            padding: 14px;
+            border-radius: 10px;
+            text-align: center;
+            cursor: pointer;
+        }
+
+        .claims-list {
+            margin-top: 18px;
+            display: grid;
+            gap: 12px;
+        }
+
+        .claim-card {
+            border: 1px solid #eee;
+            border-radius: 10px;
+            padding: 14px;
+            background: #fff;
+        }
+
+        .badge {
+            padding: 4px 10px;
+            border-radius: 999px;
+            font-size: 12px;
+            font-weight: 700;
+            display: inline-block;
+        }
+
+        .badge.open {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .badge.resolved {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .timeline {
+            height: 8px;
+            background: #f1f3f9;
+            border-radius: 999px;
+            overflow: hidden;
+        }
+
+        .timeline>div {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            width: 0%;
+        }
+
+        .topbar {
+            position: sticky;
+            top: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .link {
+            color: #4a5bdc;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .popover {
+            position: absolute;
+            right: 0;
+            top: 44px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+            min-width: 260px;
+            display: none;
+        }
+
+        .popover .hd {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #fff;
+            padding: 12px 14px;
+            border-top-left-radius: 10px;
+            border-top-right-radius: 10px;
+        }
+
+        .popover .bd {
+            padding: 12px 14px;
+        }
+
+        .popover .ft {
+            padding: 12px 14px;
+            border-top: 1px solid #f0f0f0;
+            display: flex;
+            gap: 8px;
+        }
+
+        .pill {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 999px;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .hidden {
+            display: none;
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        const SUPABASE_URL = 'https://dugjgmwlzyjillkemzhz.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR1Z2pnbXdsenlqaWxsa2Vtemh6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTU3MjE3MTIsImV4cCI6MjA3MTI5NzcxMn0.s9uM3exfI3hBvbiT3nZrC_whJ03IAy18202qmgJ4GOg';
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    </script>
+</head>
+
+<body>
+    <div class="container">
+        <div class="topbar">
+            <a href="/" class="link">← Back</a>
+            <div class="inline">
+                <a href="#" class="link" id="userBtn">Sign In</a>
+                <div class="popover" id="pop">
+                    <div class="hd">
+                        <div style="font-weight:700">Profile</div>
+                        <div id="popEmail" style="font-size:12px; opacity:0.9"></div>
+                    </div>
+                    <div class="bd">
+                        <div class="row" style="justify-content:space-between">
+                            <div>Total Claims</div>
+                            <div id="popCount" style="font-weight:700">0</div>
+                        </div>
+                        <div class="row" style="justify-content:space-between">
+                            <div>Reservation</div>
+                            <div id="popRes" class="pill" style="background:#eef2ff; color:#334;">—</div>
+                        </div>
+                    </div>
+                    <div class="ft">
+                        <button class="btn btn-primary" id="openClaimsBtn">My Claims</button>
+                        <button class="btn btn-secondary" id="signOutBtn">Sign Out</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Auth Card -->
+        <div class="card" id="authCard">
+            <div class="tabs">
+                <div class="tab active" id="tabSign">Sign in with Reservation ID</div>
+                <div class="tab" id="tabCode">Don't know your reservation?</div>
+            </div>
+            <div class="card-body">
+                <div id="authError" class="error"></div>
+                <div id="authSuccess" class="success"></div>
+                <div id="signPane">
+                    <div class="grid">
+                        <div>
+                            <label>Email</label>
+                            <input type="email" id="email" placeholder="you@example.com">
+                        </div>
+                        <div>
+                            <label>Reservation ID</label>
+                            <input type="text" id="reservationId" placeholder="ABC123">
+                        </div>
+                    </div>
+                    <div class="grid" style="margin-top: 10px;">
+                        <div>
+                            <label>Password</label>
+                            <input type="password" id="password" placeholder="Your password">
+                        </div>
+                    </div>
+                    <div class="row" style="margin-top:12px; align-items:center;">
+                        <button class="btn btn-primary" id="signInBtn">Sign In</button>
+                        <button class="btn btn-secondary" id="forgotBtn">Forgot password</button>
+                        <span class="muted">or</span>
+                        <button class="btn btn-secondary" id="sendCodeBtn">Email me a login code</button>
+                    </div>
+                </div>
+                <div id="codePane" class="hidden">
+                    <label>Email</label>
+                    <input type="email" id="codeEmail" placeholder="you@example.com">
+                    <div class="row" style="margin-top:12px; align-items:center;">
+                        <button class="btn btn-primary" id="requestCodeBtn">Send code</button>
+                        <span class="muted">We’ll email you a secure link to continue and set a password.</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Claims App -->
+        <div class="card hidden" id="appCard" style="margin-top:14px;">
+            <div class="card-body">
+                <div class="section-title">Create a claim</div>
+                <div id="createError" class="error"></div>
+                <div class="grid">
+                    <div>
+                        <label>Requested amount (USD)</label>
+                        <input type="number" id="amount" min="0" step="0.01" placeholder="0.00">
+                    </div>
+                    <div>
+                        <label>Reservation ID</label>
+                        <input type="text" id="activeReservation" disabled>
+                    </div>
+                </div>
+                <div style="margin-top:10px">
+                    <label>What went wrong?</label>
+                    <textarea id="description" placeholder="Tell us what happened..."></textarea>
+                </div>
+                <div style="margin-top:10px">
+                    <label>Attach images (optional)</label>
+                    <div class="filebox" id="fileBox">Click to upload images</div>
+                    <input id="files" type="file" accept="image/*" multiple style="display:none">
+                    <div id="fileNames" class="muted" style="margin-top:6px"></div>
+                </div>
+                <div class="row" style="margin-top:12px; align-items:center;">
+                    <button class="btn btn-primary" id="createBtn">Submit Claim</button>
+                    <span class="muted">Expected resolution: <span id="expectedPreview">—</span></span>
+                </div>
+
+                <div class="section-title">My claims</div>
+                <div id="claimsList" class="claims-list"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Password/setup modal via hash recovery -->
+    <div class="card hidden" id="setupCard"
+        style="position: fixed; left:50%; top:50%; transform: translate(-50%,-50%); max-width:420px; width:92%; z-index:2000;">
+        <div class="card-body">
+            <div class="section-title">Finish setting up</div>
+            <div class="muted" style="margin-bottom:8px">Enter your reservation ID and set a password to continue.</div>
+            <div id="setupError" class="error"></div>
+            <label>Reservation ID</label>
+            <input type="text" id="setupReservation" placeholder="ABC123">
+            <div class="grid" style="margin-top:10px;">
+                <div>
+                    <label>New password</label>
+                    <input type="password" id="setupPass" placeholder="••••••">
+                </div>
+                <div>
+                    <label>Confirm password</label>
+                    <input type="password" id="setupPass2" placeholder="••••••">
+                </div>
+            </div>
+            <div class="row" style="margin-top:12px">
+                <button class="btn btn-primary" id="finishSetupBtn">Save</button>
+                <button class="btn btn-secondary" id="setupCancelBtn">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentUser = null;
+        let currentReservation = null;
+        let myClaims = [];
+
+        const qs = (id) => document.getElementById(id);
+        const show = (el) => el.classList.remove('hidden');
+        const hide = (el) => el.classList.add('hidden');
+
+        // Tabs
+        qs('tabSign').onclick = () => { qs('tabSign').classList.add('active'); qs('tabCode').classList.remove('active'); hide(qs('codePane')); show(qs('signPane')); };
+        qs('tabCode').onclick = () => { qs('tabCode').classList.add('active'); qs('tabSign').classList.remove('active'); hide(qs('signPane')); show(qs('codePane')); };
+
+        // File uploads
+        qs('fileBox').onclick = () => qs('files').click();
+        qs('files').addEventListener('change', () => {
+            const names = Array.from(qs('files').files).map(f => f.name).join(', ');
+            qs('fileNames').textContent = names || '';
+        });
+
+        // Helper: convert files to base64 array
+        async function filesToBase64List(files) {
+            const list = [];
+            for (const f of files) {
+                const b64 = await new Promise((res, rej) => { const r = new FileReader(); r.onload = () => res(r.result); r.onerror = rej; r.readAsDataURL(f); });
+                list.push(b64);
+            }
+            return list;
+        }
+
+        function daysFromNow(num) { const d = new Date(Date.now() + num * 24 * 60 * 60 * 1000); return d; }
+        function fmt(dt) { return new Date(dt).toLocaleString(); }
+
+        function setAuthUI() {
+            if (currentUser) {
+                qs('userBtn').textContent = currentUser.email;
+                qs('popEmail').textContent = currentUser.email;
+                show(qs('appCard')); hide(qs('authCard'));
+                loadAccount();
+            } else {
+                qs('userBtn').textContent = 'Sign In';
+                hide(qs('appCard')); show(qs('authCard')); hide(qs('pop'));
+            }
+        }
+
+        function togglePop() { const p = qs('pop'); p.style.display = (p.style.display === 'block') ? 'none' : 'block'; }
+        qs('userBtn').onclick = (e) => { e.preventDefault(); if (!currentUser) { return; } togglePop(); };
+        qs('signOutBtn').onclick = async () => { await supabase.auth.signOut(); };
+        qs('openClaimsBtn').onclick = () => { togglePop(); window.scrollTo({ top: document.getElementById('claimsList').offsetTop - 20, behavior: 'smooth' }); };
+
+        // Auth: sign-in with password (requires reservation check)
+        qs('signInBtn').onclick = async () => {
+            qs('authError').style.display = 'none';
+            const email = qs('email').value.trim();
+            const reservationId = qs('reservationId').value.trim();
+            const password = qs('password').value;
+            if (!email || !reservationId || !password) { qs('authError').textContent = 'Enter email, reservation ID, and password'; qs('authError').style.display = 'block'; return; }
+
+            // Ensure claim account exists for this email + reservation
+            const { data: acct } = await supabase.from('claim_accounts').select('id').eq('email', email).eq('reservation_id', reservationId).maybeSingle();
+            if (!acct) { qs('authError').textContent = 'We could not find that reservation for this email.'; qs('authError').style.display = 'block'; return; }
+
+            const { error } = await supabase.auth.signInWithPassword({ email, password });
+            if (error) { qs('authError').textContent = 'Invalid email or password.'; qs('authError').style.display = 'block'; return; }
+        };
+
+        // Auth: forgot password (email-based)
+        qs('forgotBtn').onclick = async () => {
+            const email = qs('email').value.trim();
+            if (!email) { qs('authError').textContent = 'Enter your email first'; qs('authError').style.display = 'block'; return; }
+            const { error } = await supabase.auth.resetPasswordForEmail(email, { redirectTo: window.location.origin + '/claim/' });
+            if (error) { qs('authError').textContent = error.message; qs('authError').style.display = 'block'; return; }
+            qs('authSuccess').textContent = 'Password reset email sent. Check your inbox.'; qs('authSuccess').style.display = 'block';
+        };
+
+        // Email me a login code / magic link
+        qs('sendCodeBtn').onclick = async () => {
+            const email = qs('email').value.trim();
+            if (!email) { qs('authError').textContent = 'Enter your email first'; qs('authError').style.display = 'block'; return; }
+            const { error } = await supabase.auth.signInWithOtp({ email, options: { emailRedirectTo: window.location.origin + '/claim/' } });
+            if (error) { qs('authError').textContent = error.message; qs('authError').style.display = 'block'; return; }
+            qs('authSuccess').textContent = 'We sent a secure link to your email.'; qs('authSuccess').style.display = 'block';
+        };
+
+        // Code pane (no reservation id known)
+        qs('requestCodeBtn').onclick = async () => {
+            const email = qs('codeEmail').value.trim();
+            if (!email) { return; }
+            const { error } = await supabase.auth.signInWithOtp({ email, options: { emailRedirectTo: window.location.origin + '/claim/' } });
+            if (error) { qs('authError').textContent = error.message; qs('authError').style.display = 'block'; return; }
+            qs('authSuccess').textContent = 'We sent a secure link to your email.'; qs('authSuccess').style.display = 'block';
+        };
+
+        // Finish setup modal (after magic link or recovery)
+        async function maybeShowSetup() {
+            const hash = new URLSearchParams(window.location.hash.replace(/^#/, ''));
+            const type = hash.get('type');
+            const accessToken = hash.get('access_token');
+            const refreshToken = hash.get('refresh_token');
+            if (accessToken && (type === 'recovery' || type === 'magiclink' || type === 'signup')) {
+                await supabase.auth.setSession({ access_token: accessToken, refresh_token: refreshToken });
+                show(qs('setupCard'));
+            }
+        }
+
+        qs('setupCancelBtn').onclick = () => { hide(qs('setupCard')); window.location.hash = ''; };
+
+        qs('finishSetupBtn').onclick = async () => {
+            qs('setupError').style.display = 'none';
+            const rid = qs('setupReservation').value.trim();
+            const p1 = qs('setupPass').value; const p2 = qs('setupPass2').value;
+            if (!rid || !p1 || p1 !== p2) { qs('setupError').textContent = 'Enter reservation ID and matching passwords'; qs('setupError').style.display = 'block'; return; }
+            // Create or link claim account to user
+            const { data: { user } } = await supabase.auth.getUser();
+            if (!user) { qs('setupError').textContent = 'Session expired. Click your email link again.'; qs('setupError').style.display = 'block'; return; }
+            // Upsert claim account
+            await supabase.from('claim_accounts').upsert({ user_id: user.id, email: user.email, reservation_id: rid }, { onConflict: 'email,reservation_id' });
+            // Set password
+            const { error } = await supabase.auth.updateUser({ password: p1 });
+            if (error) { qs('setupError').textContent = error.message; qs('setupError').style.display = 'block'; return; }
+            hide(qs('setupCard')); window.location.hash = '';
+            await loadAccount();
+        };
+
+        // Load account context then claims
+        async function loadAccount() {
+            const { data: { user } } = await supabase.auth.getUser();
+            currentUser = user || null;
+            if (!currentUser) { setAuthUI(); return; }
+            // Find claim account for this user (latest)
+            const { data: acct } = await supabase.from('claim_accounts').select('*').eq('email', currentUser.email).order('created_at', { ascending: false }).limit(1).maybeSingle();
+            if (acct) { currentReservation = acct.reservation_id; qs('activeReservation').value = currentReservation; qs('popRes').textContent = currentReservation; }
+            await loadClaims();
+        }
+
+        async function loadClaims() {
+            if (!currentUser) return;
+            const q = supabase.from('claims').select('*').eq('user_id', currentUser.id).order('created_at', { ascending: false });
+            const { data, error } = await q;
+            if (error) return;
+            myClaims = data || [];
+            qs('popCount').textContent = myClaims.length;
+            renderClaims();
+        }
+
+        function renderClaims() {
+            const el = qs('claimsList');
+            el.innerHTML = '';
+            if (!myClaims.length) { el.innerHTML = '<div class="muted">No claims yet.</div>'; return; }
+            const now = Date.now();
+            myClaims.forEach(c => {
+                const expected = new Date(c.expected_resolution_at).getTime();
+                const created = new Date(c.created_at).getTime();
+                const pct = Math.max(0, Math.min(100, Math.round(((now - created) / (expected - created)) * 100)));
+                const daysLeft = Math.max(0, Math.ceil((expected - now) / (24 * 60 * 60 * 1000)));
+                const card = document.createElement('div');
+                card.className = 'claim-card';
+                card.innerHTML = `
+                    <div class="row" style="justify-content:space-between; align-items:center; margin-bottom:6px;">
+                        <div style="font-weight:700;">Claim #${c.id}</div>
+                        <span class="badge ${c.status}">${(c.status || 'open').toUpperCase()}</span>
+                    </div>
+                    <div class="muted">Created ${fmt(c.created_at)} • Expected by ${fmt(c.expected_resolution_at)}${daysLeft ? ` • ${daysLeft} days left` : ''}</div>
+                    <div class="timeline" style="margin:8px 0 10px 0"><div style="width:${pct}%"></div></div>
+                    <div class="row" style="gap:18px">
+                        <div><strong>Amount requested:</strong> $${Number(c.amount_requested || 0).toFixed(2)}</div>
+                        ${c.resolution_amount != null ? `<div><strong>Resolution:</strong> $${Number(c.resolution_amount).toFixed(2)}</div>` : ''}
+                    </div>
+                    <div style="margin-top:8px; white-space:pre-wrap;">${(c.description || '').replace(/[&<>]/g, s => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;" }[s]))}</div>
+                `;
+                el.appendChild(card);
+            });
+        }
+
+        // Create claim
+        qs('createBtn').onclick = async () => {
+            qs('createError').style.display = 'none';
+            const amount = parseFloat(qs('amount').value || '0');
+            const description = qs('description').value.trim();
+            if (!currentReservation) { qs('createError').textContent = 'No reservation selected.'; qs('createError').style.display = 'block'; return; }
+            if (!description) { qs('createError').textContent = 'Please describe your issue.'; qs('createError').style.display = 'block'; return; }
+            const images = await filesToBase64List(qs('files').files);
+            const expected = daysFromNow(14).toISOString();
+            const { data: { user } } = await supabase.auth.getUser();
+            if (!user) { qs('createError').textContent = 'Please sign in again.'; qs('createError').style.display = 'block'; return; }
+            const payload = { user_id: user.id, email: user.email, reservation_id: currentReservation, description, amount_requested: amount || 0, image_urls: images, status: 'open', expected_resolution_at: expected };
+            const { error } = await supabase.from('claims').insert([payload]);
+            if (error) { qs('createError').textContent = error.message; qs('createError').style.display = 'block'; return; }
+            qs('amount').value = ''; qs('description').value = ''; qs('files').value = ''; qs('fileNames').textContent = '';
+            await loadClaims();
+            qs('expectedPreview').textContent = fmt(expected);
+        };
+
+        // Live expected date preview when typing
+        qs('description').addEventListener('input', () => { qs('expectedPreview').textContent = fmt(daysFromNow(14)); });
+
+        // Auth state
+        supabase.auth.onAuthStateChange((_e, session) => { currentUser = session?.user || null; setAuthUI(); });
+
+        // Initialize
+        (async function init() {
+            setAuthUI();
+            await maybeShowSetup();
+            const { data: { user } } = await supabase.auth.getUser();
+            currentUser = user || null;
+            setAuthUI();
+        })();
+    </script>
+</body>
+
+</html>
