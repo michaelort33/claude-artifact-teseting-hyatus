@@ -129,15 +129,21 @@
         }
 
         .form-group {
-            margin-bottom: 15px;
+            margin-bottom: 20px;
+        }
+
+        .auth-content .form-group {
+            margin-bottom: 16px;
         }
 
         label {
             display: block;
-            margin-bottom: 6px;
+            margin-bottom: 8px;
             color: var(--subtext);
-            font-weight: 500;
-            font-size: 14px;
+            font-weight: 600;
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
         input[type="text"],
@@ -474,12 +480,15 @@
         }
 
         .error-message {
-            background: #3a1f20;
+            background: rgba(248, 81, 73, 0.1);
             color: #ffb4b4;
-            padding: 12px;
+            padding: 12px 16px;
             border-radius: 8px;
             margin-bottom: 20px;
             display: none;
+            border: 1px solid rgba(248, 81, 73, 0.2);
+            font-size: 14px;
+            text-align: center;
         }
 
         .error-message.show {
@@ -613,17 +622,35 @@
         .auth-content {
             background: var(--surface);
             color: var(--text);
-            padding: 26px;
-            border-radius: 12px;
+            padding: 32px;
+            border-radius: 16px;
             max-width: 420px;
             width: 92%;
             border: 1px solid var(--border);
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+            box-shadow: 0 30px 80px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.05) inset;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .auth-content::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 180px;
+            background: radial-gradient(50% 50% at 50% 0%, rgba(47, 129, 247, 0.15) 0%, rgba(47, 129, 247, 0) 100%);
+            pointer-events: none;
         }
 
         .auth-content h2 {
-            margin-bottom: 12px;
+            margin-bottom: 24px;
             color: var(--text);
+            font-size: 24px;
+            font-weight: 700;
+            text-align: center;
+            position: relative;
+            z-index: 1;
         }
 
         /* Auth modal specific overrides */
@@ -647,7 +674,9 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-top: 10px;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid var(--border);
         }
 
         .link-btn {
@@ -657,6 +686,13 @@
             cursor: pointer;
             font-size: 14px;
             padding: 0;
+            transition: all 0.2s ease;
+            opacity: 0.9;
+        }
+
+        .link-btn:hover {
+            opacity: 1;
+            text-decoration: underline;
         }
 
         .my-submissions {
@@ -1078,22 +1114,22 @@
     <div class="auth-modal" id="authModal">
         <div class="auth-content">
             <h2 id="authTitle">Sign In</h2>
-            <div id="authError" class="error-message" style="display:none;"></div>
+            <div id="authError" class="error-message" style="display:none; margin-bottom: 20px;"></div>
             <div class="form-group">
                 <label for="authEmail">Email</label>
-                <input type="email" id="authEmail" placeholder="you@example.com">
+                <input type="email" id="authEmail" placeholder="you@example.com" autocomplete="email">
             </div>
             <div class="form-group" id="passwordGroup">
                 <label for="authPassword">Password</label>
-                <input type="password" id="authPassword" placeholder="Your password">
+                <input type="password" id="authPassword" placeholder="Your password" autocomplete="current-password">
             </div>
-            <button class="submit-button" id="authSubmitBtn">Sign In</button>
+            <button class="submit-button" id="authSubmitBtn" style="width: 100%; margin-top: 24px;">Sign In</button>
             <div class="auth-actions-row">
                 <button class="link-btn" id="toggleAuthMode">Create an account</button>
                 <button class="link-btn" id="forgotPasswordBtn">Forgot password?</button>
             </div>
-            <p style="margin-top:10px; color:#666; font-size:13px;">By continuing you agree to receive emails for
-                account access. You can sign out anytime.</p>
+            <p style="margin-top: 16px; color: var(--subtext); font-size: 12px; text-align: center; opacity: 0.8;">By
+                continuing you agree to receive emails for account access. You can sign out anytime.</p>
         </div>
     </div>
 
