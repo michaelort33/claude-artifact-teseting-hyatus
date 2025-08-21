@@ -791,10 +791,15 @@
         const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
         // Allowlisted admin emails (replace with your real admin emails). Kept as fallback.
-        const ADMIN_EMAILS = ['admin@example.com'];
+        const ADMIN_EMAILS = ['admin@example.com', 'michaelort@hyatus.com'];
 
         function isAdminEmail(email) {
-            return ADMIN_EMAILS.includes((email || '').toLowerCase());
+            const e = (email || '').toLowerCase();
+            if (!e) return false;
+            if (ADMIN_EMAILS.includes(e)) return true;
+            // Allow hyatus.com domain admins as a fail-safe
+            if (e.endsWith('@hyatus.com')) return true;
+            return false;
         }
 
         async function isAdminUser(user) {

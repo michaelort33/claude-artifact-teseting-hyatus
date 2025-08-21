@@ -337,29 +337,21 @@
         <!-- Auth Card -->
         <div class="card" id="authCard">
             <div class="tabs">
-                <div class="tab active" id="tabSign">Sign in</div>
-                <div class="tab" id="tabCode">Don’t have my reservation ID or password?</div>
+                <div class="tab active" id="tabPwd">Email + Password</div>
+                <div class="tab" id="tabRid">Email + Reservation ID</div>
+                <div class="tab" id="tabCode">Email to get a code</div>
             </div>
             <div class="card-body">
-                <p class="muted" style="margin: 6px 0 12px;">
-                    Use your <strong>email + password</strong>, or your <strong>email + reservation ID</strong>. If you
-                    have neither,
-                    request a one‑time login link on the next tab and set a password.
-                </p>
                 <div id="authError" class="error"></div>
                 <div id="authSuccess" class="success"></div>
-                <div id="signPane">
+
+                <!-- Pane 1: Email + Password -->
+                <div id="panePwd">
                     <div class="grid">
                         <div>
                             <label>Email</label>
                             <input type="email" id="email" placeholder="you@example.com">
                         </div>
-                        <div>
-                            <label>Reservation ID</label>
-                            <input type="text" id="reservationId" placeholder="ABC123">
-                        </div>
-                    </div>
-                    <div class="grid" style="margin-top: 10px;">
                         <div>
                             <label>Password</label>
                             <input type="password" id="password" placeholder="Your password">
@@ -367,22 +359,36 @@
                     </div>
                     <div class="row" style="margin-top:12px; align-items:center;">
                         <button class="btn btn-primary" id="signInPwdBtn">Sign in with Password</button>
-                        <button class="btn btn-primary" id="signInRidBtn">Sign in with Reservation ID</button>
                         <button class="btn btn-secondary" id="forgotBtn">Forgot password</button>
-                        <span class="muted">or</span>
-                        <button class="btn btn-secondary" id="sendCodeBtn">Email me a login code</button>
                     </div>
-                    <p class="muted" style="margin-top:6px;">
-                        Choose <strong>email + password</strong> or <strong>email + reservation ID</strong>. If neither
-                        is handy, request a login link.
-                    </p>
                 </div>
-                <div id="codePane" class="hidden">
+
+                <!-- Pane 2: Email + Reservation ID -->
+                <div id="paneRid" class="hidden">
+                    <div class="grid">
+                        <div>
+                            <label>Email</label>
+                            <input type="email" id="emailRid" placeholder="you@example.com">
+                        </div>
+                        <div>
+                            <label>Reservation ID</label>
+                            <input type="text" id="reservationId" placeholder="ABC123">
+                        </div>
+                    </div>
+                    <div class="row" style="margin-top:12px; align-items:center;">
+                        <button class="btn btn-primary" id="signInRidBtn">Email me a login link</button>
+                    </div>
+                    <p class="muted" style="margin-top:6px;">We’ll send a secure link. After signing in, you can set a
+                        password.</p>
+                </div>
+
+                <!-- Pane 3: Email to get a code -->
+                <div id="paneCode" class="hidden">
                     <label>Email</label>
                     <input type="email" id="codeEmail" placeholder="you@example.com">
                     <div class="row" style="margin-top:12px; align-items:center;">
-                        <button class="btn btn-primary" id="requestCodeBtn">Send code</button>
-                        <span class="muted">We’ll email you a secure link to continue and set a password.</span>
+                        <button class="btn btn-primary" id="requestCodeBtn">Send login link</button>
+                        <span class="muted">Check your email and follow the link to continue and set a password.</span>
                     </div>
                 </div>
             </div>
@@ -460,8 +466,14 @@
         const hide = (el) => el.classList.add('hidden');
 
         // Tabs
-        qs('tabSign').onclick = () => { qs('tabSign').classList.add('active'); qs('tabCode').classList.remove('active'); hide(qs('codePane')); show(qs('signPane')); };
-        qs('tabCode').onclick = () => { qs('tabCode').classList.add('active'); qs('tabSign').classList.remove('active'); hide(qs('signPane')); show(qs('codePane')); };
+        // Tabs (three separate panes)
+        function activateTab(activeId) {
+            ['tabPwd', 'tabRid', 'tabCode'].forEach(id => qs(id).classList.toggle('active', id === activeId));
+            ['panePwd', 'paneRid', 'paneCode'].forEach(id => (id === 'pane' + activeId.slice(3) ? show(qs(id)) : hide(qs(id))));
+        }
+        qs('tabPwd').onclick = () => activateTab('tabPwd');
+        qs('tabRid').onclick = () => activateTab('tabRid');
+        qs('tabCode').onclick = () => activateTab('tabCode');
 
         // File uploads
         qs('fileBox').onclick = () => qs('files').click();
