@@ -126,10 +126,10 @@ create policy "claims_update" on public.claims for update to authenticated using
 
 -- Optional: admin policies (match your admin email(s))
 drop policy if exists "claims_admin_select" on public.claims;
-create policy "claims_admin_select" on public.claims for select to authenticated using (auth.jwt() ->> 'email' = any (array['admin@example.com']));
+create policy "claims_admin_select" on public.claims for select to authenticated using (auth.jwt() ->> 'email' = any (array['michaelort@hyatus.com']));
 
 drop policy if exists "claims_admin_update" on public.claims;
-create policy "claims_admin_update" on public.claims for update to authenticated using (auth.jwt() ->> 'email' = any (array['admin@example.com'])) with check (auth.jwt() ->> 'email' = any (array['admin@example.com']));
+create policy "claims_admin_update" on public.claims for update to authenticated using (auth.jwt() ->> 'email' = any (array['michaelort@hyatus.com'])) with check (auth.jwt() ->> 'email' = any (array['michaelort@hyatus.com']));
 ```
 
 ### Admin handling
@@ -144,3 +144,61 @@ create policy "claims_admin_update" on public.claims for update to authenticated
   - Magic link flow when reservation ID is unknown; prompts to set password and enter reservation ID once.
   - Create a claim with description, optional images, requested amount.
   - Shows timeline toward a 14-day expected resolution date.
+
+## 📧 Email Notifications Setup
+
+Get notified when new review rewards are submitted!
+
+**Note:** The site is now deployed at `https://feedback.hyatus.com/`
+
+### Important Domain Configuration:
+- For SendGrid: Verify `feedback.hyatus.com` domain or use `notifications@feedback.hyatus.com` as sender
+- For Resend: Add `feedback.hyatus.com` to your verified domains
+- All email links now point to `https://feedback.hyatus.com/admin.html`
+
+### Option 1: Netlify Functions (Recommended for Netlify hosting)
+
+1. **Install SendGrid:**
+   ```bash
+   cd netlify/functions
+   npm install
+   ```
+
+2. **Set Environment Variables in Netlify Dashboard:**
+   - `SENDGRID_API_KEY`: Your SendGrid API key
+   - `ADMIN_EMAIL`: Email to receive notifications
+
+3. **Update the function call in index.html:**
+   ```javascript
+   // Replace the sendAdminNotification function with:
+   return fetch('/.netlify/functions/notify-admin', {
+     method: 'POST',
+     headers: { 'Content-Type': 'application/json' },
+     body: JSON.stringify(submission)
+   });
+   ```
+
+### Option 2: Supabase Edge Functions
+
+1. **Deploy the Edge Function:**
+   ```bash
+   supabase functions deploy send-admin-notification
+   ```
+
+2. **Set Secrets:**
+   ```bash
+   supabase secrets set RESEND_API_KEY=your_resend_api_key
+   supabase secrets set ADMIN_EMAIL=michaelort@hyatus.com
+   ```
+
+3. **Enable the Database Trigger:**
+   Run the migration in `supabase/migrations/add_email_trigger.sql`
+
+### Option 3: Client-side with EmailJS (Quick setup)
+
+1. Sign up at [EmailJS](https://www.emailjs.com) (free tier available)
+2. Add the EmailJS script to index.html before closing `</body>`:
+   ```html
+   <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+   ```
+3. Configure the service in the sendAdminNotification function (see comments in code)

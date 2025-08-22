@@ -1346,34 +1346,35 @@
 </head>
 
 <body>
-    <div class="container">
-        <!-- Mobile Navigation Bar (shown only on mobile) -->
-        <div class="auth-buttons-mobile">
-            <div class="mobile-nav-content">
-                <div class="mobile-nav-logo">
-                    <span>💰</span>
-                    <span>Review Rewards</span>
-                </div>
-                <div class="mobile-nav-buttons">
-                    <a href="#" class="user-link" id="userAuthLinkMobile">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-                            <circle cx="12" cy="7" r="4"></circle>
-                        </svg>
-                        <span class="auth-button-text-mobile">Sign In</span>
-                    </a>
-                    <a href="admin.html" class="admin-link-top">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <rect x="3" y="11" width="18" height="10" rx="2" ry="2"></rect>
-                            <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
-                        </svg>
-                        <span class="auth-button-text-mobile">Admin</span>
-                    </a>
-                </div>
+    <!-- Mobile Navigation Bar (shown only on mobile) -->
+    <div class="auth-buttons-mobile">
+        <div class="mobile-nav-content">
+            <div class="mobile-nav-logo">
+                <span>💰</span>
+                <span>Review Rewards</span>
+            </div>
+            <div class="mobile-nav-buttons">
+                <a href="#" class="user-link" id="userAuthLinkMobile">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                        <circle cx="12" cy="7" r="4"></circle>
+                    </svg>
+                    <span class="auth-button-text-mobile">Sign In</span>
+                </a>
+                <a href="admin.html" class="admin-link-top">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="3" y="11" width="18" height="10" rx="2" ry="2"></rect>
+                        <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                    </svg>
+                    <span class="auth-button-text-mobile">Admin</span>
+                </a>
             </div>
         </div>
+    </div>
+
+    <div class="container">
 
         <div class="header">
             <h1>🎉 Claim Your Review Reward</h1>
@@ -1578,7 +1579,7 @@
         </div>
     </div>
 
-    <script>
+    <script type="text/plain">
         // Supabase configuration
         const SUPABASE_URL = 'https://dugjgmwlzyjillkemzhz.supabase.co';
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR1Z2pnbXdsenlqaWxsa2Vtemh6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTU3MjE3MTIsImV4cCI6MjA3MTI5NzcxMn0.s9uM3exfI3hBvbiT3nZrC_whJ03IAy18202qmgJ4GOg';
@@ -1682,66 +1683,57 @@
             }, 5000);
         }
 
-        // Create floating dollar signs and confetti animation
-        function createFloatingDollars() {
-            const successContainer = document.getElementById('successMessage');
-            const dollarCount = 12;
-            const confettiCount = 20;
-            const colors = ['#ffdd00', '#ff6b6b', '#4ecdc4', '#45b7d1', '#f9ca24', '#6c5ce7'];
+        // Send admin notification email
+        async function sendAdminNotification(submission) {
+        // Option 1: Use EmailJS (free tier available)
+        // 1. Sign up at https://www.emailjs.com
+        // 2. Add this script tag to your HTML: <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+    // 3. Initialize with your public key: emailjs.init("YOUR_PUBLIC_KEY");
+    // 4. Uncomment and configure:
+    /*
+    return emailjs.send("YOUR_SERVICE_ID", "YOUR_TEMPLATE_ID", {
+    to_email: "michaelort@hyatus.com",
+    payment_method: submission.payment_method,
+    payment_handle: submission.payment_handle,
+    submission_date: new Date(submission.created_at).toLocaleString(),
+    admin_link: window.location.origin + "/admin.html"
+    });
+    */
 
-            // Remove any existing animations
-            const existingElements = successContainer.querySelectorAll('.dollar-sign, .confetti');
-            existingElements.forEach(el => el.remove());
+    // Option 2: Use Netlify Functions (if deploying to Netlify)
+    // Create netlify/functions/notify-admin.js
 
-            // Create dollar signs
-            for (let i = 0; i < dollarCount; i++) {
-                const dollar = document.createElement('div');
-                dollar.className = 'dollar-sign';
-                dollar.textContent = '$';
+    // Option 3: Use Supabase Edge Functions (recommended)
+    // See supabase/functions/send-admin-notification/index.ts
 
-                // Random horizontal position
-                dollar.style.left = Math.random() * 100 + '%';
+    // For now, just log it
+    console.log('Admin notification would be sent:', submission);
+    }
 
-                // Random animation delay
-                dollar.style.animationDelay = Math.random() * 2 + 's';
+    // Create floating dollar signs and confetti animation
+    function createFloatingDollars() {
+    const successContainer = document.getElementById('successMessage');
+    const dollarCount = 12;
+    const confettiCount = 20;
+    const colors = ['#ffdd00', '#ff6b6b', '#4ecdc4', '#45b7d1', '#f9ca24', '#6c5ce7'];
 
-                // Random animation duration
-                dollar.style.animationDuration = (3 + Math.random() * 2) + 's';
+    // Remove any existing animations
+    const existingElements = successContainer.querySelectorAll('.dollar-sign, .confetti');
+    existingElements.forEach(el => el.remove());
 
-                // Start from bottom
-                dollar.style.bottom = '-50px';
-
-                successContainer.appendChild(dollar);
-            }
-
-            // Create confetti
-            for (let i = 0; i < confettiCount; i++) {
-                const confetti = document.createElement('div');
-                confetti.className = 'confetti';
-
-                // Random color
-                confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
-
-                // Random horizontal position
-                confetti.style.left = Math.random() * 100 + '%';
-
-                // Random starting position
-                confetti.style.top = -10 + 'px';
-
-                // Random animation delay
-                confetti.style.animationDelay = Math.random() * 3 + 's';
-
-                // Random animation duration
-                confetti.style.animationDuration = (2 + Math.random() * 2) + 's';
-
-                successContainer.appendChild(confetti);
-            }
-
-            // Clean up after animation
-            setTimeout(() => {
-                const elements = successContainer.querySelectorAll('.dollar-sign, .confetti');
-                elements.forEach(el => el.remove());
-            }, 6000);
+    // Create dollar signs
+    for (let i = 0; i < dollarCount; i++) { const dollar=document.createElement('div'); dollar.className='dollar-sign' ;
+        dollar.textContent='$' ; dollar.style.left=Math.random() * 100 + '%' ; dollar.style.animationDelay=Math.random()
+        * 2 + 's' ; dollar.style.animationDuration=(3 + Math.random() * 2) + 's' ; dollar.style.bottom='-50px' ;
+        successContainer.appendChild(dollar); } // Create confetti for (let i=0; i < confettiCount; i++) { const
+        confetti=document.createElement('div'); confetti.className='confetti' ;
+        confetti.style.backgroundColor=colors[Math.floor(Math.random() * colors.length)];
+        confetti.style.left=Math.random() * 100 + '%' ; confetti.style.top=-10 + 'px' ;
+        confetti.style.animationDelay=Math.random() * 3 + 's' ; confetti.style.animationDuration=(2 + Math.random() * 2)
+        + 's' ; successContainer.appendChild(confetti); } // Clean up after animation setTimeout(()=> {
+        const elements = successContainer.querySelectorAll('.dollar-sign, .confetti');
+        elements.forEach(el => el.remove());
+        }, 6000);
         }
 
         // Form submission
@@ -1764,486 +1756,480 @@
         const viewMySubsBtn = document.getElementById('viewMySubsBtn');
         const backHomeBtn = document.getElementById('backHomeBtn');
         let authMode = 'signin'; // or 'signup'
+        let mySubmissions = [];
 
         form.addEventListener('submit', async (e) => {
-            e.preventDefault();
+        e.preventDefault();
 
-            const reviewLink = document.getElementById('reviewLink').value;
-            const hasScreenshot = fileInput.files.length > 0;
+        const reviewLink = document.getElementById('reviewLink').value;
+        const hasScreenshot = fileInput.files.length > 0;
 
-            // Validation
-            if (!selectedMethod) {
-                showError('Please select a payment method');
-                return;
-            }
+        // Validation
+        if (!selectedMethod) {
+        showError('Please select a payment method');
+        return;
+        }
 
-            if (!paymentHandle.value) {
-                showError('Please enter your payment information');
-                return;
-            }
+        if (!paymentHandle.value) {
+        showError('Please enter your payment information');
+        return;
+        }
 
-            if (!reviewLink && !hasScreenshot) {
-                showError('Please provide either a review link or upload a screenshot');
-                return;
-            }
+        if (!reviewLink && !hasScreenshot) {
+        showError('Please provide either a review link or upload a screenshot');
+        return;
+        }
 
-            // Prepare submission data
-            submitButton.textContent = 'Submitting...';
-            submitButton.disabled = true;
+        // Prepare submission data
+        submitButton.textContent = 'Submitting...';
+        submitButton.disabled = true;
 
-            try {
-                let screenshotData = null;
+        try {
+        let screenshotData = null;
 
-                // Convert screenshot to base64 if provided
-                if (hasScreenshot) {
-                    screenshotData = await fileToBase64(uploadedFile);
-                }
+        // Convert screenshot to base64 if provided
+        if (hasScreenshot) {
+        screenshotData = await fileToBase64(uploadedFile);
+        }
 
-                // Fetch current user (if logged in)
-                const { data: userResp } = await supabase.auth.getUser();
-                const userId = userResp?.user?.id || null;
+        // Fetch current user (if logged in)
+        const { data: userResp } = await supabase.auth.getUser();
+        const userId = userResp?.user?.id || null;
 
-                // Submit to Supabase (include user_id when available)
-                const { data, error } = await supabase
-                    .from('review_rewards')
-                    .insert([
-                        {
-                            payment_method: selectedMethod,
-                            payment_handle: paymentHandle.value,
-                            review_link: reviewLink || null,
-                            screenshot_url: screenshotData,
-                            status: 'pending',
-                            user_id: userId
-                        }
-                    ]);
+        // Submit to Supabase (include user_id when available)
+        const { data, error } = await supabase
+        .from('review_rewards')
+        .insert([
+        {
+        payment_method: selectedMethod,
+        payment_handle: paymentHandle.value,
+        review_link: reviewLink || null,
+        screenshot_url: screenshotData,
+        status: 'pending',
+        user_id: userId
+        }
+        ]);
 
-                if (error) {
-                    throw error;
-                }
+        if (error) {
+        throw error;
+        }
 
-                // Show success message with animation
-                formContainer.style.display = 'none';
-                successMessage.style.display = 'block';
-                createFloatingDollars();
+        // Send admin notification (optional - remove if using server-side solution)
+        try {
+        await sendAdminNotification({
+        payment_method: selectedMethod,
+        payment_handle: paymentHandle.value,
+        created_at: new Date().toISOString()
+        });
+        } catch (emailError) {
+        console.error('Failed to send admin notification:', emailError);
+        // Don't block the success flow if email fails
+        }
 
-            } catch (error) {
-                console.error('Error submitting:', error);
-                showError('There was an error submitting your claim. Please try again.');
-                submitButton.textContent = 'Submit & Claim Reward';
-                submitButton.disabled = false;
-            }
+        // Show success message with animation
+        formContainer.style.display = 'none';
+        successMessage.style.display = 'block';
+        createFloatingDollars();
+
+        } catch (error) {
+        console.error('Error submitting:', error);
+        showError('There was an error submitting your claim. Please try again.');
+        submitButton.textContent = 'Submit & Claim Reward';
+        submitButton.disabled = false;
+        }
         });
 
         // ---------- Auth + User Dashboard ----------
         function openAuthModal() {
-            authModal.classList.add('active');
-            authError.style.display = 'none';
-            authEmail.value = '';
-            authPassword.value = '';
+        authModal.classList.add('active');
+        authError.style.display = 'none';
+        authEmail.value = '';
+        authPassword.value = '';
         }
 
         function closeAuthModal() {
-            authModal.classList.remove('active');
+        authModal.classList.remove('active');
         }
 
         function setAuthMode(mode) {
-            authMode = mode;
-            if (mode === 'signin') {
-                authTitle.textContent = 'Sign In';
-                authSubmitBtn.textContent = 'Sign In';
-                toggleAuthModeBtn.textContent = 'Create an account';
-            } else {
-                authTitle.textContent = 'Create Account';
-                authSubmitBtn.textContent = 'Create Account';
-                toggleAuthModeBtn.textContent = 'Have an account? Sign in';
-            }
+        authMode = mode;
+        if (mode === 'signin') {
+        authTitle.textContent = 'Sign In';
+        authSubmitBtn.textContent = 'Sign In';
+        toggleAuthModeBtn.textContent = 'Create an account';
+        } else {
+        authTitle.textContent = 'Create Account';
+        authSubmitBtn.textContent = 'Create Account';
+        toggleAuthModeBtn.textContent = 'Have an account? Sign in';
+        }
         }
 
         userAuthLink.addEventListener('click', async (e) => {
-            e.preventDefault();
-            if (currentUser) {
-                toggleProfilePopover();
-            } else {
-                setAuthMode('signin');
-                openAuthModal();
-            }
+        e.preventDefault();
+        if (currentUser) {
+        toggleProfilePopover();
+        } else {
+        setAuthMode('signin');
+        openAuthModal();
+        }
         });
 
         // Mobile auth link
         const userAuthLinkMobile = document.getElementById('userAuthLinkMobile');
         if (userAuthLinkMobile) {
-            userAuthLinkMobile.addEventListener('click', async (e) => {
-                e.preventDefault();
-                if (currentUser) {
-                    toggleProfilePopover();
-                } else {
-                    setAuthMode('signin');
-                    openAuthModal();
-                }
-            });
+        userAuthLinkMobile.addEventListener('click', async (e) => {
+        e.preventDefault();
+        if (currentUser) {
+        toggleProfilePopover();
+        } else {
+        setAuthMode('signin');
+        openAuthModal();
+        }
+        });
         }
 
         toggleAuthModeBtn.addEventListener('click', (e) => {
-            e.preventDefault();
-            setAuthMode(authMode === 'signin' ? 'signup' : 'signin');
+        e.preventDefault();
+        setAuthMode(authMode === 'signin' ? 'signup' : 'signin');
         });
 
         authSubmitBtn.addEventListener('click', async () => {
-            authError.style.display = 'none';
-            const email = authEmail.value.trim();
-            const password = authPassword.value.trim();
-            if (!email || !password) {
-                authError.textContent = 'Please enter email and password';
-                authError.style.display = 'block';
-                return;
-            }
+        authError.style.display = 'none';
+        const email = authEmail.value.trim();
+        const password = authPassword.value.trim();
+        if (!email || !password) {
+        authError.textContent = 'Please enter email and password';
+        authError.style.display = 'block';
+        return;
+        }
 
-            authSubmitBtn.disabled = true;
-            authSubmitBtn.textContent = authMode === 'signin' ? 'Signing In...' : 'Creating Account...';
-            try {
-                if (authMode === 'signin') {
-                    const { error } = await supabase.auth.signInWithPassword({ email, password });
-                    if (error) throw error;
-                } else {
-                    const { error } = await supabase.auth.signUp({ email, password });
-                    if (error) throw error;
-                    // Depending on Supabase settings, user may need to confirm email
-                }
-                closeAuthModal();
-            } catch (err) {
-                authError.textContent = err.message || 'Authentication error';
-                authError.style.display = 'block';
-            } finally {
-                authSubmitBtn.disabled = false;
-                authSubmitBtn.textContent = authMode === 'signin' ? 'Sign In' : 'Create Account';
-            }
+        authSubmitBtn.disabled = true;
+        authSubmitBtn.textContent = authMode === 'signin' ? 'Signing In...' : 'Creating Account...';
+        try {
+        if (authMode === 'signin') {
+        const { error } = await supabase.auth.signInWithPassword({ email, password });
+        if (error) throw error;
+        } else {
+        const { error } = await supabase.auth.signUp({ email, password });
+        if (error) throw error;
+        // Depending on Supabase settings, user may need to confirm email
+        }
+        closeAuthModal();
+        } catch (err) {
+        authError.textContent = err.message || 'Authentication error';
+        authError.style.display = 'block';
+        } finally {
+        authSubmitBtn.disabled = false;
+        authSubmitBtn.textContent = authMode === 'signin' ? 'Sign In' : 'Create Account';
+        }
         });
 
         forgotPasswordBtn.addEventListener('click', async (e) => {
-            e.preventDefault();
-            const email = authEmail.value.trim();
-            if (!email) {
-                authError.textContent = 'Enter your email above first to receive a reset link';
-                authError.style.display = 'block';
-                return;
-            }
-            authError.style.display = 'none';
-            try {
-                const { error } = await supabase.auth.resetPasswordForEmail(email, {
-                    redirectTo: (window.MAIN_BASE_URL || (window.location.origin + '/'))
-                });
-                if (error) throw error;
-                authError.textContent = 'Password reset email sent. Check your inbox.';
-                authError.style.display = 'block';
-                authError.style.background = '#d4edda';
-                authError.style.color = '#155724';
-            } catch (err) {
-                authError.textContent = err.message || 'Failed to send reset email';
-                authError.style.display = 'block';
-                authError.style.background = '#f8d7da';
-                authError.style.color = '#721c24';
-            }
+        e.preventDefault();
+        const email = authEmail.value.trim();
+        if (!email) {
+        authError.textContent = 'Enter your email above first to receive a reset link';
+        authError.style.display = 'block';
+        return;
+        }
+        authError.style.display = 'none';
+        try {
+        const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: (window.MAIN_BASE_URL || (window.location.origin + '/'))
+        });
+        if (error) throw error;
+        authError.textContent = 'Password reset email sent. Check your inbox.';
+        authError.style.display = 'block';
+        authError.style.background = '#d4edda';
+        authError.style.color = '#155724';
+        } catch (err) {
+        authError.textContent = err.message || 'Failed to send reset email';
+        authError.style.display = 'block';
+        authError.style.background = '#f8d7da';
+        authError.style.color = '#721c24';
+        }
         });
 
         // Close auth modal on outside click
         authModal.addEventListener('click', (e) => {
-            if (e.target === authModal) closeAuthModal();
+        if (e.target === authModal) closeAuthModal();
         });
 
         function updateAuthUI() {
-            const userAuthLinkMobile = document.getElementById('userAuthLinkMobile');
+        const userAuthLinkMobile = document.getElementById('userAuthLinkMobile');
 
-            if (currentUser) {
-                // Update button to show user icon and email
-                const userHTML = `
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-                        <circle cx="12" cy="7" r="4"></circle>
-                    </svg>
-                    <span class="auth-button-text">${currentUser.email}</span>
-                `;
-                userAuthLink.innerHTML = userHTML;
+        if (currentUser) {
+        // Update button to show user icon and email
+        const userHTML = `
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+            <circle cx="12" cy="7" r="4"></circle>
+        </svg>
+        <span class="auth-button-text">${currentUser.email}</span>
+        `;
+        userAuthLink.innerHTML = userHTML;
 
-                // Update mobile button too
-                if (userAuthLinkMobile) {
-                    userAuthLinkMobile.innerHTML = userHTML.replace('auth-button-text', 'auth-button-text-mobile');
-                }
+        // Update mobile button too
+        if (userAuthLinkMobile) {
+        userAuthLinkMobile.innerHTML = userHTML.replace('auth-button-text', 'auth-button-text-mobile');
+        }
 
-                closeAuthModal();
-                closeProfilePopover();
-                loadMySubmissions();
-            } else {
-                // Show sign in button
-                const signInHTML = `
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-                        <circle cx="12" cy="7" r="4"></circle>
-                    </svg>
-                    <span class="auth-button-text">Sign In</span>
-                `;
-                userAuthLink.innerHTML = signInHTML;
+        closeAuthModal();
+        closeProfilePopover();
+        loadMySubmissions();
+        } else {
+        // Show sign in button
+        const signInHTML = `
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+            <circle cx="12" cy="7" r="4"></circle>
+        </svg>
+        <span class="auth-button-text">Sign In</span>
+        `;
+        userAuthLink.innerHTML = signInHTML;
 
-                // Update mobile button too
-                if (userAuthLinkMobile) {
-                    userAuthLinkMobile.innerHTML = signInHTML.replace('auth-button-text', 'auth-button-text-mobile');
-                }
+        // Update mobile button too
+        if (userAuthLinkMobile) {
+        userAuthLinkMobile.innerHTML = signInHTML.replace('auth-button-text', 'auth-button-text-mobile');
+        }
 
-                closeProfilePopover();
-            }
+        closeProfilePopover();
+        }
         }
 
         async function loadMySubmissions() {
-            if (!currentUser) return;
-            const { data, error } = await supabase
-                .from('review_rewards')
-                .select('*')
-                .eq('user_id', currentUser.id)
-                .order('created_at', { ascending: false });
-            if (error) {
-                // silently ignore if column/policy not ready
-                return;
-            }
-            mySubmissions = data || [];
-            if (profilePopover.style.display === 'block') renderProfilePopover();
-            if (submissionsModal.classList.contains('active')) renderMySubmissions(mySubmissions);
+        if (!currentUser) return;
+        const { data, error } = await supabase
+        .from('review_rewards')
+        .select('*')
+        .eq('user_id', currentUser.id)
+        .order('created_at', { ascending: false });
+        if (error) {
+        // silently ignore if column/policy not ready
+        return;
+        }
+        mySubmissions = data || [];
+        if (profilePopover.style.display === 'block') renderProfilePopover();
+        if (submissionsModal.classList.contains('active')) renderMySubmissions(mySubmissions);
         }
 
         function renderMySubmissions(rows) {
-            const wrapper = document.getElementById('mySubmissionsContent');
-            if (!wrapper) return;
-            if (!rows.length) {
-                wrapper.innerHTML = '<div style="padding:16px; color:#666;">No submissions yet. Submit your first reward claim above.</div>';
-                return;
-            }
-            const header = `
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Date</th>
-                            <th>Payment</th>
-                            <th>Handle</th>
-                            <th>Type</th>
-                            <th>Status</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-            `;
-            const rowsHtml = rows.map(r => {
+        const wrapper = document.getElementById('mySubmissionsContent');
+        if (!wrapper) return;
+        if (!rows.length) {
+        wrapper.innerHTML = `<div style="padding:16px; color:#666;">No submissions yet. Submit your first reward claim
+            above.</div>`;
+        return;
+        }
+        const header = `
+        <table>
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Payment</th>
+                    <th>Handle</th>
+                    <th>Type</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                `;
+                const rowsHtml = rows.map(r => {
                 const date = new Date(r.created_at).toLocaleString();
                 const pm = (r.payment_method || '').toLowerCase();
                 const type = r.review_link ? 'link' : 'screenshot';
                 return `
-                    <tr>
-                        <td>${date}</td>
-                        <td><span class="pill ${pm}">${(r.payment_method || '').toUpperCase()}</span></td>
-                        <td><span class="handle">${r.payment_handle || ''}</span></td>
-                        <td><span class="pill ${type}">${type.toUpperCase()}</span></td>
-                        <td><span class="status-chip ${r.status}">${(r.status || '').toUpperCase()}</span></td>
-                    </tr>
+                <tr>
+                    <td>${date}</td>
+                    <td><span class="pill ${pm}">${(r.payment_method || '').toUpperCase()}</span></td>
+                    <td><span class="handle">${r.payment_handle || ''}</span></td>
+                    <td><span class="pill ${type}">${type.toUpperCase()}</span></td>
+                    <td><span class="status-chip ${r.status}">${(r.status || '').toUpperCase()}</span></td>
+                </tr>
                 `;
-            }).join('');
-            const footer = '</tbody></table>';
-            wrapper.innerHTML = header + rowsHtml + footer;
+                }).join('');
+                const footer = `
+            </tbody>
+        </table>
+        `;
+        wrapper.innerHTML = header + rowsHtml + footer;
         }
 
         function renderProfilePopover() {
-            if (!currentUser) return;
-            const count = mySubmissions.length;
-            profilePopover.innerHTML = `
-                <div class="profile-header">
-                    <div style="font-weight:600;">Profile</div>
-                    <div style="font-size:13px; opacity:0.9;">${currentUser.email}</div>
-                </div>
-                <div class="profile-body">
-                    <div class="profile-row">
-                        <div>Submissions</div>
-                        <div style="font-weight:600;">${count}</div>
-                    </div>
-                </div>
-                <div class="profile-actions">
-                    <button class="btn-primary-small" id="openMySubsBtn">My Submissions</button>
-                    <button class="btn-secondary-small" id="signOutBtn">Sign Out</button>
-                </div>
-            `;
-            document.getElementById('openMySubsBtn').onclick = () => {
-                openSubmissionsModal();
-            };
-            document.getElementById('signOutBtn').onclick = async () => {
-                await supabase.auth.signOut();
-            };
+        if (!currentUser) return;
+        const count = mySubmissions.length;
+        profilePopover.innerHTML = `
+        <div class="profile-header">
+            <div style="font-weight:600;">Profile</div>
+            <div style="font-size:13px; opacity:0.9;">${currentUser.email}</div>
+        </div>
+        <div class="profile-body">
+            <div class="profile-row">
+                <div>Submissions</div>
+                <div style="font-weight:600;">${count}</div>
+            </div>
+        </div>
+        <div class="profile-actions">
+            <button class="btn-primary-small" id="openMySubsBtn">My Submissions</button>
+            <button class="btn-secondary-small" id="signOutBtn">Sign Out</button>
+        </div>
+        `;
+        document.getElementById('openMySubsBtn').onclick = () => {
+        openSubmissionsModal();
+        };
+        document.getElementById('signOutBtn').onclick = async () => {
+        await supabase.auth.signOut();
+        };
         }
 
         function toggleProfilePopover() {
-            if (profilePopover.style.display === 'block') {
-                closeProfilePopover();
-            } else {
-                renderProfilePopover();
-                profilePopover.style.display = 'block';
-            }
+        if (profilePopover.style.display === 'block') {
+        closeProfilePopover();
+        } else {
+        renderProfilePopover();
+        profilePopover.style.display = 'block';
+        }
         }
 
         function closeProfilePopover() {
-            profilePopover.style.display = 'none';
+        profilePopover.style.display = 'none';
         }
 
         async function openSubmissionsModal() {
-            submissionsModal.classList.add('active');
-            closeProfilePopover();
-            const wrapper = document.getElementById('mySubmissionsContent');
-            if (!currentUser) {
-                if (wrapper) {
-                    wrapper.innerHTML = '<div style="padding:16px; color:#666;">Please sign in to view your submissions.<br/><button class="btn-primary-small" id="modalSignInBtn" style="margin-top:10px;">Sign In</button></div>';
-                    const btn = document.getElementById('modalSignInBtn');
-                    if (btn) btn.onclick = () => { closeSubmissionsModal(); setAuthMode('signin'); openAuthModal(); };
-                }
-                return;
-            }
-            if (wrapper) wrapper.innerHTML = '<div style="padding:16px; color:#666;">Loading...</div>';
-            if (!mySubmissions.length) {
-                await loadMySubmissions();
-            }
-            renderMySubmissions(mySubmissions);
+        submissionsModal.classList.add('active');
+        closeProfilePopover();
+        const wrapper = document.getElementById('mySubmissionsContent');
+        if (!currentUser) {
+        if (wrapper) {
+        wrapper.innerHTML = '<div style="padding:16px; color:#666;">Please sign in to view your
+            submissions.<br /><button class="btn-primary-small" id="modalSignInBtn" style="margin-top:10px;">Sign
+                In</button></div>';
+        const btn = document.getElementById('modalSignInBtn');
+        if (btn) btn.onclick = () => {
+        closeSubmissionsModal();
+        setAuthMode('signin');
+        openAuthModal();
+        };
+        }
+        return;
+        }
+        if (wrapper) wrapper.innerHTML = '<div style="padding:16px; color:#666;">Loading...</div>';
+        if (!mySubmissions.length) {
+        await loadMySubmissions();
+        }
+        renderMySubmissions(mySubmissions);
         }
 
         function closeSubmissionsModal() {
-            submissionsModal.classList.remove('active');
+        submissionsModal.classList.remove('active');
         }
 
         closeSubmissionsModalBtn.addEventListener('click', closeSubmissionsModal);
         submissionsModal.addEventListener('click', (e) => {
-            if (e.target === submissionsModal) closeSubmissionsModal();
+        if (e.target === submissionsModal) closeSubmissionsModal();
         });
 
         // Success actions
         const viewBtn = document.getElementById('viewMySubsBtn');
         if (viewBtn) viewBtn.addEventListener('click', () => {
-            openSubmissionsModal();
+        openSubmissionsModal();
         });
         const homeBtn = document.getElementById('backHomeBtn');
         if (homeBtn) homeBtn.addEventListener('click', () => {
-            // Reset to form view
-            successMessage.style.display = 'none';
-            formContainer.style.display = 'block';
-            submitButton.textContent = 'Submit & Claim Reward';
-            submitButton.disabled = false;
-            form.reset();
-            paymentMethods.forEach(m => m.classList.remove('selected'));
-            selectedMethod = '';
-            paymentHandle.disabled = true;
-            paymentHandle.value = '';
-            paymentLabel.textContent = 'Select a payment method above';
-            fileUploadArea.classList.remove('has-file');
-            fileName.textContent = '';
+        // Reset to form view
+        successMessage.style.display = 'none';
+        formContainer.style.display = 'block';
+        submitButton.textContent = 'Submit & Claim Reward';
+        submitButton.disabled = false;
+        form.reset();
+        paymentMethods.forEach(m => m.classList.remove('selected'));
+        selectedMethod = '';
+        paymentHandle.disabled = true;
+        paymentHandle.value = '';
+        paymentLabel.textContent = 'Select a payment method above';
+        fileUploadArea.classList.remove('has-file');
+        fileName.textContent = '';
         });
 
         // Check for password reset token in URL
         async function checkForPasswordReset() {
-            const hashParams = new URLSearchParams(window.location.hash.substring(1));
-            const accessToken = hashParams.get('access_token');
-            const refreshToken = hashParams.get('refresh_token');
-            const type = hashParams.get('type');
-            const error = hashParams.get('error');
-            const errorCode = hashParams.get('error_code');
-            const errorDescription = hashParams.get('error_description');
+        const hashParams = new URLSearchParams(window.location.hash.substring(1));
+        const accessToken = hashParams.get('access_token');
+        const refreshToken = hashParams.get('refresh_token');
+        const type = hashParams.get('type');
+        const error = hashParams.get('error');
+        const errorCode = hashParams.get('error_code');
+        const errorDescription = hashParams.get('error_description');
 
-            // Check for error first
-            if (error === 'access_denied' && errorCode === 'otp_expired') {
-                // Show error message with option to go to admin login
-                const message = `Password reset link has expired. Please request a new one.\n\nWould you like to go to the admin login page?`;
-                if (confirm(message)) {
-                    window.location.href = 'admin.html?reset_expired=true';
-                }
-                // Clear the error from URL
-                window.location.hash = '';
-                return;
-            }
+        // Check for error first
+        if (error === 'access_denied' && errorCode === 'otp_expired') {
+        // Show error message with option to go to admin login
+        const message = `Password reset link has expired. Please request a new one.\n\nWould you like to go to the admin
+        login page?`;
+        if (confirm(message)) {
+        window.location.href = 'admin.html?reset_expired=true';
+        }
+        // Clear the error from URL
+        window.location.hash = '';
+        return;
+        }
 
-            if (accessToken && type === 'recovery') {
-                // Set the session with the tokens from the URL
-                const { data, error } = await supabase.auth.setSession({
-                    access_token: accessToken,
-                    refresh_token: refreshToken
-                });
+        if (accessToken && type === 'recovery') {
+        // Set the session with the tokens from the URL
+        const { data, error } = await supabase.auth.setSession({
+        access_token: accessToken,
+        refresh_token: refreshToken
+        });
 
-                if (error) {
-                    alert('Error setting up password reset session: ' + error.message);
-                    return;
-                }
+        if (error) {
+        alert('Error setting up password reset session: ' + error.message);
+        return;
+        }
 
-                // Show password reset modal
-                document.getElementById('resetModal').classList.add('active');
-            }
+        // Show password reset modal
+        document.getElementById('resetModal').classList.add('active');
+        }
         }
 
         // Password reset function
         async function resetPassword() {
-            const newPassword = document.getElementById('newPassword').value;
-            const confirmPassword = document.getElementById('confirmPassword').value;
+        const newPassword = document.getElementById('newPassword').value;
+        const confirmPassword = document.getElementById('confirmPassword').value;
 
-            if (newPassword !== confirmPassword) {
-                alert('Passwords do not match!');
-                return;
-            }
+        if (newPassword !== confirmPassword) {
+        alert('Passwords do not match!');
+        return;
+        }
 
-            if (newPassword.length < 6) {
-                alert('Password must be at least 6 characters long!');
-                return;
-            }
-
-            try {
-                // First check if we have a session
-                const { data: { session } } = await supabase.auth.getSession();
-
-                if (!session) {
-                    alert('Session expired. Please request a new password reset link.');
-                    closeResetModal();
-                    return;
-                }
-
-                // Now update the password
-                const { data, error } = await supabase.auth.updateUser({
-                    password: newPassword
-                });
-
-                if (error) throw error;
-
-                alert('Password updated successfully! Redirecting to admin login...');
-
-                // Sign out to clear the session
-                await supabase.auth.signOut();
-
-                // Redirect to site home (not admin)
-                window.location.href = 'index.html';
-            } catch (error) {
-                alert('Error updating password: ' + error.message);
+        if (newPassword.length < 6) { alert('Password must be at least 6 characters long!'); return; } try { // First
+            check if we have a session const { data: { session } }=await supabase.auth.getSession(); if (!session) {
+            alert('Session expired. Please request a new password reset link.'); closeResetModal(); return; } // Now
+            update the password const { data, error }=await supabase.auth.updateUser({ password: newPassword }); if
+            (error) throw error; alert('Password updated successfully! Redirecting to admin login...'); // Sign out to
+            clear the session await supabase.auth.signOut(); // Redirect to site home (not admin)
+            window.location.href='index.html' ; } catch (error) { alert('Error updating password: ' + error.message);
             }
         }
 
         // Close reset modal
         function closeResetModal() {
-            document.getElementById('resetModal').classList.remove('active');
-            // Clear the URL hash
-            window.location.hash = '';
-        }
-
-        // Auth state + initial session
-        async function initAuth() {
-            const { data: { user } } = await supabase.auth.getUser();
-            if (user) currentUser = user;
-            updateAuthUI();
-        }
-
-        supabase.auth.onAuthStateChange((_event, session) => {
+            document.getElementById(' resetModal').classList.remove('active'); // Clear the URL hash
+            window.location.hash='' ; } // Auth state + initial session async function initAuth() { const { data: { user
+            } }=await supabase.auth.getUser(); if (user) currentUser=user; updateAuthUI(); }
+            supabase.auth.onAuthStateChange((_event, session)=> {
             currentUser = session?.user || null;
             updateAuthUI();
-        });
+            });
 
-        // Check for password reset on page load
-        window.addEventListener('load', () => {
+            // Check for password reset on page load
+            window.addEventListener('load', () => {
             initAuth();
             checkForPasswordReset();
-        });
-    </script>
+            });
+            </script>
+            <script src="js/index.js"></script>
 </body>
 
 </html>
