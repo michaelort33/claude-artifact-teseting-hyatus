@@ -1,4 +1,11 @@
 console.log('External JavaScript file loaded successfully!');
+console.log('Current URL:', window.location.href);
+console.log('Supabase available:', typeof window.supabase !== 'undefined');
+
+// Add global error handler
+window.addEventListener('error', (e) => {
+    console.error('Global JavaScript error:', e.message, e.filename, e.lineno);
+});
 
 // Supabase configuration
 const SUPABASE_URL = 'https://dugjgmwlzyjillkemzhz.supabase.co';
@@ -206,10 +213,20 @@ const formContainer = document.getElementById('formContainer');
 const successMessage = document.getElementById('successMessage');
 const submitButton = document.getElementById('submitButton');
 
+console.log('Form setup - Form element:', form);
+console.log('Form setup - Submit button:', submitButton);
 
+// Also add click listener to submit button as backup
+if (submitButton) {
+    submitButton.addEventListener('click', (e) => {
+        console.log('Submit button clicked!');
+    });
+}
 
 if (form) {
+    console.log('Adding submit event listener to form...');
     form.addEventListener('submit', async (e) => {
+        console.log('FORM SUBMITTED!');
         e.preventDefault();
 
         const reviewLinkInput = document.getElementById('reviewLink');
