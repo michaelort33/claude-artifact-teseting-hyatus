@@ -801,37 +801,97 @@
             box-shadow: 0 4px 12px rgba(47, 129, 247, 0.3);
         }
 
-        /* Mobile Auth Buttons */
+        /* Mobile Navigation Bar */
         .auth-buttons-mobile {
             display: none;
-            padding: 15px 20px;
-            background: rgba(21, 23, 28, 0.5);
-            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 1200;
+            background: rgba(21, 23, 28, 0.98);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        .mobile-nav-content {
+            max-width: 100%;
+            padding: 14px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .mobile-nav-logo {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--text);
+            display: flex;
+            align-items: center;
             gap: 10px;
-            justify-content: flex-end;
+            letter-spacing: -0.5px;
+        }
+
+        .mobile-nav-logo span:first-child {
+            font-size: 24px;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        .mobile-nav-buttons {
+            display: flex;
+            gap: 8px;
         }
 
         .auth-buttons-mobile .user-link,
         .auth-buttons-mobile .admin-link-top {
-            background: rgba(21, 23, 28, 0.95);
-            backdrop-filter: blur(10px);
+            background: rgba(47, 129, 247, 0.1);
             color: var(--text);
             padding: 8px 14px;
-            border: 1px solid var(--border);
+            border: 1px solid rgba(47, 129, 247, 0.2);
             border-radius: 20px;
             text-decoration: none;
-            font-size: 14px;
+            font-size: 13px;
             font-weight: 500;
-            transition: all 0.3s;
+            transition: all 0.2s;
             display: inline-flex;
             align-items: center;
             gap: 6px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .auth-buttons-mobile .user-link::before,
+        .auth-buttons-mobile .admin-link-top::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            transition: left 0.5s;
+        }
+
+        .auth-buttons-mobile .user-link:hover::before,
+        .auth-buttons-mobile .admin-link-top:hover::before {
+            left: 100%;
         }
 
         .auth-buttons-mobile .user-link:hover,
         .auth-buttons-mobile .admin-link-top:hover {
+            background: rgba(47, 129, 247, 0.2);
             border-color: var(--accent);
-            background: rgba(47, 129, 247, 0.1);
+            transform: translateY(-1px);
+        }
+
+        .auth-buttons-mobile .user-link svg,
+        .auth-buttons-mobile .admin-link-top svg {
+            width: 14px;
+            height: 14px;
+        }
+
+        .auth-button-text-mobile {
+            font-weight: 500;
         }
 
         @media (max-width: 768px) {
@@ -843,11 +903,24 @@
 
             /* Show mobile auth buttons */
             .auth-buttons-mobile {
-                display: flex;
+                display: block;
             }
 
-            .auth-button-text-mobile {
-                font-size: 13px;
+            /* Adjust header for sticky nav */
+            .header {
+                padding-top: 30px;
+            }
+
+            /* Adjust container to account for sticky nav */
+            .container {
+                padding-top: 0;
+            }
+
+            /* Adjust profile popover position on mobile */
+            .profile-popover {
+                top: 60px;
+                right: 10px;
+                width: 260px;
             }
         }
 
@@ -1274,24 +1347,32 @@
 
 <body>
     <div class="container">
-        <!-- Mobile Auth Buttons (shown only on mobile) -->
+        <!-- Mobile Navigation Bar (shown only on mobile) -->
         <div class="auth-buttons-mobile">
-            <a href="#" class="user-link" id="userAuthLinkMobile">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                    stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-                    <circle cx="12" cy="7" r="4"></circle>
-                </svg>
-                <span class="auth-button-text-mobile">Sign In</span>
-            </a>
-            <a href="admin.html" class="admin-link-top">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                    stroke-linecap="round" stroke-linejoin="round">
-                    <rect x="3" y="11" width="18" height="10" rx="2" ry="2"></rect>
-                    <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
-                </svg>
-                <span class="auth-button-text-mobile">Admin</span>
-            </a>
+            <div class="mobile-nav-content">
+                <div class="mobile-nav-logo">
+                    <span>💰</span>
+                    <span>Review Rewards</span>
+                </div>
+                <div class="mobile-nav-buttons">
+                    <a href="#" class="user-link" id="userAuthLinkMobile">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                            <circle cx="12" cy="7" r="4"></circle>
+                        </svg>
+                        <span class="auth-button-text-mobile">Sign In</span>
+                    </a>
+                    <a href="admin.html" class="admin-link-top">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="3" y="11" width="18" height="10" rx="2" ry="2"></rect>
+                            <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                        </svg>
+                        <span class="auth-button-text-mobile">Admin</span>
+                    </a>
+                </div>
+            </div>
         </div>
 
         <div class="header">
@@ -1870,27 +1951,43 @@
         });
 
         function updateAuthUI() {
+            const userAuthLinkMobile = document.getElementById('userAuthLinkMobile');
+
             if (currentUser) {
                 // Update button to show user icon and email
-                userAuthLink.innerHTML = `
+                const userHTML = `
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
                         <circle cx="12" cy="7" r="4"></circle>
                     </svg>
                     <span class="auth-button-text">${currentUser.email}</span>
                 `;
+                userAuthLink.innerHTML = userHTML;
+
+                // Update mobile button too
+                if (userAuthLinkMobile) {
+                    userAuthLinkMobile.innerHTML = userHTML.replace('auth-button-text', 'auth-button-text-mobile');
+                }
+
                 closeAuthModal();
                 closeProfilePopover();
                 loadMySubmissions();
             } else {
                 // Show sign in button
-                userAuthLink.innerHTML = `
+                const signInHTML = `
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
                         <circle cx="12" cy="7" r="4"></circle>
                     </svg>
                     <span class="auth-button-text">Sign In</span>
                 `;
+                userAuthLink.innerHTML = signInHTML;
+
+                // Update mobile button too
+                if (userAuthLinkMobile) {
+                    userAuthLinkMobile.innerHTML = signInHTML.replace('auth-button-text', 'auth-button-text-mobile');
+                }
+
                 closeProfilePopover();
             }
         }
