@@ -1780,9 +1780,27 @@
     <script src="js/index.js?v=3"></script>
 
     <script>
-        console.log('Inline JavaScript test - after loading js/index.js');
+        console.log('🟠 Inline JavaScript test - AFTER loading js/index.js');
         console.log('Testing if sendAdminNotification is available:', typeof window.sendAdminNotification);
         console.log('Testing if form element can be found:', document.getElementById('rewardForm'));
+
+        // Test if we can fetch the js file directly
+        fetch('js/index.js?v=3')
+            .then(response => {
+                console.log('📁 js/index.js fetch response:', response.status, response.statusText);
+                if (response.ok) {
+                    return response.text();
+                } else {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+            })
+            .then(text => {
+                console.log('📄 js/index.js file size:', text.length, 'characters');
+                console.log('📄 First 100 characters:', text.substring(0, 100));
+            })
+            .catch(error => {
+                console.error('❌ Failed to fetch js/index.js:', error);
+            });
     </script>
 
     <script>
