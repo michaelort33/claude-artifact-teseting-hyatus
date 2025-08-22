@@ -1,3 +1,5 @@
+console.log('External JavaScript file loaded successfully!');
+
 // Supabase configuration
 const SUPABASE_URL = 'https://dugjgmwlzyjillkemzhz.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR1Z2pnbXdsenlqaWxsa2Vtemh6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTU3MjE3MTIsImV4cCI6MjA3MTI5NzcxMn0.s9uM3exfI3hBvbiT3nZrC_whJ03IAy18202qmgJ4GOg';
@@ -194,7 +196,9 @@ const successMessage = document.getElementById('successMessage');
 const submitButton = document.getElementById('submitButton');
 
 if (form) {
+    console.log('Form found, adding submit listener...');
     form.addEventListener('submit', async (e) => {
+        console.log('Form submitted!');
         e.preventDefault();
 
         const reviewLinkInput = document.getElementById('reviewLink');
