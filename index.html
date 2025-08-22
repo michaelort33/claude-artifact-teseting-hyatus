@@ -1756,10 +1756,10 @@
 
 
 
-    <script type="text/javascript">
-        /* All inline JavaScript has been commented out
-            // ---------- Auth + User Dashboard ----------
-            function openAuthModal() {
+    <script type="text/plain">
+    /* All inline JavaScript has been commented out
+        // ---------- Auth + User Dashboard ----------
+        function openAuthModal() {
             authModal.classList.add('active');
             authError.style.display = 'none';
             authEmail.value = '';
@@ -1918,6 +1918,8 @@
             }
             }
     
+            <script type="text/plain">
+            /* This code block is disabled to prevent conflicts with external JS
             async function loadMySubmissions() {
             if (!currentUser) return;
             const { data, error } = await supabase
@@ -2071,7 +2073,9 @@
             fileUploadArea.classList.remove('has-file');
             fileName.textContent = '';
             });
-        */
+            */
+            </script>
+    */
     </script>
 
 </body>
