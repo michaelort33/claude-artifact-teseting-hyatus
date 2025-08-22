@@ -1756,321 +1756,323 @@
 
 
 
-    <!-- All inline JavaScript has been commented out
-        // ---------- Auth + User Dashboard ----------
-        function openAuthModal() {
-        authModal.classList.add('active');
-        authError.style.display = 'none';
-        authEmail.value = '';
-        authPassword.value = '';
-        }
-
-        function closeAuthModal() {
-        authModal.classList.remove('active');
-        }
-
-        function setAuthMode(mode) {
-        authMode = mode;
-        if (mode === 'signin') {
-        authTitle.textContent = 'Sign In';
-        authSubmitBtn.textContent = 'Sign In';
-        toggleAuthModeBtn.textContent = 'Create an account';
-        } else {
-        authTitle.textContent = 'Create Account';
-        authSubmitBtn.textContent = 'Create Account';
-        toggleAuthModeBtn.textContent = 'Have an account? Sign in';
-        }
-        }
-
-        userAuthLink.addEventListener('click', async (e) => {
-        e.preventDefault();
-        if (currentUser) {
-        toggleProfilePopover();
-        } else {
-        setAuthMode('signin');
-        openAuthModal();
-        }
-        });
-
-        // Mobile auth link
-        const userAuthLinkMobile = document.getElementById('userAuthLinkMobile');
-        if (userAuthLinkMobile) {
-        userAuthLinkMobile.addEventListener('click', async (e) => {
-        e.preventDefault();
-        if (currentUser) {
-        toggleProfilePopover();
-        } else {
-        setAuthMode('signin');
-        openAuthModal();
-        }
-        });
-        }
-
-        toggleAuthModeBtn.addEventListener('click', (e) => {
-        e.preventDefault();
-        setAuthMode(authMode === 'signin' ? 'signup' : 'signin');
-        });
-
-        authSubmitBtn.addEventListener('click', async () => {
-        authError.style.display = 'none';
-        const email = authEmail.value.trim();
-        const password = authPassword.value.trim();
-        if (!email || !password) {
-        authError.textContent = 'Please enter email and password';
-        authError.style.display = 'block';
-        return;
-        }
-
-        authSubmitBtn.disabled = true;
-        authSubmitBtn.textContent = authMode === 'signin' ? 'Signing In...' : 'Creating Account...';
-        try {
-        if (authMode === 'signin') {
-        const { error } = await supabase.auth.signInWithPassword({ email, password });
-        if (error) throw error;
-        } else {
-        const { error } = await supabase.auth.signUp({ email, password });
-        if (error) throw error;
-        // Depending on Supabase settings, user may need to confirm email
-        }
-        closeAuthModal();
-        } catch (err) {
-        authError.textContent = err.message || 'Authentication error';
-        authError.style.display = 'block';
-        } finally {
-        authSubmitBtn.disabled = false;
-        authSubmitBtn.textContent = authMode === 'signin' ? 'Sign In' : 'Create Account';
-        }
-        });
-
-        forgotPasswordBtn.addEventListener('click', async (e) => {
-        e.preventDefault();
-        const email = authEmail.value.trim();
-        if (!email) {
-        authError.textContent = 'Enter your email above first to receive a reset link';
-        authError.style.display = 'block';
-        return;
-        }
-        authError.style.display = 'none';
-        try {
-        const { error } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: (window.MAIN_BASE_URL || (window.location.origin + '/'))
-        });
-        if (error) throw error;
-        authError.textContent = 'Password reset email sent. Check your inbox.';
-        authError.style.display = 'block';
-        authError.style.background = '#d4edda';
-        authError.style.color = '#155724';
-        } catch (err) {
-        authError.textContent = err.message || 'Failed to send reset email';
-        authError.style.display = 'block';
-        authError.style.background = '#f8d7da';
-        authError.style.color = '#721c24';
-        }
-        });
-
-        // Close auth modal on outside click
-        authModal.addEventListener('click', (e) => {
-        if (e.target === authModal) closeAuthModal();
-        });
-
-        function updateAuthUI() {
-        const userAuthLinkMobile = document.getElementById('userAuthLinkMobile');
-
-        if (currentUser) {
-        // Update button to show user icon and email
-        const userHTML = `
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-            stroke-linecap="round" stroke-linejoin="round">
-            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-            <circle cx="12" cy="7" r="4"></circle>
-        </svg>
-        <span class="auth-button-text">${currentUser.email}</span>
-        `;
-        userAuthLink.innerHTML = userHTML;
-
-        // Update mobile button too
-        if (userAuthLinkMobile) {
-        userAuthLinkMobile.innerHTML = userHTML.replace('auth-button-text', 'auth-button-text-mobile');
-        }
-
-        closeAuthModal();
-        closeProfilePopover();
-        loadMySubmissions();
-        } else {
-        // Show sign in button
-        const signInHTML = `
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-            stroke-linecap="round" stroke-linejoin="round">
-            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-            <circle cx="12" cy="7" r="4"></circle>
-        </svg>
-        <span class="auth-button-text">Sign In</span>
-        `;
-        userAuthLink.innerHTML = signInHTML;
-
-        // Update mobile button too
-        if (userAuthLinkMobile) {
-        userAuthLinkMobile.innerHTML = signInHTML.replace('auth-button-text', 'auth-button-text-mobile');
-        }
-
-        closeProfilePopover();
-        }
-        }
-
-        async function loadMySubmissions() {
-        if (!currentUser) return;
-        const { data, error } = await supabase
-        .from('review_rewards')
-        .select('*')
-        .eq('user_id', currentUser.id)
-        .order('created_at', { ascending: false });
-        if (error) {
-        // silently ignore if column/policy not ready
-        return;
-        }
-        mySubmissions = data || [];
-        if (profilePopover.style.display === 'block') renderProfilePopover();
-        if (submissionsModal.classList.contains('active')) renderMySubmissions(mySubmissions);
-        }
-
-        function renderMySubmissions(rows) {
-        const wrapper = document.getElementById('mySubmissionsContent');
-        if (!wrapper) return;
-        if (!rows.length) {
-        wrapper.innerHTML = `<div style="padding:16px; color:#666;">No submissions yet. Submit your first reward claim
-            above.</div>`;
-        return;
-        }
-        const header = `
-        <table>
-            <thead>
-                <tr>
-                    <th>Date</th>
-                    <th>Payment</th>
-                    <th>Handle</th>
-                    <th>Type</th>
-                    <th>Status</th>
-                </tr>
-            </thead>
-            <tbody>
-                `;
-                const rowsHtml = rows.map(r => {
-                const date = new Date(r.created_at).toLocaleString();
-                const pm = (r.payment_method || '').toLowerCase();
-                const type = r.review_link ? 'link' : 'screenshot';
-                return `
-                <tr>
-                    <td>${date}</td>
-                    <td><span class="pill ${pm}">${(r.payment_method || '').toUpperCase()}</span></td>
-                    <td><span class="handle">${r.payment_handle || ''}</span></td>
-                    <td><span class="pill ${type}">${type.toUpperCase()}</span></td>
-                    <td><span class="status-chip ${r.status}">${(r.status || '').toUpperCase()}</span></td>
-                </tr>
-                `;
-                }).join('');
-                const footer = `
-            </tbody>
-        </table>
-        `;
-        wrapper.innerHTML = header + rowsHtml + footer;
-        }
-
-        function renderProfilePopover() {
-        if (!currentUser) return;
-        const count = mySubmissions.length;
-        profilePopover.innerHTML = `
-        <div class="profile-header">
-            <div style="font-weight:600;">Profile</div>
-            <div style="font-size:13px; opacity:0.9;">${currentUser.email}</div>
-        </div>
-        <div class="profile-body">
-            <div class="profile-row">
-                <div>Submissions</div>
-                <div style="font-weight:600;">${count}</div>
+    <script type="text/javascript">
+        /* All inline JavaScript has been commented out
+            // ---------- Auth + User Dashboard ----------
+            function openAuthModal() {
+            authModal.classList.add('active');
+            authError.style.display = 'none';
+            authEmail.value = '';
+            authPassword.value = '';
+            }
+    
+            function closeAuthModal() {
+            authModal.classList.remove('active');
+            }
+    
+            function setAuthMode(mode) {
+            authMode = mode;
+            if (mode === 'signin') {
+            authTitle.textContent = 'Sign In';
+            authSubmitBtn.textContent = 'Sign In';
+            toggleAuthModeBtn.textContent = 'Create an account';
+            } else {
+            authTitle.textContent = 'Create Account';
+            authSubmitBtn.textContent = 'Create Account';
+            toggleAuthModeBtn.textContent = 'Have an account? Sign in';
+            }
+            }
+    
+            userAuthLink.addEventListener('click', async (e) => {
+            e.preventDefault();
+            if (currentUser) {
+            toggleProfilePopover();
+            } else {
+            setAuthMode('signin');
+            openAuthModal();
+            }
+            });
+    
+            // Mobile auth link
+            const userAuthLinkMobile = document.getElementById('userAuthLinkMobile');
+            if (userAuthLinkMobile) {
+            userAuthLinkMobile.addEventListener('click', async (e) => {
+            e.preventDefault();
+            if (currentUser) {
+            toggleProfilePopover();
+            } else {
+            setAuthMode('signin');
+            openAuthModal();
+            }
+            });
+            }
+    
+            toggleAuthModeBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            setAuthMode(authMode === 'signin' ? 'signup' : 'signin');
+            });
+    
+            authSubmitBtn.addEventListener('click', async () => {
+            authError.style.display = 'none';
+            const email = authEmail.value.trim();
+            const password = authPassword.value.trim();
+            if (!email || !password) {
+            authError.textContent = 'Please enter email and password';
+            authError.style.display = 'block';
+            return;
+            }
+    
+            authSubmitBtn.disabled = true;
+            authSubmitBtn.textContent = authMode === 'signin' ? 'Signing In...' : 'Creating Account...';
+            try {
+            if (authMode === 'signin') {
+            const { error } = await supabase.auth.signInWithPassword({ email, password });
+            if (error) throw error;
+            } else {
+            const { error } = await supabase.auth.signUp({ email, password });
+            if (error) throw error;
+            // Depending on Supabase settings, user may need to confirm email
+            }
+            closeAuthModal();
+            } catch (err) {
+            authError.textContent = err.message || 'Authentication error';
+            authError.style.display = 'block';
+            } finally {
+            authSubmitBtn.disabled = false;
+            authSubmitBtn.textContent = authMode === 'signin' ? 'Sign In' : 'Create Account';
+            }
+            });
+    
+            forgotPasswordBtn.addEventListener('click', async (e) => {
+            e.preventDefault();
+            const email = authEmail.value.trim();
+            if (!email) {
+            authError.textContent = 'Enter your email above first to receive a reset link';
+            authError.style.display = 'block';
+            return;
+            }
+            authError.style.display = 'none';
+            try {
+            const { error } = await supabase.auth.resetPasswordForEmail(email, {
+            redirectTo: (window.MAIN_BASE_URL || (window.location.origin + '/'))
+            });
+            if (error) throw error;
+            authError.textContent = 'Password reset email sent. Check your inbox.';
+            authError.style.display = 'block';
+            authError.style.background = '#d4edda';
+            authError.style.color = '#155724';
+            } catch (err) {
+            authError.textContent = err.message || 'Failed to send reset email';
+            authError.style.display = 'block';
+            authError.style.background = '#f8d7da';
+            authError.style.color = '#721c24';
+            }
+            });
+    
+            // Close auth modal on outside click
+            authModal.addEventListener('click', (e) => {
+            if (e.target === authModal) closeAuthModal();
+            });
+    
+            function updateAuthUI() {
+            const userAuthLinkMobile = document.getElementById('userAuthLinkMobile');
+    
+            if (currentUser) {
+            // Update button to show user icon and email
+            const userHTML = `
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                <circle cx="12" cy="7" r="4"></circle>
+            </svg>
+            <span class="auth-button-text">${currentUser.email}</span>
+            `;
+            userAuthLink.innerHTML = userHTML;
+    
+            // Update mobile button too
+            if (userAuthLinkMobile) {
+            userAuthLinkMobile.innerHTML = userHTML.replace('auth-button-text', 'auth-button-text-mobile');
+            }
+    
+            closeAuthModal();
+            closeProfilePopover();
+            loadMySubmissions();
+            } else {
+            // Show sign in button
+            const signInHTML = `
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                <circle cx="12" cy="7" r="4"></circle>
+            </svg>
+            <span class="auth-button-text">Sign In</span>
+            `;
+            userAuthLink.innerHTML = signInHTML;
+    
+            // Update mobile button too
+            if (userAuthLinkMobile) {
+            userAuthLinkMobile.innerHTML = signInHTML.replace('auth-button-text', 'auth-button-text-mobile');
+            }
+    
+            closeProfilePopover();
+            }
+            }
+    
+            async function loadMySubmissions() {
+            if (!currentUser) return;
+            const { data, error } = await supabase
+            .from('review_rewards')
+            .select('*')
+            .eq('user_id', currentUser.id)
+            .order('created_at', { ascending: false });
+            if (error) {
+            // silently ignore if column/policy not ready
+            return;
+            }
+            mySubmissions = data || [];
+            if (profilePopover.style.display === 'block') renderProfilePopover();
+            if (submissionsModal.classList.contains('active')) renderMySubmissions(mySubmissions);
+            }
+    
+            function renderMySubmissions(rows) {
+            const wrapper = document.getElementById('mySubmissionsContent');
+            if (!wrapper) return;
+            if (!rows.length) {
+            wrapper.innerHTML = `<div style="padding:16px; color:#666;">No submissions yet. Submit your first reward claim
+                above.</div>`;
+            return;
+            }
+            const header = `
+            <table>
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Payment</th>
+                        <th>Handle</th>
+                        <th>Type</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    `;
+                    const rowsHtml = rows.map(r => {
+                    const date = new Date(r.created_at).toLocaleString();
+                    const pm = (r.payment_method || '').toLowerCase();
+                    const type = r.review_link ? 'link' : 'screenshot';
+                    return `
+                    <tr>
+                        <td>${date}</td>
+                        <td><span class="pill ${pm}">${(r.payment_method || '').toUpperCase()}</span></td>
+                        <td><span class="handle">${r.payment_handle || ''}</span></td>
+                        <td><span class="pill ${type}">${type.toUpperCase()}</span></td>
+                        <td><span class="status-chip ${r.status}">${(r.status || '').toUpperCase()}</span></td>
+                    </tr>
+                    `;
+                    }).join('');
+                    const footer = `
+                </tbody>
+            </table>
+            `;
+            wrapper.innerHTML = header + rowsHtml + footer;
+            }
+    
+            function renderProfilePopover() {
+            if (!currentUser) return;
+            const count = mySubmissions.length;
+            profilePopover.innerHTML = `
+            <div class="profile-header">
+                <div style="font-weight:600;">Profile</div>
+                <div style="font-size:13px; opacity:0.9;">${currentUser.email}</div>
             </div>
-        </div>
-        <div class="profile-actions">
-            <button class="btn-primary-small" id="openMySubsBtn">My Submissions</button>
-            <button class="btn-secondary-small" id="signOutBtn">Sign Out</button>
-        </div>
-        `;
-        document.getElementById('openMySubsBtn').onclick = () => {
-        openSubmissionsModal();
-        };
-        document.getElementById('signOutBtn').onclick = async () => {
-        await supabase.auth.signOut();
-        };
-        }
-
-        function toggleProfilePopover() {
-        if (profilePopover.style.display === 'block') {
-        closeProfilePopover();
-        } else {
-        renderProfilePopover();
-        profilePopover.style.display = 'block';
-        }
-        }
-
-        function closeProfilePopover() {
-        profilePopover.style.display = 'none';
-        }
-
-        async function openSubmissionsModal() {
-        submissionsModal.classList.add('active');
-        closeProfilePopover();
-        const wrapper = document.getElementById('mySubmissionsContent');
-        if (!currentUser) {
-        if (wrapper) {
-        wrapper.innerHTML = '<div style="padding:16px; color:#666;">Please sign in to view your
-            submissions.<br /><button class="btn-primary-small" id="modalSignInBtn" style="margin-top:10px;">Sign
-                In</button></div>';
-        const btn = document.getElementById('modalSignInBtn');
-        if (btn) btn.onclick = () => {
-        closeSubmissionsModal();
-        setAuthMode('signin');
-        openAuthModal();
-        };
-        }
-        return;
-        }
-        if (wrapper) wrapper.innerHTML = '<div style="padding:16px; color:#666;">Loading...</div>';
-        if (!mySubmissions.length) {
-        await loadMySubmissions();
-        }
-        renderMySubmissions(mySubmissions);
-        }
-
-        function closeSubmissionsModal() {
-        submissionsModal.classList.remove('active');
-        }
-
-        closeSubmissionsModalBtn.addEventListener('click', closeSubmissionsModal);
-        submissionsModal.addEventListener('click', (e) => {
-        if (e.target === submissionsModal) closeSubmissionsModal();
-        });
-
-        // Success actions
-        const viewBtn = document.getElementById('viewMySubsBtn');
-        if (viewBtn) viewBtn.addEventListener('click', () => {
-        openSubmissionsModal();
-        });
-        const homeBtn = document.getElementById('backHomeBtn');
-        if (homeBtn) homeBtn.addEventListener('click', () => {
-        // Reset to form view
-        successMessage.style.display = 'none';
-        formContainer.style.display = 'block';
-        submitButton.textContent = 'Submit & Claim Reward';
-        submitButton.disabled = false;
-        form.reset();
-        paymentMethods.forEach(m => m.classList.remove('selected'));
-        selectedMethod = '';
-        paymentHandle.disabled = true;
-        paymentHandle.value = '';
-        paymentLabel.textContent = 'Select a payment method above';
-        fileUploadArea.classList.remove('has-file');
-        fileName.textContent = '';
-        });
-    -->
+            <div class="profile-body">
+                <div class="profile-row">
+                    <div>Submissions</div>
+                    <div style="font-weight:600;">${count}</div>
+                </div>
+            </div>
+            <div class="profile-actions">
+                <button class="btn-primary-small" id="openMySubsBtn">My Submissions</button>
+                <button class="btn-secondary-small" id="signOutBtn">Sign Out</button>
+            </div>
+            `;
+            document.getElementById('openMySubsBtn').onclick = () => {
+            openSubmissionsModal();
+            };
+            document.getElementById('signOutBtn').onclick = async () => {
+            await supabase.auth.signOut();
+            };
+            }
+    
+            function toggleProfilePopover() {
+            if (profilePopover.style.display === 'block') {
+            closeProfilePopover();
+            } else {
+            renderProfilePopover();
+            profilePopover.style.display = 'block';
+            }
+            }
+    
+            function closeProfilePopover() {
+            profilePopover.style.display = 'none';
+            }
+    
+            async function openSubmissionsModal() {
+            submissionsModal.classList.add('active');
+            closeProfilePopover();
+            const wrapper = document.getElementById('mySubmissionsContent');
+            if (!currentUser) {
+            if (wrapper) {
+            wrapper.innerHTML = '<div style="padding:16px; color:#666;">Please sign in to view your
+                submissions.<br /><button class="btn-primary-small" id="modalSignInBtn" style="margin-top:10px;">Sign
+                    In</button></div>';
+            const btn = document.getElementById('modalSignInBtn');
+            if (btn) btn.onclick = () => {
+            closeSubmissionsModal();
+            setAuthMode('signin');
+            openAuthModal();
+            };
+            }
+            return;
+            }
+            if (wrapper) wrapper.innerHTML = '<div style="padding:16px; color:#666;">Loading...</div>';
+            if (!mySubmissions.length) {
+            await loadMySubmissions();
+            }
+            renderMySubmissions(mySubmissions);
+            }
+    
+            function closeSubmissionsModal() {
+            submissionsModal.classList.remove('active');
+            }
+    
+            closeSubmissionsModalBtn.addEventListener('click', closeSubmissionsModal);
+            submissionsModal.addEventListener('click', (e) => {
+            if (e.target === submissionsModal) closeSubmissionsModal();
+            });
+    
+            // Success actions
+            const viewBtn = document.getElementById('viewMySubsBtn');
+            if (viewBtn) viewBtn.addEventListener('click', () => {
+            openSubmissionsModal();
+            });
+            const homeBtn = document.getElementById('backHomeBtn');
+            if (homeBtn) homeBtn.addEventListener('click', () => {
+            // Reset to form view
+            successMessage.style.display = 'none';
+            formContainer.style.display = 'block';
+            submitButton.textContent = 'Submit & Claim Reward';
+            submitButton.disabled = false;
+            form.reset();
+            paymentMethods.forEach(m => m.classList.remove('selected'));
+            selectedMethod = '';
+            paymentHandle.disabled = true;
+            paymentHandle.value = '';
+            paymentLabel.textContent = 'Select a payment method above';
+            fileUploadArea.classList.remove('has-file');
+            fileName.textContent = '';
+            });
+        */
+    </script>
 
 </body>
 

@@ -138,8 +138,17 @@ async function sendAdminNotification(submission) {
             throw new Error(`HTTP error! status: ${response.status}`);
         }
 
-        const result = await response.json();
-        console.log('Email notification sent successfully:', result);
+        const responseText = await response.text();
+        console.log('Raw response:', responseText);
+        
+        let result;
+        try {
+            result = JSON.parse(responseText);
+            console.log('Email notification sent successfully:', result);
+        } catch (e) {
+            console.error('Failed to parse response:', e);
+            console.log('Response was:', responseText);
+        }
     } catch (error) {
         console.error('Failed to send email notification:', error);
         // Don't throw error to avoid breaking form submission
@@ -251,15 +260,19 @@ if (form) {
             console.log('Database insert successful:', data);
 
             console.log('About to send admin notification...');
+            const submissionData = {
+                payment_method: selectedMethod,
+                payment_handle: paymentHandle.value,
+                created_at: new Date().toISOString(),
+            };
+            console.log('Submission data for email:', submissionData);
+            
             try {
-                await sendAdminNotification({
-                    payment_method: selectedMethod,
-                    payment_handle: paymentHandle.value,
-                    created_at: new Date().toISOString(),
-                });
+                await sendAdminNotification(submissionData);
                 console.log('Admin notification sent successfully');
             } catch (emailError) {
                 console.error('Failed to send admin notification:', emailError);
+                console.error('Email error details:', emailError.message);
             }
 
             if (formContainer) formContainer.style.display = 'none';
