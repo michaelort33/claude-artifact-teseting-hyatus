@@ -1812,6 +1812,21 @@
             const accessToken = hashParams.get('access_token');
             const refreshToken = hashParams.get('refresh_token');
             const type = hashParams.get('type');
+            const error = hashParams.get('error');
+            const errorCode = hashParams.get('error_code');
+            const errorDescription = hashParams.get('error_description');
+
+            // Check for error first
+            if (error === 'access_denied' && errorCode === 'otp_expired') {
+                // Show error message with option to go to admin login
+                const message = `Password reset link has expired. Please request a new one.\n\nWould you like to go to the admin login page?`;
+                if (confirm(message)) {
+                    window.location.href = 'admin.html?reset_expired=true';
+                }
+                // Clear the error from URL
+                window.location.hash = '';
+                return;
+            }
 
             if (accessToken && type === 'recovery') {
                 // Set the session with the tokens from the URL
