@@ -184,15 +184,23 @@ if (form) {
         }
 
         try {
+            console.log('Starting form submission...');
             let screenshotData = null;
             if (hasScreenshot && uploadedFile) {
+                console.log('Converting file to base64...');
                 screenshotData = await fileToBase64(uploadedFile);
             }
 
-            const { data: userResp } = await supabase.auth.getUser();
+            console.log('Getting user...');
+            const { data: userResp, error: userError } = await supabase.auth.getUser();
+            if (userError) {
+                console.error('User error:', userError);
+            }
             const userId = userResp?.user?.id || null;
+            console.log('User ID:', userId);
 
-            const { error } = await supabase
+            console.log('Inserting into database...');
+            const { data, error } = await supabase
                 .from('review_rewards')
                 .insert([
                     {
@@ -205,7 +213,11 @@ if (form) {
                     },
                 ]);
 
-            if (error) throw error;
+            if (error) {
+                console.error('Database error:', error);
+                throw error;
+            }
+            console.log('Database insert successful:', data);
 
             try {
                 await sendAdminNotification({

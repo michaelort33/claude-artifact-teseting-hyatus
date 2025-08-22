@@ -2153,83 +2153,8 @@
         fileName.textContent = '';
         });
 
-        // Check for password reset token in URL
-        async function checkForPasswordReset() {
-        const hashParams = new URLSearchParams(window.location.hash.substring(1));
-        const accessToken = hashParams.get('access_token');
-        const refreshToken = hashParams.get('refresh_token');
-        const type = hashParams.get('type');
-        const error = hashParams.get('error');
-        const errorCode = hashParams.get('error_code');
-        const errorDescription = hashParams.get('error_description');
-
-        // Check for error first
-        if (error === 'access_denied' && errorCode === 'otp_expired') {
-        // Show error message with option to go to admin login
-        const message = `Password reset link has expired. Please request a new one.\n\nWould you like to go to the admin
-        login page?`;
-        if (confirm(message)) {
-        window.location.href = 'admin.html?reset_expired=true';
-        }
-        // Clear the error from URL
-        window.location.hash = '';
-        return;
-        }
-
-        if (accessToken && type === 'recovery') {
-        // Set the session with the tokens from the URL
-        const { data, error } = await supabase.auth.setSession({
-        access_token: accessToken,
-        refresh_token: refreshToken
-        });
-
-        if (error) {
-        alert('Error setting up password reset session: ' + error.message);
-        return;
-        }
-
-        // Show password reset modal
-        document.getElementById('resetModal').classList.add('active');
-        }
-        }
-
-        // Password reset function
-        async function resetPassword() {
-        const newPassword = document.getElementById('newPassword').value;
-        const confirmPassword = document.getElementById('confirmPassword').value;
-
-        if (newPassword !== confirmPassword) {
-        alert('Passwords do not match!');
-        return;
-        }
-
-        if (newPassword.length < 6) { alert('Password must be at least 6 characters long!'); return; } try { // First
-            check if we have a session const { data: { session } }=await supabase.auth.getSession(); if (!session) {
-            alert('Session expired. Please request a new password reset link.'); closeResetModal(); return; } // Now
-            update the password const { data, error }=await supabase.auth.updateUser({ password: newPassword }); if
-            (error) throw error; alert('Password updated successfully! Redirecting to admin login...'); // Sign out to
-            clear the session await supabase.auth.signOut(); // Redirect to site home (not admin)
-            window.location.href='index.html' ; } catch (error) { alert('Error updating password: ' + error.message);
-            }
-        }
-
-        // Close reset modal
-        function closeResetModal() {
-            document.getElementById(' resetModal').classList.remove('active'); // Clear the URL hash
-            window.location.hash='' ; } // Auth state + initial session async function initAuth() { const { data: { user
-            } }=await supabase.auth.getUser(); if (user) currentUser=user; updateAuthUI(); }
-            supabase.auth.onAuthStateChange((_event, session)=> {
-            currentUser = session?.user || null;
-            updateAuthUI();
-            });
-
-            // Check for password reset on page load
-            window.addEventListener('load', () => {
-            initAuth();
-            checkForPasswordReset();
-            });
-            </script>
-            <script src="js/index.js"></script>
+        </script>
+        <script src="js/index.js"></script>
 </body>
 
 </html>
