@@ -1746,6 +1746,9 @@
     <!-- Test if JavaScript is working at all -->
     <script>
         console.log('Inline JavaScript test - before loading js/index.js');
+        console.warn('WARNING TEST - This should appear in yellow/orange');
+        console.error('ERROR TEST - This should appear in red');
+        alert('JavaScript is working! Check console for messages.');
         document.addEventListener('DOMContentLoaded', function () {
             document.body.style.border = '3px solid red';
             console.log('DOMContentLoaded fired - added red border to body');
