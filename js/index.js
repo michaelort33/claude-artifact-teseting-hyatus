@@ -125,26 +125,36 @@ function showError(message) {
 // Send admin notification email
 async function sendAdminNotification(submission) {
     console.log('sendAdminNotification called with:', submission);
+    console.log('Current domain:', window.location.origin);
+    console.log('Supabase URL:', 'https://dugjgmwlzyjillkemzhz.supabase.co/functions/v1/send-admin-notification');
+    
+    const requestBody = {
+        record: submission
+    };
+    console.log('Request body:', JSON.stringify(requestBody, null, 2));
+    
     try {
         console.log('Making fetch request to Edge Function...');
+        console.log('Starting fetch at:', new Date().toISOString());
+        
         const response = await fetch('https://dugjgmwlzyjillkemzhz.supabase.co/functions/v1/send-admin-notification', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
             },
-            body: JSON.stringify({
-                record: submission
-            })
+            body: JSON.stringify(requestBody)
         });
 
+        console.log('Fetch completed at:', new Date().toISOString());
         console.log('Response status:', response.status);
         console.log('Response ok:', response.ok);
+        console.log('Response headers:', Object.fromEntries(response.headers.entries()));
 
         if (!response.ok) {
             const errorText = await response.text();
             console.error('Response error text:', errorText);
-            throw new Error(`HTTP error! status: ${response.status}`);
+            throw new Error(`HTTP error! status: ${response.status} - ${errorText}`);
         }
 
         const responseText = await response.text();
@@ -154,13 +164,19 @@ async function sendAdminNotification(submission) {
         try {
             result = JSON.parse(responseText);
             console.log('Email notification sent successfully:', result);
+            return result;
         } catch (e) {
             console.error('Failed to parse response:', e);
             console.log('Response was:', responseText);
+            return { success: true, rawResponse: responseText };
         }
     } catch (error) {
         console.error('Failed to send email notification:', error);
-        // Don't throw error to avoid breaking form submission
+        console.error('Error name:', error.name);
+        console.error('Error message:', error.message);
+        console.error('Error stack:', error.stack);
+        // Re-throw error so caller can handle it properly
+        throw error;
     }
 }
 
@@ -279,6 +295,8 @@ if (form) {
             console.log('Database insert successful:', data);
 
             console.log('About to send admin notification...');
+            console.log('Current URL/domain:', window.location.origin);
+            
             const submissionData = {
                 payment_method: selectedMethod,
                 payment_handle: paymentHandle.value,
@@ -286,13 +304,16 @@ if (form) {
             };
             console.log('Submission data for email:', submissionData);
 
+            console.log('Calling sendAdminNotification function...');
             try {
-                await sendAdminNotification(submissionData);
-                console.log('Admin notification sent successfully');
+                const emailResult = await sendAdminNotification(submissionData);
+                console.log('Admin notification sent successfully:', emailResult);
             } catch (emailError) {
                 console.error('Failed to send admin notification:', emailError);
                 console.error('Email error details:', emailError.message);
+                console.error('Email error stack:', emailError.stack);
             }
+            console.log('Email notification call completed (success or failure)');
 
             if (formContainer) formContainer.style.display = 'none';
             if (successMessage) successMessage.style.display = 'block';
@@ -724,5 +745,38 @@ window.addEventListener('load', () => {
 // Make sendAdminNotification globally accessible for testing
 window.sendAdminNotification = sendAdminNotification;
 console.log('sendAdminNotification function is now available globally for testing');
+
+// Add test email button functionality
+const testEmailBtn = document.getElementById('testEmailBtn');
+if (testEmailBtn) {
+    testEmailBtn.addEventListener('click', async () => {
+        console.log('Test email button clicked!');
+        testEmailBtn.textContent = '⏳ Testing...';
+        testEmailBtn.disabled = true;
+        
+        const testData = {
+            payment_method: 'venmo',
+            payment_handle: '@testuser',
+            created_at: new Date().toISOString(),
+        };
+        
+        try {
+            console.log('Testing email function with test data:', testData);
+            const result = await sendAdminNotification(testData);
+            console.log('Test email result:', result);
+            alert('Test email sent successfully! Check console for details.');
+            testEmailBtn.textContent = '✅ Test Successful';
+        } catch (error) {
+            console.error('Test email failed:', error);
+            alert('Test email failed! Check console for details. Error: ' + error.message);
+            testEmailBtn.textContent = '❌ Test Failed';
+        }
+        
+        setTimeout(() => {
+            testEmailBtn.textContent = '🧪 Test Email Function';
+            testEmailBtn.disabled = false;
+        }, 3000);
+    });
+}
 
 
