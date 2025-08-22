@@ -1514,8 +1514,8 @@
 
             <!-- Debug Test Button -->
             <button type="button" id="testEmailBtn"
-                style="margin-top: 10px; padding: 10px 20px; background: #f44336; color: white; border: none; border-radius: 5px; cursor: pointer;">
-                🧪 Test Email Function
+                style="margin-top: 20px; padding: 15px 25px; background: #f44336; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 16px; font-weight: bold; display: block; width: 100%; max-width: 300px; margin-left: auto; margin-right: auto; box-shadow: 0 4px 8px rgba(244, 67, 54, 0.3);">
+                🧪 TEST EMAIL FUNCTION
             </button>
 
 
@@ -1781,6 +1781,8 @@
 
     <script>
         console.log('Inline JavaScript test - after loading js/index.js');
+        console.log('Testing if sendAdminNotification is available:', typeof window.sendAdminNotification);
+        console.log('Testing if form element can be found:', document.getElementById('rewardForm'));
     </script>
 
     <script>

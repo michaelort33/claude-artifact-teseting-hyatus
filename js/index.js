@@ -1,6 +1,8 @@
-console.log('External JavaScript file loaded successfully!');
+console.log('🚀 External JavaScript file loaded successfully!');
 console.log('Current URL:', window.location.href);
 console.log('Supabase available:', typeof window.supabase !== 'undefined');
+console.log('DOM ready state:', document.readyState);
+console.log('Page load time:', new Date().toISOString());
 
 // Add global error handler
 window.addEventListener('error', (e) => {
@@ -229,20 +231,51 @@ const formContainer = document.getElementById('formContainer');
 const successMessage = document.getElementById('successMessage');
 const submitButton = document.getElementById('submitButton');
 
-console.log('Form setup - Form element:', form);
-console.log('Form setup - Submit button:', submitButton);
+console.log('🔍 ELEMENT DEBUGGING:');
+console.log('Form element:', form);
+console.log('Form container:', formContainer);
+console.log('Success message:', successMessage);
+console.log('Submit button:', submitButton);
+console.log('Payment handle input:', document.getElementById('paymentHandle'));
+console.log('Review link input:', document.getElementById('reviewLink'));
+console.log('File input:', document.getElementById('reviewScreenshot'));
 
 // Also add click listener to submit button as backup
 if (submitButton) {
+    console.log('Submit button found:', submitButton);
+    console.log('Submit button ID:', submitButton.id);
+    console.log('Submit button type:', submitButton.type);
+
     submitButton.addEventListener('click', (e) => {
-        console.log('Submit button clicked!');
+        console.log('🔥 SUBMIT BUTTON CLICKED!');
+        console.log('Click event:', e);
+        console.log('Button type:', e.target.type);
+        console.log('Form element from button:', e.target.form);
+
+        // If the button type is not "submit", manually trigger form submission
+        if (e.target.type !== 'submit') {
+            console.log('Button is not type submit, manually triggering form submit...');
+            if (form) {
+                console.log('Manually dispatching submit event...');
+                form.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
+            }
+        }
     });
 }
 
 if (form) {
     console.log('Adding submit event listener to form...');
+    console.log('Form element found:', form);
+    console.log('Form ID:', form.id);
+    console.log('Form action:', form.action);
+    console.log('Form method:', form.method);
+
     form.addEventListener('submit', async (e) => {
-        console.log('FORM SUBMITTED!');
+        console.log('🔥 FORM SUBMITTED EVENT FIRED!');
+        console.log('Event object:', e);
+        console.log('Event type:', e.type);
+        console.log('Event target:', e.target);
+        console.log('Preventing default...');
         e.preventDefault();
 
         const reviewLinkInput = document.getElementById('reviewLink');
@@ -765,8 +798,6 @@ window.addEventListener('load', () => {
 window.sendAdminNotification = sendAdminNotification;
 console.log('sendAdminNotification function is now available globally for testing');
 
-<<<<<<< Current (Your changes)
-=======
 // Add test email button functionality
 const testEmailBtn = document.getElementById('testEmailBtn');
 if (testEmailBtn) {
@@ -799,6 +830,4 @@ if (testEmailBtn) {
         }, 3000);
     });
 }
-
->>>>>>> Incoming (Background Agent changes)
 
