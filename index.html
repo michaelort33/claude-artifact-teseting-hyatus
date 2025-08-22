@@ -801,21 +801,53 @@
             box-shadow: 0 4px 12px rgba(47, 129, 247, 0.3);
         }
 
-        @media (max-width: 480px) {
+        /* Mobile Auth Buttons */
+        .auth-buttons-mobile {
+            display: none;
+            padding: 15px 20px;
+            background: rgba(21, 23, 28, 0.5);
+            border-bottom: 1px solid var(--border);
+            gap: 10px;
+            justify-content: flex-end;
+        }
+
+        .auth-buttons-mobile .user-link,
+        .auth-buttons-mobile .admin-link-top {
+            background: rgba(21, 23, 28, 0.95);
+            backdrop-filter: blur(10px);
+            color: var(--text);
+            padding: 8px 14px;
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .auth-buttons-mobile .user-link:hover,
+        .auth-buttons-mobile .admin-link-top:hover {
+            border-color: var(--accent);
+            background: rgba(47, 129, 247, 0.1);
+        }
+
+        @media (max-width: 768px) {
+
+            /* Hide fixed auth buttons on mobile */
             .auth-buttons {
-                top: 10px;
-                right: 10px;
-                gap: 6px;
+                display: none !important;
             }
 
-            .user-link,
-            .admin-link-top {
-                padding: 8px 12px;
+            /* Show mobile auth buttons */
+            .auth-buttons-mobile {
+                display: flex;
+            }
+
+            .auth-button-text-mobile {
                 font-size: 13px;
-            }
-
-            .auth-button-text {
-                display: none;
             }
         }
 
@@ -1242,6 +1274,26 @@
 
 <body>
     <div class="container">
+        <!-- Mobile Auth Buttons (shown only on mobile) -->
+        <div class="auth-buttons-mobile">
+            <a href="#" class="user-link" id="userAuthLinkMobile">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                    <circle cx="12" cy="7" r="4"></circle>
+                </svg>
+                <span class="auth-button-text-mobile">Sign In</span>
+            </a>
+            <a href="admin.html" class="admin-link-top">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="3" y="11" width="18" height="10" rx="2" ry="2"></rect>
+                    <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                </svg>
+                <span class="auth-button-text-mobile">Admin</span>
+            </a>
+        </div>
+
         <div class="header">
             <h1>🎉 Claim Your Review Reward</h1>
             <p>Thank you for your review! Submit proof below to receive your reward.</p>
@@ -1735,6 +1787,20 @@
                 openAuthModal();
             }
         });
+
+        // Mobile auth link
+        const userAuthLinkMobile = document.getElementById('userAuthLinkMobile');
+        if (userAuthLinkMobile) {
+            userAuthLinkMobile.addEventListener('click', async (e) => {
+                e.preventDefault();
+                if (currentUser) {
+                    toggleProfilePopover();
+                } else {
+                    setAuthMode('signin');
+                    openAuthModal();
+                }
+            });
+        }
 
         toggleAuthModeBtn.addEventListener('click', (e) => {
             e.preventDefault();
