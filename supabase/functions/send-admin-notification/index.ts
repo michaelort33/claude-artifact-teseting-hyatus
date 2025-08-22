@@ -17,11 +17,16 @@ serve(async (req) => {
         'https://feedback.hyatus.com',
         'http://localhost:8000',
         'http://localhost:3000',
-        'https://merry-monstera-b43126.netlify.app'
+        'https://merry-monstera-b43126.netlify.app',
+        'https://claude-artifact-teseting-hyatus.netlify.app',
+        'https://main--claude-artifact-teseting-hyatus.netlify.app'
     ];
     
+    // Also allow any *.netlify.app domain for testing
+    const isNetlifyDomain = origin && origin.includes('.netlify.app');
+    
     // Check if the origin is allowed
-    const corsOrigin = allowedOrigins.includes(origin) ? origin : 'https://feedback.hyatus.com';
+    const corsOrigin = (allowedOrigins.includes(origin) || isNetlifyDomain) ? origin : 'https://feedback.hyatus.com';
     
     // Handle CORS preflight requests
     if (req.method === 'OPTIONS') {
