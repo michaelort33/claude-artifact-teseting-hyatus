@@ -123,7 +123,7 @@ function showError(message) {
 // Send admin notification email
 async function sendAdminNotification(submission) {
     const requestBody = { record: submission };
-    
+
     try {
         const response = await fetch('https://dugjgmwlzyjillkemzhz.supabase.co/functions/v1/send-admin-notification', {
             method: 'POST',
@@ -231,7 +231,7 @@ if (form) {
             submitButton.disabled = true;
         }
 
-                try {
+        try {
             let screenshotData = null;
             if (hasScreenshot && uploadedFile) {
                 screenshotData = await fileToBase64(uploadedFile);
