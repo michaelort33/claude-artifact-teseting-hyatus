@@ -5,27 +5,7 @@ const SUPABASE_URL = 'https://dugjgmwlzyjillkemzhz.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR1Z2pnbXdsenlqaWxsa2Vtemh6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTU3MjE3MTIsImV4cCI6MjA3MTI5NzcxMn0.s9uM3exfI3hBvbiT3nZrC_whJ03IAy18202qmgJ4GOg';
 
 // Initialize Supabase client
-console.log('Initializing Supabase client...');
-console.log('window.supabase:', window.supabase);
 const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-console.log('Supabase client created:', supabase);
-
-// Test Supabase connection
-async function testSupabaseConnection() {
-    try {
-        const { data, error } = await supabase.from('review_rewards').select('count').limit(1);
-        if (error) {
-            console.error('Supabase connection test failed:', error);
-        } else {
-            console.log('Supabase connection test successful');
-        }
-    } catch (err) {
-        console.error('Supabase connection test error:', err);
-    }
-}
-
-// Run test on page load
-testSupabaseConnection();
 
 let currentUser = null;
 let selectedMethod = '';
@@ -43,11 +23,7 @@ const paymentMethods = document.querySelectorAll('.payment-method');
 const paymentHandle = document.getElementById('paymentHandle');
 const paymentLabel = document.getElementById('paymentLabel');
 
-console.log('Element initialization:', {
-    paymentMethods: paymentMethods.length,
-    paymentHandle: paymentHandle,
-    paymentLabel: paymentLabel
-});
+
 
 paymentMethods.forEach((method) => {
     method.addEventListener('click', () => {
@@ -230,49 +206,19 @@ const formContainer = document.getElementById('formContainer');
 const successMessage = document.getElementById('successMessage');
 const submitButton = document.getElementById('submitButton');
 
-console.log('Form elements check:', {
-    form: form,
-    formContainer: formContainer,
-    successMessage: successMessage,
-    submitButton: submitButton
-});
+
 
 if (form) {
-    console.log('Form found, adding submit listener...');
     form.addEventListener('submit', async (e) => {
-        console.log('Form submitted!');
         e.preventDefault();
-
-        console.log('Current state:', {
-            selectedMethod,
-            paymentHandle: paymentHandle?.value,
-            fileInput: fileInput,
-            filesLength: fileInput?.files?.length
-        });
 
         const reviewLinkInput = document.getElementById('reviewLink');
         const reviewLink = reviewLinkInput ? reviewLinkInput.value : '';
         const hasScreenshot = fileInput && fileInput.files && fileInput.files.length > 0;
 
-        console.log('Form values:', {
-            reviewLink,
-            hasScreenshot,
-            selectedMethod,
-            paymentHandleValue: paymentHandle?.value
-        });
-
-        if (!selectedMethod) {
-            console.log('No payment method selected');
-            return showError('Please select a payment method');
-        }
-        if (!paymentHandle || !paymentHandle.value) {
-            console.log('No payment handle value');
-            return showError('Please enter your payment information');
-        }
-        if (!reviewLink && !hasScreenshot) {
-            console.log('No review link or screenshot');
-            return showError('Please provide either a review link or upload a screenshot');
-        }
+        if (!selectedMethod) return showError('Please select a payment method');
+        if (!paymentHandle || !paymentHandle.value) return showError('Please enter your payment information');
+        if (!reviewLink && !hasScreenshot) return showError('Please provide either a review link or upload a screenshot');
 
         if (submitButton) {
             submitButton.textContent = 'Submitting...';
@@ -754,16 +700,8 @@ supabase.auth.onAuthStateChange((_event, session) => {
 });
 
 window.addEventListener('load', () => {
-    console.log('=== Window loaded, initializing app ===');
     initAuth();
     checkForPasswordReset();
-
-    // Final check of critical elements
-    console.log('Final element check:', {
-        form: document.getElementById('rewardForm'),
-        submitButton: document.getElementById('submitButton'),
-        paymentMethods: document.querySelectorAll('.payment-method').length
-    });
 });
 
 // Make sendAdminNotification globally accessible for testing

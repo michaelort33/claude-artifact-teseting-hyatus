@@ -54,7 +54,17 @@ serve(async (req) => {
     }
 
     if (!RESEND_API_KEY || !ADMIN_EMAIL) {
-        return new Response('Missing RESEND_API_KEY or ADMIN_EMAIL', {
+        console.error('Missing environment variables:', {
+            hasResendKey: !!RESEND_API_KEY,
+            hasAdminEmail: !!ADMIN_EMAIL
+        });
+        return new Response(JSON.stringify({ 
+            error: 'Missing required environment variables',
+            details: {
+                hasResendKey: !!RESEND_API_KEY,
+                hasAdminEmail: !!ADMIN_EMAIL
+            }
+        }), {
             status: 500,
             headers: {
                 'Access-Control-Allow-Origin': corsOrigin,
@@ -63,34 +73,65 @@ serve(async (req) => {
             },
         })
     }
+    
+    console.log('Sending email to:', ADMIN_EMAIL);
 
     try {
+        const emailPayload = {
+            from: 'Hyatus Feedback <feedback@resend.dev>',
+            to: [ADMIN_EMAIL],
+            subject: 'New Review Reward Submission!',
+            html: `
+                <h2>New Submission Received</h2>
+                <p><strong>Payment Method:</strong> ${record.payment_method}</p>
+                <p><strong>Payment Handle:</strong> ${record.payment_handle}</p>
+                <p><strong>Submitted:</strong> ${new Date(record.created_at).toLocaleString()}</p>
+                <p><a href="https://feedback.hyatus.com/admin.html">View in Admin Dashboard</a></p>
+            `,
+        };
+        
+        console.log('Sending email with payload:', JSON.stringify(emailPayload, null, 2));
+        
         const res = await fetch('https://api.resend.com/emails', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${RESEND_API_KEY}`,
             },
-            body: JSON.stringify({
-                from: 'Review Rewards <onboarding@resend.dev>',
-                to: [ADMIN_EMAIL],
-                subject: 'New Review Reward Submission!',
-                html: `
-                    <h2>New Submission Received</h2>
-                    <p><strong>Payment Method:</strong> ${record.payment_method}</p>
-                    <p><strong>Payment Handle:</strong> ${record.payment_handle}</p>
-                    <p><strong>Submitted:</strong> ${new Date(record.created_at).toLocaleString()}</p>
-                    <p><a href="https://feedback.hyatus.com/admin.html">View in Admin Dashboard</a></p>
-                `,
-            }),
+            body: JSON.stringify(emailPayload),
         })
 
-        const data = await res.json()
-        console.log('Email sent successfully:', data);
+        const responseText = await res.text()
+        console.log('Resend API response status:', res.status);
+        console.log('Resend API response:', responseText);
+        
+        let data;
+        try {
+            data = JSON.parse(responseText);
+        } catch (e) {
+            console.error('Failed to parse Resend response:', e);
+            data = { rawResponse: responseText };
+        }
         
         if (!res.ok) {
-            console.error('Resend API error:', data);
+            console.error('Resend API error:', {
+                status: res.status,
+                data: data
+            });
+            return new Response(JSON.stringify({
+                error: 'Failed to send email',
+                details: data
+            }), {
+                status: res.status,
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Access-Control-Allow-Origin': corsOrigin,
+                    'Access-Control-Allow-Credentials': 'true',
+                },
+            })
         }
+        
+        console.log('Email sent successfully:', data);
         
         return new Response(JSON.stringify(data), {
             headers: {
