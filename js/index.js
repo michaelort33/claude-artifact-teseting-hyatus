@@ -524,18 +524,19 @@ function renderMySubmissions(rows) {
         return;
     }
     const header = `
-    <table>
-      <thead>
-        <tr>
-          <th>Date</th>
-          <th>Payment</th>
-          <th>Handle</th>
-          <th>Type</th>
-          <th>Status</th>
-        </tr>
-      </thead>
-      <tbody>
-  `;
+    <div class="subs-table">
+      <table>
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Payment</th>
+            <th>Handle</th>
+            <th>Type</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+    `;
     const rowsHtml = rows
         .map((r) => {
             const date = new Date(r.created_at).toLocaleString();
@@ -552,7 +553,7 @@ function renderMySubmissions(rows) {
       `;
         })
         .join('');
-    const footer = `</tbody></table>`;
+    const footer = `</tbody></table></div>`;
     wrapper.innerHTML = header + rowsHtml + footer;
 }
 

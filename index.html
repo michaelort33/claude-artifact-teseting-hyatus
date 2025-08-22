@@ -914,6 +914,7 @@
         }
 
         @media (max-width: 768px) {
+
             /* Fix mobile layout - prevent flex centering issues */
             body {
                 display: block !important;
@@ -982,6 +983,86 @@
                 right: 10px;
                 width: 260px;
             }
+
+            /* Optimize submissions modal for mobile */
+            .submissions-modal .modal-content {
+                width: 95% !important;
+                max-width: none !important;
+                margin: 10px !important;
+                max-height: 90vh !important;
+            }
+
+            .submissions-modal .modal-header h2 {
+                font-size: 20px !important;
+            }
+        }
+
+        /* Mobile submissions table optimization */
+        @media (max-width: 768px) {
+            /* Hide table headers and make table responsive */
+            .subs-table table,
+            .subs-table thead,
+            .subs-table tbody,
+            .subs-table th,
+            .subs-table td,
+            .subs-table tr {
+                display: block;
+            }
+
+            .subs-table thead tr {
+                position: absolute;
+                top: -9999px;
+                left: -9999px;
+            }
+
+            .subs-table tbody tr {
+                background: var(--surface);
+                border: 1px solid var(--border);
+                border-radius: 8px;
+                margin-bottom: 12px;
+                padding: 16px;
+                position: relative;
+            }
+
+            .subs-table tbody tr:nth-child(even) {
+                background: var(--surface);
+            }
+
+            .subs-table tbody td {
+                border: none;
+                border-bottom: 1px solid var(--border);
+                position: relative;
+                padding: 8px 0 8px 120px !important;
+                text-align: left;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+
+            .subs-table tbody td:last-child {
+                border-bottom: none;
+            }
+
+            .subs-table tbody td:before {
+                content: attr(data-label);
+                position: absolute;
+                left: 0;
+                width: 110px;
+                padding-right: 10px;
+                white-space: nowrap;
+                font-weight: 600;
+                color: var(--subtext);
+                font-size: 12px;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+            }
+
+            /* Add labels for mobile table */
+            .subs-table tbody td:nth-child(1):before { content: "Date"; }
+            .subs-table tbody td:nth-child(2):before { content: "Payment"; }
+            .subs-table tbody td:nth-child(3):before { content: "Handle"; }
+            .subs-table tbody td:nth-child(4):before { content: "Type"; }
+            .subs-table tbody td:nth-child(5):before { content: "Status"; }
         }
 
         /* Extra small mobile devices */
@@ -1005,6 +1086,32 @@
             .payment-method {
                 padding: 12px !important;
                 font-size: 14px !important;
+            }
+
+            /* Further optimize table for very small screens */
+            .subs-table tbody td {
+                padding: 6px 0 6px 100px !important;
+                font-size: 14px;
+            }
+
+            .subs-table tbody td:before {
+                width: 90px;
+                font-size: 11px;
+            }
+
+            .handle {
+                font-size: 12px;
+                padding: 2px 6px;
+            }
+
+            .pill {
+                font-size: 11px;
+                padding: 3px 8px;
+            }
+
+            .status-chip {
+                font-size: 11px;
+                padding: 3px 8px;
             }
         }
 
