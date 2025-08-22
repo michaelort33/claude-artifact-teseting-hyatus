@@ -9,10 +9,27 @@ const RESEND_API_KEY = Deno.env.get('RESEND_API_KEY')
 const ADMIN_EMAIL = Deno.env.get('ADMIN_EMAIL')
 
 serve(async (req) => {
+    // Handle CORS preflight requests
+    if (req.method === 'OPTIONS') {
+        return new Response('ok', {
+            headers: {
+                'Access-Control-Allow-Origin': '*',
+                'Access-Control-Allow-Methods': 'POST, OPTIONS',
+                'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+            },
+        })
+    }
+
     const { record } = await req.json()
 
     if (!RESEND_API_KEY || !ADMIN_EMAIL) {
-        return new Response('Missing RESEND_API_KEY or ADMIN_EMAIL', { status: 500 })
+        return new Response('Missing RESEND_API_KEY or ADMIN_EMAIL', {
+            status: 500,
+            headers: {
+                'Access-Control-Allow-Origin': '*',
+                'Content-Type': 'application/json',
+            },
+        })
     }
 
     const res = await fetch('https://api.resend.com/emails', {
@@ -37,6 +54,9 @@ serve(async (req) => {
 
     const data = await res.json()
     return new Response(JSON.stringify(data), {
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+            'Content-Type': 'application/json',
+            'Access-Control-Allow-Origin': '*',
+        },
     })
 })

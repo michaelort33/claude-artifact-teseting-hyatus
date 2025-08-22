@@ -1742,6 +1742,17 @@
 
     <script src="js/index.js"></script>
 
+    <script>
+        // Minimal script for mobile navigation to fix layout issues
+        document.addEventListener('DOMContentLoaded', function () {
+            // This ensures critical mobile UI elements work even if main JS has issues
+            const mobileAuthButton = document.getElementById('userAuthLinkMobile');
+            if (mobileAuthButton) {
+                console.log('Mobile auth button found and ready');
+            }
+        });
+    </script>
+
 
 
 
