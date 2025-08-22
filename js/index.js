@@ -140,7 +140,7 @@ async function sendAdminNotification(submission) {
 
         const responseText = await response.text();
         console.log('Raw response:', responseText);
-        
+
         let result;
         try {
             result = JSON.parse(responseText);
@@ -266,7 +266,7 @@ if (form) {
                 created_at: new Date().toISOString(),
             };
             console.log('Submission data for email:', submissionData);
-            
+
             try {
                 await sendAdminNotification(submissionData);
                 console.log('Admin notification sent successfully');
