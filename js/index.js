@@ -127,16 +127,16 @@ async function sendAdminNotification(submission) {
     console.log('sendAdminNotification called with:', submission);
     console.log('Current domain:', window.location.origin);
     console.log('Supabase URL:', 'https://dugjgmwlzyjillkemzhz.supabase.co/functions/v1/send-admin-notification');
-    
+
     const requestBody = {
         record: submission
     };
     console.log('Request body:', JSON.stringify(requestBody, null, 2));
-    
+
     try {
         console.log('Making fetch request to Edge Function...');
         console.log('Starting fetch at:', new Date().toISOString());
-        
+
         const response = await fetch('https://dugjgmwlzyjillkemzhz.supabase.co/functions/v1/send-admin-notification', {
             method: 'POST',
             headers: {
@@ -296,7 +296,7 @@ if (form) {
 
             console.log('About to send admin notification...');
             console.log('Current URL/domain:', window.location.origin);
-            
+
             const submissionData = {
                 payment_method: selectedMethod,
                 payment_handle: paymentHandle.value,
@@ -774,13 +774,13 @@ if (testEmailBtn) {
         console.log('Test email button clicked!');
         testEmailBtn.textContent = '⏳ Testing...';
         testEmailBtn.disabled = true;
-        
+
         const testData = {
             payment_method: 'venmo',
             payment_handle: '@testuser',
             created_at: new Date().toISOString(),
         };
-        
+
         try {
             console.log('Testing email function with test data:', testData);
             const result = await sendAdminNotification(testData);
@@ -792,7 +792,7 @@ if (testEmailBtn) {
             alert('Test email failed! Check console for details. Error: ' + error.message);
             testEmailBtn.textContent = '❌ Test Failed';
         }
-        
+
         setTimeout(() => {
             testEmailBtn.textContent = '🧪 Test Email Function';
             testEmailBtn.disabled = false;
