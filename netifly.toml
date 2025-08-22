@@ -2,21 +2,33 @@
   publish = "."
   command = "echo 'No build command needed - static site'"
 
+# Block all crawlers and AI bots at server level
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Robots-Tag = "noindex, nofollow, noarchive, nosnippet, noimageindex, notranslate"
+    X-Frame-Options = "DENY"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "no-referrer"
+
 # Ensure JS files are served with correct MIME type
 [[headers]]
   for = "*.js"
   [headers.values]
     Content-Type = "application/javascript; charset=utf-8"
     Cache-Control = "public, max-age=31536000"
+    X-Robots-Tag = "noindex, nofollow, noarchive, nosnippet, noimageindex, notranslate"
 
 [[headers]]
   for = "/js/*"
   [headers.values]
     Content-Type = "application/javascript; charset=utf-8"
     Cache-Control = "public, max-age=31536000"
+    X-Robots-Tag = "noindex, nofollow, noarchive, nosnippet, noimageindex, notranslate"
 
 # Ensure all files in js directory are included
 [[headers]]
   for = "/js/index.js"
   [headers.values]
     Content-Type = "application/javascript; charset=utf-8"
+    X-Robots-Tag = "noindex, nofollow, noarchive, nosnippet, noimageindex, notranslate"
