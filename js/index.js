@@ -113,7 +113,9 @@ function showError(message) {
 
 // Send admin notification email
 async function sendAdminNotification(submission) {
+    console.log('sendAdminNotification called with:', submission);
     try {
+        console.log('Making fetch request to Edge Function...');
         const response = await fetch('https://dugjgmwlzyjillkemzhz.supabase.co/functions/v1/send-admin-notification', {
             method: 'POST',
             headers: {
@@ -125,7 +127,12 @@ async function sendAdminNotification(submission) {
             })
         });
 
+        console.log('Response status:', response.status);
+        console.log('Response ok:', response.ok);
+
         if (!response.ok) {
+            const errorText = await response.text();
+            console.error('Response error text:', errorText);
             throw new Error(`HTTP error! status: ${response.status}`);
         }
 
