@@ -999,6 +999,7 @@
 
         /* Mobile submissions table optimization */
         @media (max-width: 768px) {
+
             /* Hide table headers and make table responsive */
             .subs-table table,
             .subs-table thead,
@@ -1058,11 +1059,25 @@
             }
 
             /* Add labels for mobile table */
-            .subs-table tbody td:nth-child(1):before { content: "Date"; }
-            .subs-table tbody td:nth-child(2):before { content: "Payment"; }
-            .subs-table tbody td:nth-child(3):before { content: "Handle"; }
-            .subs-table tbody td:nth-child(4):before { content: "Type"; }
-            .subs-table tbody td:nth-child(5):before { content: "Status"; }
+            .subs-table tbody td:nth-child(1):before {
+                content: "Date";
+            }
+
+            .subs-table tbody td:nth-child(2):before {
+                content: "Payment";
+            }
+
+            .subs-table tbody td:nth-child(3):before {
+                content: "Handle";
+            }
+
+            .subs-table tbody td:nth-child(4):before {
+                content: "Type";
+            }
+
+            .subs-table tbody td:nth-child(5):before {
+                content: "Status";
+            }
         }
 
         /* Extra small mobile devices */
