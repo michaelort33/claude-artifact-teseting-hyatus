@@ -661,6 +661,10 @@
             </div>
             <button type="submit" class="btn btn-full">Login</button>
         </form>
+        <p style="margin-top: 15px; text-align: center;">
+            <a href="#" id="forgotPasswordLink"
+                style="color: var(--accent); text-decoration: none; font-size: 14px;">Forgot password?</a>
+        </p>
         <p style="margin-top: 20px; color: #666; font-size: 14px;">
             First time? Create an admin account in your Supabase dashboard under Authentication → Users
         </p>
@@ -871,6 +875,28 @@
             document.getElementById('loginContainer').style.display = 'block';
             document.getElementById('dashboard').classList.remove('active');
             document.getElementById('logoutBtn').style.display = 'none';
+        });
+
+        // Forgot password handler
+        document.getElementById('forgotPasswordLink').addEventListener('click', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('email').value || prompt('Please enter your email address:');
+
+            if (!email) {
+                return;
+            }
+
+            try {
+                const { error } = await supabase.auth.resetPasswordForEmail(email, {
+                    redirectTo: `${window.location.origin}/index.html`,
+                });
+
+                if (error) throw error;
+
+                alert('Password reset email sent! Please check your inbox.');
+            } catch (error) {
+                alert('Error sending password reset email: ' + error.message);
+            }
         });
 
         // Show dashboard
