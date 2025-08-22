@@ -914,6 +914,42 @@
         }
 
         @media (max-width: 768px) {
+            /* Fix mobile layout - prevent flex centering issues */
+            body {
+                display: block !important;
+                align-items: unset !important;
+                justify-content: unset !important;
+                padding: 10px !important;
+                min-height: 100vh;
+                overflow-x: hidden;
+            }
+
+            .container {
+                max-width: none !important;
+                width: 100% !important;
+                margin: 0 auto !important;
+                border-radius: 16px !important;
+                min-height: auto !important;
+            }
+
+            /* Ensure form elements are properly sized on mobile */
+            .form-group input,
+            .form-group select,
+            .submit-button {
+                width: 100% !important;
+                max-width: 100% !important;
+            }
+
+            /* Fix payment methods grid on mobile */
+            .payment-methods {
+                grid-template-columns: 1fr !important;
+                gap: 12px !important;
+            }
+
+            .payment-method {
+                width: 100% !important;
+                padding: 16px !important;
+            }
 
             /* Hide fixed auth buttons on mobile */
             .auth-buttons {
@@ -948,7 +984,29 @@
             }
         }
 
+        /* Extra small mobile devices */
+        @media (max-width: 480px) {
+            body {
+                padding: 8px !important;
+            }
 
+            .container {
+                border-radius: 12px !important;
+            }
+
+            .header h1 {
+                font-size: 24px !important;
+            }
+
+            .form-content {
+                padding: 20px !important;
+            }
+
+            .payment-method {
+                padding: 12px !important;
+                font-size: 14px !important;
+            }
+        }
 
         .auth-modal {
             display: none;
