@@ -335,7 +335,7 @@ s3_secret_key = "env(S3_SECRET_KEY)"
 
 [functions.send-admin-notification]
 enabled = true
-verify_jwt = true
+verify_jwt = false
 import_map = "./functions/send-admin-notification/deno.json"
 # Uncomment to specify a custom file path to the entrypoint.
 # Supported file extensions are: .ts, .js, .mjs, .jsx, .tsx
