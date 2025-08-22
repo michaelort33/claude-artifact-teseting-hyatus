@@ -1512,11 +1512,7 @@
                 <button type="submit" class="submit-button" id="submitButton">Submit & Claim Reward</button>
             </form>
 
-            <!-- Debug Test Button -->
-            <button type="button" id="testEmailBtn"
-                style="margin-top: 20px; padding: 15px 25px; background: #f44336; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 16px; font-weight: bold; display: block; width: 100%; max-width: 300px; margin-left: auto; margin-right: auto; box-shadow: 0 4px 8px rgba(244, 67, 54, 0.3);">
-                🧪 TEST EMAIL FUNCTION
-            </button>
+
 
 
         </div>
@@ -1765,72 +1761,14 @@
         }
         -->
 
-    <!-- Test if JavaScript is working at all -->
-    <script>
-        console.log('Inline JavaScript test - before loading js/index.js');
-        console.warn('WARNING TEST - This should appear in yellow/orange');
-        console.error('ERROR TEST - This should appear in red');
-        alert('JavaScript is working! Check console for messages.');
-        document.addEventListener('DOMContentLoaded', function () {
-            document.body.style.border = '3px solid red';
-            console.log('DOMContentLoaded fired - added red border to body');
-        });
-    </script>
 
-    <!-- TEMPORARY: Inline JavaScript for testing Netlify issue -->
-    <script>
-        console.log('🧪 INLINE TEST: JavaScript is working!');
 
-        // Test if we can access the external file
-        fetch('./js/index.js?v=3')
-            .then(response => {
-                console.log('📁 External JS file status:', response.status);
-                if (response.ok) {
-                    console.log('✅ External JS file is accessible');
-                    return response.text();
-                } else {
-                    console.error('❌ External JS file not found:', response.status);
-                    throw new Error('File not found');
-                }
-            })
-            .then(jsContent => {
-                console.log('📄 External JS file loaded, size:', jsContent.length);
-                // Execute the JavaScript content
-                eval(jsContent);
-                console.log('✅ External JS executed successfully');
-            })
-            .catch(error => {
-                console.error('❌ Failed to load external JS:', error);
-                console.log('🔧 This confirms Netlify is not serving the JS file properly');
-            });
-    </script>
 
-    <!-- Original external script (commented out for testing) -->
-    <!-- <script src="js/index.js?v=3"></script> -->
+    <script src="js/index.js"></script>
 
-    <script>
-        console.log('🟠 Inline JavaScript test - AFTER loading js/index.js');
-        console.log('Testing if sendAdminNotification is available:', typeof window.sendAdminNotification);
-        console.log('Testing if form element can be found:', document.getElementById('rewardForm'));
 
-        // Test if we can fetch the js file directly
-        fetch('js/index.js?v=3')
-            .then(response => {
-                console.log('📁 js/index.js fetch response:', response.status, response.statusText);
-                if (response.ok) {
-                    return response.text();
-                } else {
-                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-                }
-            })
-            .then(text => {
-                console.log('📄 js/index.js file size:', text.length, 'characters');
-                console.log('📄 First 100 characters:', text.substring(0, 100));
-            })
-            .catch(error => {
-                console.error('❌ Failed to fetch js/index.js:', error);
-            });
-    </script>
+
+    
 
     <script>
         // Minimal script for mobile navigation to fix layout issues

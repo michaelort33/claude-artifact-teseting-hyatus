@@ -1,8 +1,4 @@
-console.log('🚀 External JavaScript file loaded successfully!');
-console.log('Current URL:', window.location.href);
-console.log('Supabase available:', typeof window.supabase !== 'undefined');
-console.log('DOM ready state:', document.readyState);
-console.log('Page load time:', new Date().toISOString());
+// Main application JavaScript
 
 // Add global error handler
 window.addEventListener('error', (e) => {
@@ -126,19 +122,9 @@ function showError(message) {
 
 // Send admin notification email
 async function sendAdminNotification(submission) {
-    console.log('sendAdminNotification called with:', submission);
-    console.log('Current domain:', window.location.origin);
-    console.log('Supabase URL:', 'https://dugjgmwlzyjillkemzhz.supabase.co/functions/v1/send-admin-notification');
-
-    const requestBody = {
-        record: submission
-    };
-    console.log('Request body:', JSON.stringify(requestBody, null, 2));
-
+    const requestBody = { record: submission };
+    
     try {
-        console.log('Making fetch request to Edge Function...');
-        console.log('Starting fetch at:', new Date().toISOString());
-
         const response = await fetch('https://dugjgmwlzyjillkemzhz.supabase.co/functions/v1/send-admin-notification', {
             method: 'POST',
             headers: {
@@ -148,36 +134,19 @@ async function sendAdminNotification(submission) {
             body: JSON.stringify(requestBody)
         });
 
-        console.log('Fetch completed at:', new Date().toISOString());
-        console.log('Response status:', response.status);
-        console.log('Response ok:', response.ok);
-        console.log('Response headers:', Object.fromEntries(response.headers.entries()));
-
         if (!response.ok) {
             const errorText = await response.text();
-            console.error('Response error text:', errorText);
             throw new Error(`HTTP error! status: ${response.status} - ${errorText}`);
         }
 
         const responseText = await response.text();
-        console.log('Raw response:', responseText);
-
-        let result;
         try {
-            result = JSON.parse(responseText);
-            console.log('Email notification sent successfully:', result);
-            return result;
+            return JSON.parse(responseText);
         } catch (e) {
-            console.error('Failed to parse response:', e);
-            console.log('Response was:', responseText);
             return { success: true, rawResponse: responseText };
         }
     } catch (error) {
         console.error('Failed to send email notification:', error);
-        console.error('Error name:', error.name);
-        console.error('Error message:', error.message);
-        console.error('Error stack:', error.stack);
-        // Re-throw error so caller can handle it properly
         throw error;
     }
 }
@@ -231,32 +200,14 @@ const formContainer = document.getElementById('formContainer');
 const successMessage = document.getElementById('successMessage');
 const submitButton = document.getElementById('submitButton');
 
-console.log('🔍 ELEMENT DEBUGGING:');
-console.log('Form element:', form);
-console.log('Form container:', formContainer);
-console.log('Success message:', successMessage);
-console.log('Submit button:', submitButton);
-console.log('Payment handle input:', document.getElementById('paymentHandle'));
-console.log('Review link input:', document.getElementById('reviewLink'));
-console.log('File input:', document.getElementById('reviewScreenshot'));
+// Form elements
 
-// Also add click listener to submit button as backup
+// Submit button click handler
 if (submitButton) {
-    console.log('Submit button found:', submitButton);
-    console.log('Submit button ID:', submitButton.id);
-    console.log('Submit button type:', submitButton.type);
-
     submitButton.addEventListener('click', (e) => {
-        console.log('🔥 SUBMIT BUTTON CLICKED!');
-        console.log('Click event:', e);
-        console.log('Button type:', e.target.type);
-        console.log('Form element from button:', e.target.form);
-
         // If the button type is not "submit", manually trigger form submission
         if (e.target.type !== 'submit') {
-            console.log('Button is not type submit, manually triggering form submit...');
             if (form) {
-                console.log('Manually dispatching submit event...');
                 form.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
             }
         }
@@ -264,18 +215,7 @@ if (submitButton) {
 }
 
 if (form) {
-    console.log('Adding submit event listener to form...');
-    console.log('Form element found:', form);
-    console.log('Form ID:', form.id);
-    console.log('Form action:', form.action);
-    console.log('Form method:', form.method);
-
     form.addEventListener('submit', async (e) => {
-        console.log('🔥 FORM SUBMITTED EVENT FIRED!');
-        console.log('Event object:', e);
-        console.log('Event type:', e.type);
-        console.log('Event target:', e.target);
-        console.log('Preventing default...');
         e.preventDefault();
 
         const reviewLinkInput = document.getElementById('reviewLink');
@@ -291,23 +231,18 @@ if (form) {
             submitButton.disabled = true;
         }
 
-        try {
-            console.log('Starting form submission...');
+                try {
             let screenshotData = null;
             if (hasScreenshot && uploadedFile) {
-                console.log('Converting file to base64...');
                 screenshotData = await fileToBase64(uploadedFile);
             }
 
-            console.log('Getting user...');
             const { data: userResp, error: userError } = await supabase.auth.getUser();
             if (userError) {
                 console.error('User error:', userError);
             }
             const userId = userResp?.user?.id || null;
-            console.log('User ID:', userId);
 
-            console.log('Inserting into database...');
             const { data, error } = await supabase
                 .from('review_rewards')
                 .insert([
@@ -325,28 +260,20 @@ if (form) {
                 console.error('Database error:', error);
                 throw error;
             }
-            console.log('Database insert successful:', data);
 
-            console.log('About to send admin notification...');
-            console.log('Current URL/domain:', window.location.origin);
-
+            // Send admin notification
             const submissionData = {
                 payment_method: selectedMethod,
                 payment_handle: paymentHandle.value,
                 created_at: new Date().toISOString(),
             };
-            console.log('Submission data for email:', submissionData);
 
-            console.log('Calling sendAdminNotification function...');
             try {
-                const emailResult = await sendAdminNotification(submissionData);
-                console.log('Admin notification sent successfully:', emailResult);
+                await sendAdminNotification(submissionData);
             } catch (emailError) {
                 console.error('Failed to send admin notification:', emailError);
-                console.error('Email error details:', emailError.message);
-                console.error('Email error stack:', emailError.stack);
+                // Don't fail the whole submission for email issues
             }
-            console.log('Email notification call completed (success or failure)');
 
             if (formContainer) formContainer.style.display = 'none';
             if (successMessage) successMessage.style.display = 'block';
@@ -794,40 +721,5 @@ window.addEventListener('load', () => {
     checkForPasswordReset();
 });
 
-// Make sendAdminNotification globally accessible for testing
-window.sendAdminNotification = sendAdminNotification;
-console.log('sendAdminNotification function is now available globally for testing');
 
-// Add test email button functionality
-const testEmailBtn = document.getElementById('testEmailBtn');
-if (testEmailBtn) {
-    testEmailBtn.addEventListener('click', async () => {
-        console.log('Test email button clicked!');
-        testEmailBtn.textContent = '⏳ Testing...';
-        testEmailBtn.disabled = true;
-
-        const testData = {
-            payment_method: 'venmo',
-            payment_handle: '@testuser',
-            created_at: new Date().toISOString(),
-        };
-
-        try {
-            console.log('Testing email function with test data:', testData);
-            const result = await sendAdminNotification(testData);
-            console.log('Test email result:', result);
-            alert('Test email sent successfully! Check console for details.');
-            testEmailBtn.textContent = '✅ Test Successful';
-        } catch (error) {
-            console.error('Test email failed:', error);
-            alert('Test email failed! Check console for details. Error: ' + error.message);
-            testEmailBtn.textContent = '❌ Test Failed';
-        }
-
-        setTimeout(() => {
-            testEmailBtn.textContent = '🧪 Test Email Function';
-            testEmailBtn.disabled = false;
-        }, 3000);
-    });
-}
 
