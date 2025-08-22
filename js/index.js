@@ -111,10 +111,30 @@ function showError(message) {
     }, 5000);
 }
 
-// Send admin notification email (placeholder)
+// Send admin notification email
 async function sendAdminNotification(submission) {
-    // Optionally integrate EmailJS / Netlify Functions / Supabase Edge Function
-    console.log('Admin notification would be sent:', submission);
+    try {
+        const response = await fetch('https://dugjgmwlzyjillkemzhz.supabase.co/functions/v1/send-admin-notification', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
+            },
+            body: JSON.stringify({
+                record: submission
+            })
+        });
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const result = await response.json();
+        console.log('Email notification sent successfully:', result);
+    } catch (error) {
+        console.error('Failed to send email notification:', error);
+        // Don't throw error to avoid breaking form submission
+    }
 }
 
 // Create floating dollar signs and confetti animation
@@ -219,12 +239,14 @@ if (form) {
             }
             console.log('Database insert successful:', data);
 
+            console.log('About to send admin notification...');
             try {
                 await sendAdminNotification({
                     payment_method: selectedMethod,
                     payment_handle: paymentHandle.value,
                     created_at: new Date().toISOString(),
                 });
+                console.log('Admin notification sent successfully');
             } catch (emailError) {
                 console.error('Failed to send admin notification:', emailError);
             }
@@ -234,6 +256,12 @@ if (form) {
             createFloatingDollars();
         } catch (err) {
             console.error('Error submitting:', err);
+            console.error('Error details:', {
+                message: err.message,
+                code: err.code,
+                details: err.details,
+                hint: err.hint
+            });
             showError('There was an error submitting your claim. Please try again.');
             if (submitButton) {
                 submitButton.textContent = 'Submit & Claim Reward';

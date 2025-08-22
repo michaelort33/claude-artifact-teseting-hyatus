@@ -22,16 +22,16 @@ serve(async (req) => {
             'Authorization': `Bearer ${RESEND_API_KEY}`,
         },
         body: JSON.stringify({
-            from: 'Review Rewards <notifications@feedback.hyatus.com>',
+            from: 'Review Rewards <onboarding@resend.dev>',
             to: [ADMIN_EMAIL],
             subject: 'New Review Reward Submission!',
             html: `
-        <h2>New Submission Received</h2>
-        <p><strong>Payment Method:</strong> ${record.payment_method}</p>
-        <p><strong>Payment Handle:</strong> ${record.payment_handle}</p>
-        <p><strong>Submitted:</strong> ${new Date(record.created_at).toLocaleString()}</p>
-        <p><a href="https://feedback.hyatus.com/admin.html">View in Admin Dashboard</a></p>
-      `,
+                <h2>New Submission Received</h2>
+                <p><strong>Payment Method:</strong> ${record.payment_method}</p>
+                <p><strong>Payment Handle:</strong> ${record.payment_handle}</p>
+                <p><strong>Submitted:</strong> ${new Date(record.created_at).toLocaleString()}</p>
+                <p><a href="https://feedback.hyatus.com/admin.html">View in Admin Dashboard</a></p>
+            `,
         }),
     })
 
