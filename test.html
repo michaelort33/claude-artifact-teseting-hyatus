@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>JavaScript Test</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+
+<body>
+    <h1>JavaScript Test Page</h1>
+    <p>Check the console for messages</p>
+
+    <script>
+        console.log('Test page: Inline script 1 working');
+        console.log('Test page: Supabase available?', typeof window.supabase);
+    </script>
+
+    <script src="js/index.js"></script>
+
+    <script>
+        console.log('Test page: Inline script 2 working');
+        console.log('Test page: Form element?', document.getElementById('rewardForm'));
+    </script>
+</body>
+
+</html>

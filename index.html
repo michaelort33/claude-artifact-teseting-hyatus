@@ -1343,6 +1343,9 @@
         }
     </style>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        console.log('Checking Supabase after load:', typeof window.supabase);
+    </script>
 </head>
 
 <body>
@@ -1740,7 +1743,20 @@
         }
         -->
 
-    <script src="js/index.js?v=2"></script>
+    <!-- Test if JavaScript is working at all -->
+    <script>
+        console.log('Inline JavaScript test - before loading js/index.js');
+        document.addEventListener('DOMContentLoaded', function () {
+            document.body.style.border = '3px solid red';
+            console.log('DOMContentLoaded fired - added red border to body');
+        });
+    </script>
+
+    <script src="js/index.js?v=3"></script>
+
+    <script>
+        console.log('Inline JavaScript test - after loading js/index.js');
+    </script>
 
     <script>
         // Minimal script for mobile navigation to fix layout issues
