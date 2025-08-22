@@ -689,4 +689,8 @@ window.addEventListener('load', () => {
     checkForPasswordReset();
 });
 
+// Make sendAdminNotification globally accessible for testing
+window.sendAdminNotification = sendAdminNotification;
+console.log('sendAdminNotification function is now available globally for testing');
+
 
