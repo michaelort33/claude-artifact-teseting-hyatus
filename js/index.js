@@ -308,6 +308,7 @@ const forgotPasswordBtn = document.getElementById('forgotPasswordBtn');
 const profilePopover = document.getElementById('profilePopover');
 const submissionsModal = document.getElementById('submissionsModal');
 const closeSubmissionsModalBtn = document.getElementById('closeSubmissionsModal');
+const closeAuthModalBtn = document.getElementById('closeAuthModal');
 const viewMySubsBtn = document.getElementById('viewMySubsBtn');
 const backHomeBtn = document.getElementById('backHomeBtn');
 
@@ -432,6 +433,27 @@ if (forgotPasswordBtn) {
         }
     });
 }
+
+// Close auth modal functionality
+if (closeAuthModalBtn) {
+    closeAuthModalBtn.addEventListener('click', closeAuthModal);
+}
+
+// Close modal when clicking outside
+if (authModal) {
+    authModal.addEventListener('click', (e) => {
+        if (e.target === authModal) {
+            closeAuthModal();
+        }
+    });
+}
+
+// Close modal with Escape key
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && authModal && authModal.classList.contains('active')) {
+        closeAuthModal();
+    }
+});
 
 function updateAuthUI() {
     const userAuthLinkMobileEl = document.getElementById('userAuthLinkMobile');

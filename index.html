@@ -963,6 +963,29 @@
             position: relative;
         }
 
+        .modal-close-btn {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            background: none;
+            border: none;
+            font-size: 24px;
+            color: var(--subtext);
+            cursor: pointer;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            transition: all 0.2s ease;
+        }
+
+        .modal-close-btn:hover {
+            background: var(--surface-2);
+            color: var(--text);
+        }
+
         @media (min-width: 768px) {
             .auth-content {
                 padding: 32px;
@@ -1566,6 +1589,7 @@
     <!-- Auth Modal -->
     <div class="auth-modal" id="authModal">
         <div class="auth-content">
+            <button class="modal-close-btn" id="closeAuthModal">&times;</button>
             <h2 id="authTitle">Sign In</h2>
             <div id="authError" class="error-message" style="display:none; margin-bottom: 20px;"></div>
             <div class="form-group">
@@ -1722,7 +1746,6 @@
     submission_date: new Date(submission.created_at).toLocaleString(),
     admin_link: window.location.origin + "/admin.html"
     });
-    */
 
     // Option 2: Use Netlify Functions (if deploying to Netlify)
     // Create netlify/functions/notify-admin.js
@@ -2105,10 +2128,7 @@
             fileUploadArea.classList.remove('has-file');
             fileName.textContent = '';
             });
-            */
             </script>
-    */
-    </script>
 
 </body>
 
