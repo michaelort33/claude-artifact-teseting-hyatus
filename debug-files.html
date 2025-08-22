@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Debug Files</title>
+</head>
+<body>
+    <h1>Debug File Access</h1>
+    <div id="results"></div>
+    
+    <script>
+        const files = [
+            'js/index.js',
+            './js/index.js',
+            '/js/index.js',
+            'index.html',
+            'debug-files.html'
+        ];
+        
+        const results = document.getElementById('results');
+        
+        files.forEach(async (file) => {
+            try {
+                const response = await fetch(file);
+                const div = document.createElement('div');
+                div.innerHTML = `<strong>${file}</strong>: ${response.status} ${response.statusText}`;
+                div.style.color = response.ok ? 'green' : 'red';
+                results.appendChild(div);
+            } catch (error) {
+                const div = document.createElement('div');
+                div.innerHTML = `<strong>${file}</strong>: ERROR - ${error.message}`;
+                div.style.color = 'red';
+                results.appendChild(div);
+            }
+        });
+    </script>
+</body>
+</html>

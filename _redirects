@@ -1,0 +1,2 @@
+# Ensure JS files are served properly
+/js/* /js/:splat 200
