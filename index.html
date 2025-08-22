@@ -1777,7 +1777,36 @@
         });
     </script>
 
-    <script src="js/index.js?v=3"></script>
+    <!-- TEMPORARY: Inline JavaScript for testing Netlify issue -->
+    <script>
+        console.log('🧪 INLINE TEST: JavaScript is working!');
+        
+        // Test if we can access the external file
+        fetch('./js/index.js?v=3')
+            .then(response => {
+                console.log('📁 External JS file status:', response.status);
+                if (response.ok) {
+                    console.log('✅ External JS file is accessible');
+                    return response.text();
+                } else {
+                    console.error('❌ External JS file not found:', response.status);
+                    throw new Error('File not found');
+                }
+            })
+            .then(jsContent => {
+                console.log('📄 External JS file loaded, size:', jsContent.length);
+                // Execute the JavaScript content
+                eval(jsContent);
+                console.log('✅ External JS executed successfully');
+            })
+            .catch(error => {
+                console.error('❌ Failed to load external JS:', error);
+                console.log('🔧 This confirms Netlify is not serving the JS file properly');
+            });
+    </script>
+    
+    <!-- Original external script (commented out for testing) -->
+    <!-- <script src="js/index.js?v=3"></script> -->
 
     <script>
         console.log('🟠 Inline JavaScript test - AFTER loading js/index.js');
