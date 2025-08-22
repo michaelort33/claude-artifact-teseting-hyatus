@@ -537,6 +537,8 @@
             display: none;
             text-align: center;
             padding: 40px;
+            position: relative;
+            overflow: hidden;
         }
 
         .success-icon {
@@ -568,10 +570,112 @@
         .success-message h2 {
             color: var(--text);
             margin-bottom: 10px;
+            font-size: 32px;
+            animation: celebrateText 0.8s ease-out 0.3s both;
+        }
+
+        @keyframes celebrateText {
+            0% {
+                transform: scale(0.8) rotateZ(-5deg);
+                opacity: 0;
+            }
+
+            50% {
+                transform: scale(1.1) rotateZ(3deg);
+            }
+
+            100% {
+                transform: scale(1) rotateZ(0);
+                opacity: 1;
+            }
         }
 
         .success-message p {
             color: var(--subtext);
+            animation: fadeInUp 0.6s ease-out 0.5s both;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .dollar-sign {
+            position: absolute;
+            font-size: 28px;
+            color: var(--success);
+            animation: floatUp 3s ease-out infinite;
+            z-index: 1;
+            user-select: none;
+            pointer-events: none;
+        }
+
+        @keyframes floatUp {
+            0% {
+                transform: translateY(0) rotateZ(0deg);
+                opacity: 0;
+            }
+
+            10% {
+                opacity: 1;
+            }
+
+            90% {
+                opacity: 1;
+            }
+
+            100% {
+                transform: translateY(-400px) rotateZ(360deg);
+                opacity: 0;
+            }
+        }
+
+        .success-best {
+            color: var(--accent);
+            font-weight: 600;
+            display: inline-block;
+            animation: shimmer 2s ease-in-out infinite;
+        }
+
+        @keyframes shimmer {
+
+            0%,
+            100% {
+                opacity: 0.8;
+                transform: scale(1);
+            }
+
+            50% {
+                opacity: 1;
+                transform: scale(1.05);
+            }
+        }
+
+        .confetti {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            animation: confetti-fall 3s ease-out infinite;
+            z-index: 1;
+        }
+
+        @keyframes confetti-fall {
+            0% {
+                transform: translateY(0) rotateZ(0deg);
+                opacity: 1;
+            }
+
+            100% {
+                transform: translateY(400px) rotateZ(720deg);
+                opacity: 0;
+            }
         }
 
         .error-message {
@@ -1259,8 +1363,8 @@
         </div>
 
         <div class="success-message" id="successMessage">
-            <div class="success-icon">🎊</div>
-            <h2>Thank You!</h2>
+            <div class="success-icon">💰</div>
+            <h2>Thank You! <span class="success-best">You're the Best!</span></h2>
             <p>Your reward claim has been submitted successfully.</p>
             <p>We'll process your payment within 24-48 hours.</p>
             <div style="margin-top: 18px; display: flex; gap: 10px; justify-content: center;">
@@ -1445,6 +1549,68 @@
             }, 5000);
         }
 
+        // Create floating dollar signs and confetti animation
+        function createFloatingDollars() {
+            const successContainer = document.getElementById('successMessage');
+            const dollarCount = 12;
+            const confettiCount = 20;
+            const colors = ['#ffdd00', '#ff6b6b', '#4ecdc4', '#45b7d1', '#f9ca24', '#6c5ce7'];
+
+            // Remove any existing animations
+            const existingElements = successContainer.querySelectorAll('.dollar-sign, .confetti');
+            existingElements.forEach(el => el.remove());
+
+            // Create dollar signs
+            for (let i = 0; i < dollarCount; i++) {
+                const dollar = document.createElement('div');
+                dollar.className = 'dollar-sign';
+                dollar.textContent = '$';
+
+                // Random horizontal position
+                dollar.style.left = Math.random() * 100 + '%';
+
+                // Random animation delay
+                dollar.style.animationDelay = Math.random() * 2 + 's';
+
+                // Random animation duration
+                dollar.style.animationDuration = (3 + Math.random() * 2) + 's';
+
+                // Start from bottom
+                dollar.style.bottom = '-50px';
+
+                successContainer.appendChild(dollar);
+            }
+
+            // Create confetti
+            for (let i = 0; i < confettiCount; i++) {
+                const confetti = document.createElement('div');
+                confetti.className = 'confetti';
+
+                // Random color
+                confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+
+                // Random horizontal position
+                confetti.style.left = Math.random() * 100 + '%';
+
+                // Random starting position
+                confetti.style.top = -10 + 'px';
+
+                // Random animation delay
+                confetti.style.animationDelay = Math.random() * 3 + 's';
+
+                // Random animation duration
+                confetti.style.animationDuration = (2 + Math.random() * 2) + 's';
+
+                successContainer.appendChild(confetti);
+            }
+
+            // Clean up after animation
+            setTimeout(() => {
+                const elements = successContainer.querySelectorAll('.dollar-sign, .confetti');
+                elements.forEach(el => el.remove());
+            }, 6000);
+        }
+
         // Form submission
         const form = document.getElementById('rewardForm');
         const formContainer = document.getElementById('formContainer');
@@ -1522,9 +1688,10 @@
                     throw error;
                 }
 
-                // Show success message
+                // Show success message with animation
                 formContainer.style.display = 'none';
                 successMessage.style.display = 'block';
+                createFloatingDollars();
 
             } catch (error) {
                 console.error('Error submitting:', error);
