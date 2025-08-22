@@ -892,6 +892,7 @@
 
         .auth-button-text-mobile {
             font-weight: 500;
+            white-space: nowrap;
         }
 
         @media (max-width: 768px) {
@@ -909,6 +910,11 @@
             /* Adjust header for sticky nav */
             .header {
                 padding-top: 30px;
+            }
+
+            /* Show optional sign-in message on mobile */
+            .mobile-optional-signin {
+                display: block !important;
             }
 
             /* Adjust container to account for sticky nav */
@@ -1382,6 +1388,16 @@
         <div class="header">
             <h1>🎉 Claim Your Review Reward</h1>
             <p>Thank you for your review! Submit proof below to receive your reward.</p>
+            <p class="mobile-optional-signin" style="margin-top: 10px; font-size: 13px; opacity: 0.8; display: none;">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round"
+                    style="display: inline-block; vertical-align: middle; margin-right: 4px;">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <line x1="12" y1="16" x2="12" y2="12"></line>
+                    <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                </svg>
+                Signing in is optional - you can submit your reward without an account
+            </p>
         </div>
 
         <div class="form-container" id="formContainer">

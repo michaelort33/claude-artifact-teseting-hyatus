@@ -455,6 +455,16 @@ if (forgotPasswordBtn) {
 function updateAuthUI() {
     const userAuthLinkMobileEl = document.getElementById('userAuthLinkMobile');
     if (currentUser) {
+        // Get initials from email
+        const email = currentUser.email;
+        let displayText = email;
+
+        // For mobile, show initials instead of full email
+        // If there's a name, use first letter of first and last name
+        // Otherwise, use first letter of email
+        const emailPrefix = email.split('@')[0];
+        const initials = emailPrefix.charAt(0).toUpperCase();
+
         const userHTML = `
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
@@ -462,8 +472,17 @@ function updateAuthUI() {
       </svg>
       <span class="auth-button-text">${currentUser.email}</span>
     `;
+
+        const userHTMLMobile = `
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+        <circle cx="12" cy="7" r="4"></circle>
+      </svg>
+      <span class="auth-button-text-mobile">${initials}</span>
+    `;
+
         if (userAuthLink) userAuthLink.innerHTML = userHTML;
-        if (userAuthLinkMobileEl) userAuthLinkMobileEl.innerHTML = userHTML.replace('auth-button-text', 'auth-button-text-mobile');
+        if (userAuthLinkMobileEl) userAuthLinkMobileEl.innerHTML = userHTMLMobile;
         closeAuthModal();
         closeProfilePopover();
         loadMySubmissions();
