@@ -1,10 +1,6 @@
 [build]
   publish = "."
   command = "echo 'No build command needed - static site'"
-  functions = "netlify/functions"
-
-[functions]
-  node_bundler = "esbuild"
 
 # Ensure JS files are served with correct MIME type
 [[headers]]
