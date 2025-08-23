@@ -979,28 +979,34 @@
 
         // Load submissions
         async function loadSubmissions() {
-            const statusFilter = document.getElementById('statusFilter').value;
-            const paymentFilter = document.getElementById('paymentFilter').value;
+            try {
+                const statusFilter = document.getElementById('statusFilter').value;
+                const paymentFilter = document.getElementById('paymentFilter').value;
 
-            let query = supabase.from('review_rewards').select('*').order('created_at', { ascending: false });
+                let query = supabase.from('review_rewards').select('*').order('created_at', { ascending: false });
 
-            if (statusFilter !== 'all') {
-                query = query.eq('status', statusFilter);
+                if (statusFilter !== 'all') {
+                    query = query.eq('status', statusFilter);
+                }
+                if (paymentFilter !== 'all') {
+                    query = query.eq('payment_method', paymentFilter);
+                }
+
+                const { data, error } = await query;
+
+                if (error) {
+                    console.error('Error loading submissions:', error);
+                    alert('Error loading submissions: ' + error.message);
+                    return;
+                }
+
+                submissions = data || [];
+                updateStats(submissions);
+                renderSubmissions(submissions);
+            } catch (err) {
+                console.error('Unexpected error in loadSubmissions:', err);
+                alert('Unexpected error loading submissions: ' + err.message);
             }
-            if (paymentFilter !== 'all') {
-                query = query.eq('payment_method', paymentFilter);
-            }
-
-            const { data, error } = await query;
-
-            if (error) {
-                console.error('Error loading submissions:', error);
-                return;
-            }
-
-            submissions = data;
-            updateStats(data);
-            renderSubmissions(data);
         }
 
         // ------- Claims Admin -------
@@ -1108,38 +1114,56 @@
 
         // Render submissions table
         function renderSubmissions(data) {
-            const tbody = document.getElementById('submissionsBody');
-            tbody.innerHTML = '';
+            try {
+                const tbody = document.getElementById('submissionsBody');
+                if (!tbody) {
+                    console.error('Submissions table body not found');
+                    return;
+                }
 
-            if (data.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; color: #999;">No submissions found</td></tr>';
-                return;
+                tbody.innerHTML = '';
+
+                if (!data || data.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; color: #999;">No submissions found</td></tr>';
+                    return;
+                }
+
+                data.forEach(submission => {
+                    try {
+                        const row = document.createElement('tr');
+                        const date = new Date(submission.created_at || Date.now()).toLocaleDateString();
+                        const reviewType = submission.review_link ? 'Link' : 'Screenshot';
+
+                        row.innerHTML = `
+                            <td>#${submission.id || 'N/A'}</td>
+                            <td>${date}</td>
+                            <td>${(submission.payment_method || '').toUpperCase()}</td>
+                            <td>${submission.payment_handle || ''}</td>
+                            <td>${reviewType}</td>
+                            <td><span class="status-badge status-${submission.status || 'pending'}">${(submission.status || 'pending').toUpperCase()}</span></td>
+                            <td>
+                                <div class="action-buttons">
+                                    <button class="action-btn btn-view" onclick="viewDetails(${submission.id})">View</button>
+                                    ${(submission.status || 'pending') === 'pending' ? `
+                                        <button class="action-btn btn-award" onclick="updateStatus(${submission.id}, 'awarded')">Award</button>
+                                        <button class="action-btn btn-reject" onclick="updateStatus(${submission.id}, 'rejected')">Reject</button>
+                                    ` : ''}
+                                </div>
+                            </td>
+                        `;
+                        tbody.appendChild(row);
+                    } catch (submissionError) {
+                        console.error('Error rendering submission:', submissionError, submission);
+                        // Continue with other submissions
+                    }
+                });
+            } catch (err) {
+                console.error('Error in renderSubmissions:', err);
+                const tbody = document.getElementById('submissionsBody');
+                if (tbody) {
+                    tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; color: #f00;">Error loading submissions</td></tr>';
+                }
             }
-
-            data.forEach(submission => {
-                const row = document.createElement('tr');
-                const date = new Date(submission.created_at).toLocaleDateString();
-                const reviewType = submission.review_link ? 'Link' : 'Screenshot';
-
-                row.innerHTML = `
-                    <td>#${submission.id}</td>
-                    <td>${date}</td>
-                    <td>${submission.payment_method.toUpperCase()}</td>
-                    <td>${submission.payment_handle}</td>
-                    <td>${reviewType}</td>
-                    <td><span class="status-badge status-${submission.status}">${submission.status.toUpperCase()}</span></td>
-                    <td>
-                        <div class="action-buttons">
-                            <button class="action-btn btn-view" onclick="viewDetails(${submission.id})">View</button>
-                            ${submission.status === 'pending' ? `
-                                <button class="action-btn btn-award" onclick="updateStatus(${submission.id}, 'awarded')">Award</button>
-                                <button class="action-btn btn-reject" onclick="updateStatus(${submission.id}, 'rejected')">Reject</button>
-                            ` : ''}
-                        </div>
-                    </td>
-                `;
-                tbody.appendChild(row);
-            });
         }
 
         // View submission details
@@ -1161,11 +1185,11 @@
                 </div>
                 <div class="detail-row">
                     <div class="detail-label">Payment Method:</div>
-                    <div class="detail-value">${submission.payment_method.toUpperCase()}</div>
+                    <div class="detail-value">${(submission.payment_method || '').toUpperCase()}</div>
                 </div>
                 <div class="detail-row">
                     <div class="detail-label">Payment Handle:</div>
-                    <div class="detail-value">${submission.payment_handle}</div>
+                    <div class="detail-value">${submission.payment_handle || ''}</div>
                 </div>
                 <div class="detail-row">
                     <div class="detail-label">Status:</div>
