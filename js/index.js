@@ -51,6 +51,9 @@ paymentMethods.forEach((method) => {
         } else if (selectedMethod === 'paypal') {
             paymentLabel.textContent = 'PayPal Email';
             if (paymentHandle) paymentHandle.placeholder = 'email@example.com';
+        } else if (selectedMethod === 'other') {
+            paymentLabel.textContent = 'Preferred Payment Method';
+            if (paymentHandle) paymentHandle.placeholder = 'e.g., Cash App, Apple Pay, etc.';
         }
     });
 });

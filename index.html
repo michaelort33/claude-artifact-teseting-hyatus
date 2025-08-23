@@ -228,7 +228,7 @@
 
         .payment-methods {
             display: grid;
-            grid-template-columns: repeat(3, 1fr);
+            grid-template-columns: repeat(4, 1fr);
             gap: 10px;
             margin-bottom: 15px;
         }
@@ -1559,6 +1559,11 @@
             color: #0b8043;
         }
 
+        .pill.other {
+            background: #f3e5f5;
+            color: #7b1fa2;
+        }
+
         .pill.link {
             background: #eaf2ff;
             color: #1a73e8;
@@ -1643,6 +1648,10 @@
                         <div class="payment-method" data-method="paypal">
                             <div>💰</div>
                             <div>PayPal</div>
+                        </div>
+                        <div class="payment-method" data-method="other">
+                            <div>📝</div>
+                            <div>Other</div>
                         </div>
                     </div>
                     <div class="form-group">
@@ -1862,6 +1871,9 @@
                 } else if (selectedMethod === 'paypal') {
                     paymentLabel.textContent = 'PayPal Email';
                     paymentHandle.placeholder = 'email@example.com';
+                } else if (selectedMethod === 'other') {
+                    paymentLabel.textContent = 'Preferred Payment Method';
+                    paymentHandle.placeholder = 'e.g., Cash App, Apple Pay, etc.';
                 }
             });
         });
