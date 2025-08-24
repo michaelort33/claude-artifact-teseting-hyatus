@@ -431,11 +431,15 @@
             border-radius: 10px;
             box-shadow: none;
             border: 1px solid var(--border);
-            overflow: hidden;
+            overflow-x: auto;
+            min-width: 1200px;
+            /* Ensure minimum width to prevent cutoff */
         }
 
         table {
             width: 100%;
+            min-width: 1200px;
+            /* Match container minimum width */
             border-collapse: collapse;
         }
 
@@ -493,16 +497,18 @@
 
         .action-buttons {
             display: flex;
-            gap: 5px;
+            gap: 3px;
+            flex-wrap: wrap;
         }
 
         .action-btn {
-            padding: 5px 10px;
+            padding: 4px 8px;
             border: none;
-            border-radius: 5px;
+            border-radius: 4px;
             cursor: pointer;
-            font-size: 12px;
+            font-size: 11px;
             transition: all 0.3s;
+            white-space: nowrap;
         }
 
         .action-btn:hover {
@@ -537,6 +543,12 @@
             background: #2a1f3a;
             border-color: #3a2a54;
             color: #b794f4;
+        }
+
+        .btn-revert {
+            background: #3a2a1a;
+            border-color: #543a2a;
+            color: #ffa94d;
         }
 
         .expandable-row {
@@ -781,7 +793,7 @@
             <div class="login-header">
                 <div class="login-icon">🔐</div>
                 <h2>Admin Login</h2>
-                <p class="login-subtitle">Sign in to manage rewards and claims</p>
+                <p class="login-subtitle" id="loginMessage">Sign in to manage rewards and claims</p>
             </div>
             <div id="loginError" class="error-message" style="display: none;"></div>
             <form id="loginForm">
@@ -1150,6 +1162,12 @@
             const maxRetries = 3;
             const retryDelay = 1000 * Math.pow(2, retryCount); // Exponential backoff
 
+            // Show loading state
+            const tbody = document.getElementById('submissionsBody');
+            if (tbody && retryCount === 0) {
+                tbody.innerHTML = '<tr><td colspan="10" style="text-align: center; color: #666;">Loading submissions...</td></tr>';
+            }
+
             try {
                 // Check if we have Supabase client
                 if (!supabase) {
@@ -1162,7 +1180,15 @@
                 const paymentFilter = document.getElementById('paymentFilter') ? document.getElementById('paymentFilter').value : 'all';
                 const searchHandle = document.getElementById('searchHandle') ? document.getElementById('searchHandle').value.toLowerCase().trim() : '';
 
-                let query = supabase.from('review_rewards').select('*').order('created_at', { ascending: false });
+                console.log('Starting database query...');
+                const queryStart = performance.now();
+
+                // Start with a more efficient query
+                let query = supabase
+                    .from('review_rewards')
+                    .select('*')
+                    .order('created_at', { ascending: false })
+                    .limit(500); // Limit initial load for better performance
 
                 if (statusFilter !== 'all') {
                     if (statusFilter === 'pending') {
@@ -1210,7 +1236,8 @@
                 }
 
                 submissions = data || [];
-                console.log('Loaded submissions:', submissions.length);
+                const queryEnd = performance.now();
+                console.log(`Loaded ${submissions.length} submissions in ${(queryEnd - queryStart).toFixed(2)}ms`);
 
                 updateStats(submissions); // Stats should show all, not filtered
 
@@ -1299,7 +1326,12 @@
                                         <button class="action-btn btn-reject" onclick="updateStatus(${submission.id}, 'rejected')">Reject</button>
                                     ` : (submission.status === 'awarded' ? `
                                         <button class="action-btn btn-paid" onclick="updateStatus(${submission.id}, 'paid')">Mark Paid</button>
-                                    ` : '')}
+                                        <button class="action-btn btn-revert" onclick="updateStatus(${submission.id}, 'pending')">Revert to Pending</button>
+                                    ` : (submission.status === 'paid' ? `
+                                        <button class="action-btn btn-revert" onclick="updateStatus(${submission.id}, 'awarded')">Revert to Awarded</button>
+                                    ` : (submission.status === 'rejected' ? `
+                                        <button class="action-btn btn-revert" onclick="updateStatus(${submission.id}, 'pending')">Revert to Pending</button>
+                                    ` : '')))}
                                 </div>
                             </td>
                         `;
@@ -1420,6 +1452,10 @@
                     }
                 } else if (newStatus === 'paid') {
                     updateData.paid_at = new Date().toISOString();
+                } else if (newStatus === 'pending') {
+                    // When reverting to pending, clear the timestamps
+                    updateData.awarded_at = null;
+                    updateData.paid_at = null;
                 }
 
                 // Retry logic for better reliability
@@ -1447,6 +1483,10 @@
                                 submission.award_amount = updateData.award_amount;
                             } else if (newStatus === 'paid') {
                                 submission.paid_at = updateData.paid_at;
+                            } else if (newStatus === 'pending') {
+                                // Clear timestamps when reverting to pending
+                                submission.awarded_at = null;
+                                submission.paid_at = null;
                             }
                         }
 
@@ -1455,7 +1495,9 @@
                         renderSubmissions(submissions);
 
                         // Show success feedback
-                        const statusText = newStatus === 'awarded' ? 'Awarded' : (newStatus === 'paid' ? 'Paid' : 'Rejected');
+                        const statusText = newStatus === 'awarded' ? 'Awarded' :
+                            (newStatus === 'paid' ? 'Paid' :
+                                (newStatus === 'pending' ? 'Reverted' : 'Rejected'));
                         button.textContent = '✓ ' + statusText;
                         button.style.background = '#4caf50';
                         button.style.color = 'white';
@@ -2014,6 +2056,57 @@
                 closeEditAwardModal();
             }
         });
+
+        // Check session on page load
+        async function checkSession() {
+            try {
+                // Show checking message
+                const loginMessage = document.getElementById('loginMessage');
+                if (loginMessage) {
+                    loginMessage.textContent = 'Checking session...';
+                }
+
+                console.log('Checking existing session...');
+                const { data: { session }, error } = await supabase.auth.getSession();
+
+                if (error) {
+                    console.error('Session check error:', error);
+                    return;
+                }
+
+                if (session) {
+                    console.log('Session found for:', session.user.email);
+                    currentUser = session.user;
+
+                    // Check if user is admin
+                    const { data: adminData, error: adminError } = await supabase
+                        .from('admins')
+                        .select('*')
+                        .eq('email', session.user.email)
+                        .single();
+
+                    if (adminError || !adminData) {
+                        console.log('User is not an admin');
+                        await supabase.auth.signOut();
+                        return;
+                    }
+
+                    console.log('Admin verified, showing dashboard');
+                    showDashboard();
+                } else {
+                    console.log('No existing session found');
+                    // Reset login message
+                    if (loginMessage) {
+                        loginMessage.textContent = 'Sign in to manage rewards and claims';
+                    }
+                }
+            } catch (err) {
+                console.error('Unexpected error checking session:', err);
+            }
+        }
+
+        // Check session when page loads
+        checkSession();
     </script>
 </body>
 
