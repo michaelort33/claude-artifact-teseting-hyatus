@@ -1145,7 +1145,10 @@
         }
 
         // Load submissions
-        async function loadSubmissions() {
+        async function loadSubmissions(retryCount = 0) {
+            const maxRetries = 3;
+            const retryDelay = 1000 * Math.pow(2, retryCount); // Exponential backoff
+
             try {
                 // Check if we have Supabase client
                 if (!supabase) {
@@ -1185,10 +1188,20 @@
 
                     // More helpful error messages
                     if (error.message.includes('Failed to fetch')) {
-                        alert('Network error: Unable to connect to the database. Please check your internet connection and try again.');
+                        console.error('Network error details:', error);
+                        // Retry with exponential backoff
+                        if (retryCount < maxRetries) {
+                            console.log(`Retrying in ${retryDelay}ms... (attempt ${retryCount + 1}/${maxRetries})`);
+                            setTimeout(() => loadSubmissions(retryCount + 1), retryDelay);
+                            return;
+                        } else {
+                            alert('Network error: Unable to connect to the database after multiple attempts. Please check your internet connection and try again.\n\nTip: If this persists, try refreshing the page or logging out and back in.');
+                        }
                     } else if (error.code === 'PGRST301') {
                         alert('Authentication error: Please log in again.');
                         window.location.reload();
+                    } else if (error.message.includes('infinite recursion')) {
+                        alert('Database policy error detected. Please contact support to fix RLS policies.');
                     } else {
                         alert('Error loading submissions: ' + error.message);
                     }
