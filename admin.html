@@ -1198,18 +1198,10 @@
                 submissions = data || [];
                 console.log('Loaded submissions:', submissions.length);
 
-                // Apply client-side search filter
-                let filteredSubmissions = submissions;
-                if (searchHandle) {
-                    filteredSubmissions = submissions.filter(sub =>
-                        sub.payment_handle && sub.payment_handle.toLowerCase().includes(searchHandle)
-                    );
-                    console.log('Filtered to:', filteredSubmissions.length);
-                }
-
                 updateStats(submissions); // Stats should show all, not filtered
-                renderSubmissions(filteredSubmissions);
-                updateSelection(); // Clear selection when reloading
+
+                // Apply search filter if there's a search term
+                filterSubmissions();
             } catch (err) {
                 console.error('Unexpected error in loadSubmissions:', err);
                 alert('Unexpected error loading submissions: ' + err.message);
@@ -1967,9 +1959,25 @@
             searchInput.addEventListener('input', (e) => {
                 clearTimeout(searchTimeout);
                 searchTimeout = setTimeout(() => {
-                    loadSubmissions();
+                    filterSubmissions();
                 }, 300); // 300ms debounce
             });
+        }
+
+        // Client-side filtering function
+        function filterSubmissions() {
+            const searchHandle = document.getElementById('searchHandle') ? document.getElementById('searchHandle').value.toLowerCase().trim() : '';
+
+            let filteredSubmissions = submissions;
+            if (searchHandle) {
+                filteredSubmissions = submissions.filter(sub =>
+                    sub.payment_handle && sub.payment_handle.toLowerCase().includes(searchHandle)
+                );
+            }
+
+            console.log('Filtering:', submissions.length, 'to', filteredSubmissions.length, 'with search:', searchHandle);
+            renderSubmissions(filteredSubmissions);
+            updateSelection(); // Clear selection when filtering
         }
 
         // Close modal on outside click
