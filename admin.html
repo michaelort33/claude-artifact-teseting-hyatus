@@ -580,6 +580,33 @@
             color: var(--border);
         }
 
+        .refresh-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 32px;
+            height: 32px;
+            border-radius: 6px;
+            background: var(--surface-2);
+            border: 1px solid var(--border);
+            color: var(--subtext);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            margin-left: auto;
+        }
+
+        .refresh-icon:hover {
+            background: var(--surface-3);
+            color: var(--accent);
+            border-color: var(--accent);
+            transform: rotate(180deg);
+        }
+
+        .refresh-icon svg {
+            width: 18px;
+            height: 18px;
+        }
+
         .modal {
             display: none;
             position: fixed;
@@ -813,7 +840,12 @@
                 <option value="paypal">PayPal</option>
                 <option value="other">Other</option>
             </select>
-            <button class="btn" onclick="loadSubmissions()">Refresh</button>
+            <div class="refresh-icon" onclick="loadSubmissions()" title="Refresh data">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                </svg>
+            </div>
         </div>
 
         <!-- Submissions Table -->
@@ -905,7 +937,12 @@
                     style="margin-right: 5px;">
                 Show breakdown by payment handle
             </label>
-            <button class="btn" onclick="loadSummary()">Refresh</button>
+            <div class="refresh-icon" onclick="loadSummary()" title="Refresh data">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                </svg>
+            </div>
         </div>
 
         <div class="submissions-table">
@@ -1028,6 +1065,7 @@
         document.getElementById('logoutBtn').addEventListener('click', async () => {
             await supabase.auth.signOut();
             currentUser = null;
+            stopAutoRefresh();
             document.querySelector('.login-wrapper').style.display = 'flex';
             document.getElementById('dashboard').classList.remove('active');
             document.getElementById('logoutBtn').style.display = 'none';
@@ -1063,6 +1101,7 @@
             document.getElementById('logoutBtn').style.display = 'block';
             document.getElementById('navTabs').classList.add('active');
             loadSubmissions();
+            startAutoRefresh();
         }
 
         // Load submissions
@@ -1504,6 +1543,27 @@
         // Toggle handle breakdown
         function toggleHandleBreakdown() {
             loadSummary();
+        }
+
+        // Auto-refresh functionality
+        let autoRefreshInterval = null;
+
+        function startAutoRefresh() {
+            // Refresh every 30 seconds when on dashboard
+            autoRefreshInterval = setInterval(() => {
+                if (document.getElementById('dashboard').classList.contains('active')) {
+                    loadSubmissions();
+                } else if (document.getElementById('summaryDashboard').style.display === 'block') {
+                    loadSummary();
+                }
+            }, 30000); // 30 seconds
+        }
+
+        function stopAutoRefresh() {
+            if (autoRefreshInterval) {
+                clearInterval(autoRefreshInterval);
+                autoRefreshInterval = null;
+            }
         }
 
         // Initialize on load
