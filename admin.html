@@ -489,16 +489,7 @@
             color: #58a6ff;
         }
 
-        /* Claim statuses */
-        .status-open {
-            background: var(--badge-open-bg);
-            color: var(--badge-open-fg);
-        }
 
-        .status-resolved {
-            background: var(--badge-res-bg);
-            color: var(--badge-res-fg);
-        }
 
         .action-buttons {
             display: flex;
@@ -540,6 +531,53 @@
             background: #142a3e;
             border-color: #1c3a54;
             color: #58a6ff;
+        }
+
+        .btn-edit {
+            background: #2a1f3a;
+            border-color: #3a2a54;
+            color: #b794f4;
+        }
+
+        .expandable-row {
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .expandable-row:hover {
+            background: var(--surface-2);
+        }
+
+        .expand-icon {
+            display: inline-block;
+            width: 20px;
+            transition: transform 0.2s;
+        }
+
+        .expand-icon.expanded {
+            transform: rotate(90deg);
+        }
+
+        .handle-row {
+            background: var(--surface);
+            font-size: 13px;
+            display: none;
+        }
+
+        .handle-row.visible {
+            display: table-row;
+        }
+
+        .handle-row td:first-child {
+            padding-left: 40px;
+            position: relative;
+        }
+
+        .handle-row td:first-child::before {
+            content: "└─";
+            position: absolute;
+            left: 20px;
+            color: var(--border);
         }
 
         .modal {
@@ -679,13 +717,6 @@
             border: 1px solid rgba(63, 185, 80, 0.3);
             font-size: 14px;
         }
-
-        /* Inline search input override */
-        #claimSearch {
-            background: var(--surface-2) !important;
-            color: var(--text) !important;
-            border: 1px solid var(--border) !important;
-        }
     </style>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
@@ -704,7 +735,6 @@
     <!-- Tabs (visible when logged in) -->
     <div class="nav-tabs" id="navTabs">
         <button class="nav-tab active" id="tabRewards">Rewards</button>
-        <button class="nav-tab" id="tabClaims">Claims</button>
         <button class="nav-tab" id="tabSummary">Summary</button>
     </div>
 
@@ -808,37 +838,7 @@
         </div>
     </div>
 
-    <!-- Claims Dashboard -->
-    <div class="dashboard" id="claimsDashboard" style="display:none;">
-        <div class="filter-bar">
-            <select id="claimStatusFilter">
-                <option value="all">All Status</option>
-                <option value="open">Open</option>
-                <option value="resolved">Resolved</option>
-            </select>
-            <input id="claimSearch" placeholder="Search email or reservation"
-                style="padding:8px 12px; border:2px solid #e0e0e0; border-radius:5px; font-size:14px;" />
-            <button class="btn" id="refreshClaimsBtn">Refresh</button>
-        </div>
 
-        <div class="submissions-table">
-            <table>
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Date</th>
-                        <th>Email</th>
-                        <th>Reservation</th>
-                        <th>Requested</th>
-                        <th>Resolution</th>
-                        <th>Status</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody id="claimsBody"></tbody>
-            </table>
-        </div>
-    </div>
 
     <!-- Detail Modal -->
     <div class="modal" id="detailModal">
@@ -853,14 +853,31 @@
         </div>
     </div>
 
-    <!-- Claim Modal -->
-    <div class="modal" id="claimModal">
-        <div class="modal-content">
+
+
+    <!-- Edit Award Modal -->
+    <div class="modal" id="editAwardModal">
+        <div class="modal-content" style="max-width: 400px;">
             <div class="modal-header">
-                <h2>Claim Details</h2>
-                <button class="modal-close" onclick="closeClaimModal()">&times;</button>
+                <h2>Edit Award Amount</h2>
+                <button class="modal-close" onclick="closeEditAwardModal()">&times;</button>
             </div>
-            <div id="claimModalBody"></div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="editAwardAmount">Award Amount ($)</label>
+                    <input type="number" id="editAwardAmount" step="0.01" min="0" placeholder="10.00"
+                        style="width: 100%; padding: 10px; background: var(--surface-2); color: var(--text); border: 1px solid var(--border); border-radius: 5px;">
+                </div>
+                <div style="margin-top: 10px; font-size: 13px; color: var(--subtext);">
+                    <p>Current submission: #<span id="editSubmissionId"></span></p>
+                    <p>Default amount: $<span id="defaultAmount"></span></p>
+                </div>
+                <div style="margin-top: 20px; display: flex; gap: 10px;">
+                    <button class="btn" onclick="saveAwardAmount()" style="flex: 1;">Save Amount</button>
+                    <button class="btn btn-secondary" onclick="closeEditAwardModal()"
+                        style="flex: 1; background: var(--surface-2); color: var(--text);">Cancel</button>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -883,6 +900,11 @@
 
         <div class="filter-bar">
             <h3>Payment Summary by Method</h3>
+            <label style="margin-left: 20px;">
+                <input type="checkbox" id="showHandleBreakdown" onchange="toggleHandleBreakdown()"
+                    style="margin-right: 5px;">
+                Show breakdown by payment handle
+            </label>
             <button class="btn" onclick="loadSummary()">Refresh</button>
         </div>
 
@@ -1075,104 +1097,22 @@
             }
         }
 
-        // ------- Claims Admin -------
-        let claims = [];
 
-        async function loadClaimsAdmin() {
-            const status = document.getElementById('claimStatusFilter').value;
-            const search = document.getElementById('claimSearch').value.trim().toLowerCase();
-            let query = supabase.from('claims').select('*').order('created_at', { ascending: false });
-            if (status !== 'all') query = query.eq('status', status);
-            const { data, error } = await query;
-            if (error) { console.error('Error loading claims:', error); return; }
-            claims = (data || []).filter(c => {
-                if (!search) return true;
-                const hay = `${(c.email || '').toLowerCase()} ${(c.reservation_id || '').toLowerCase()}`;
-                return hay.includes(search);
-            });
-            renderClaimsAdmin(claims);
-        }
-
-        function renderClaimsAdmin(list) {
-            const tbody = document.getElementById('claimsBody');
-            tbody.innerHTML = '';
-            if (!list.length) { tbody.innerHTML = '<tr><td colspan="8" style="text-align:center; color:#999;">No claims found</td></tr>'; return; }
-            list.forEach(c => {
-                const row = document.createElement('tr');
-                const date = new Date(c.created_at).toLocaleString();
-                row.innerHTML = `
-                    <td>#${c.id}</td>
-                    <td>${date}</td>
-                    <td>${c.email}</td>
-                    <td>${c.reservation_id}</td>
-                    <td>$${Number(c.amount_requested || 0).toFixed(2)}</td>
-                    <td>${c.resolution_amount != null ? `$${Number(c.resolution_amount).toFixed(2)}` : '—'}</td>
-                    <td><span class="status-badge status-${c.status}">${(c.status || 'OPEN').toUpperCase()}</span></td>
-                    <td>
-                        <div class="action-buttons">
-                            <button class="action-btn btn-view" onclick="viewClaim(${c.id})">View</button>
-                            ${c.status === 'open' ? `<button class="action-btn btn-award" onclick="resolveClaim(${c.id})">Resolve</button>` : `<button class="action-btn btn-view" onclick="resolveClaim(${c.id})">Update</button>`}
-                        </div>
-                    </td>
-                `;
-                tbody.appendChild(row);
-            });
-        }
-
-        function viewClaim(id) {
-            const c = claims.find(x => x.id === id);
-            if (!c) return;
-            const body = document.getElementById('claimModalBody');
-            body.innerHTML = `
-                <div class="detail-row"><div class="detail-label">Claim ID:</div><div class="detail-value">#${c.id}</div></div>
-                <div class="detail-row"><div class="detail-label">Email:</div><div class="detail-value">${c.email}</div></div>
-                <div class="detail-row"><div class="detail-label">Reservation:</div><div class="detail-value">${c.reservation_id}</div></div>
-                <div class="detail-row"><div class="detail-label">Created:</div><div class="detail-value">${new Date(c.created_at).toLocaleString()}</div></div>
-                <div class="detail-row"><div class="detail-label">Requested:</div><div class="detail-value">$${Number(c.amount_requested || 0).toFixed(2)}</div></div>
-                ${c.resolution_amount != null ? `<div class="detail-row"><div class="detail-label">Resolution:</div><div class="detail-value">$${Number(c.resolution_amount).toFixed(2)}</div></div>` : ''}
-                <div class="detail-row"><div class="detail-label">Status:</div><div class="detail-value"><span class="status-badge status-${c.status}">${(c.status || 'OPEN').toUpperCase()}</span></div></div>
-                <div class="detail-row"><div class="detail-label">Description:</div><div class="detail-value" style="white-space:pre-wrap;">${(c.description || '').replace(/[&<>]/g, s => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;" }[s]))}</div></div>
-                ${Array.isArray(c.image_urls) && c.image_urls.length ? `<div class="detail-row"><div class="detail-label">Images:</div><div class="detail-value">${c.image_urls.map(u => `<img src="${u}" class="screenshot-preview" style="max-width:120px; margin-right:6px; margin-bottom:6px;"/>`).join('')}</div></div>` : ''}
-            `;
-            document.getElementById('claimModal').classList.add('active');
-        }
-
-        function closeClaimModal() { document.getElementById('claimModal').classList.remove('active'); }
-
-        async function resolveClaim(id) {
-            const c = claims.find(x => x.id === id);
-            if (!c) return;
-            const amount = prompt('Enter resolution amount (leave blank to accept requested):', c.amount_requested);
-            if (amount === null) return;
-            const parsed = amount === '' ? c.amount_requested : Number(amount);
-            if (isNaN(parsed)) { alert('Invalid amount'); return; }
-            const { error } = await supabase.from('claims').update({ resolution_amount: parsed, status: 'resolved' }).eq('id', id);
-            if (error) { alert('Error resolving claim: ' + error.message); return; }
-            loadClaimsAdmin();
-        }
 
         // Tabs logic
         function switchTab(which) {
             const rewardsTab = document.getElementById('dashboard');
-            const claimsTab = document.getElementById('claimsDashboard');
             const summaryTab = document.getElementById('summaryDashboard');
             const btnRewards = document.getElementById('tabRewards');
-            const btnClaims = document.getElementById('tabClaims');
             const btnSummary = document.getElementById('tabSummary');
 
             // Hide all tabs
             rewardsTab.classList.remove('active'); rewardsTab.style.display = 'none';
-            claimsTab.classList.remove('active'); claimsTab.style.display = 'none';
             summaryTab.classList.remove('active'); summaryTab.style.display = 'none';
             btnRewards.classList.remove('active');
-            btnClaims.classList.remove('active');
             btnSummary.classList.remove('active');
 
-            if (which === 'claims') {
-                claimsTab.style.display = 'block'; claimsTab.classList.add('active');
-                btnClaims.classList.add('active');
-                loadClaimsAdmin();
-            } else if (which === 'summary') {
+            if (which === 'summary') {
                 summaryTab.style.display = 'block'; summaryTab.classList.add('active');
                 btnSummary.classList.add('active');
                 loadSummary();
@@ -1220,11 +1160,12 @@
                             <td>${(submission.payment_method || '').toUpperCase()}</td>
                             <td>${submission.payment_handle || ''}</td>
                             <td>${reviewType}</td>
-                            <td>$${getAwardAmount(submission.id).toFixed(2)}</td>
+                            <td>$${(submission.award_amount || getAwardAmount(submission.id)).toFixed(2)}</td>
                             <td><span class="status-badge status-${submission.status || 'pending'}">${(submission.status || 'pending').toUpperCase()}</span></td>
                             <td>
                                 <div class="action-buttons">
                                     <button class="action-btn btn-view" onclick="viewDetails(${submission.id})">View</button>
+                                    <button class="action-btn btn-edit" onclick="editAward(${submission.id})">Edit Award</button>
                                     ${(submission.status || 'pending') === 'pending' ? `
                                         <button class="action-btn btn-award" onclick="updateStatus(${submission.id}, 'awarded')">Award</button>
                                         <button class="action-btn btn-reject" onclick="updateStatus(${submission.id}, 'rejected')">Reject</button>
@@ -1485,21 +1426,119 @@
             }
         }
 
+        // Edit Award functions
+        let currentEditSubmissionId = null;
+
+        async function editAward(id) {
+            currentEditSubmissionId = id;
+            const submission = submissions.find(s => s.id === id);
+            if (!submission) return;
+
+            const defaultAmt = getAwardAmount(id);
+            const currentAmt = submission.award_amount || defaultAmt;
+
+            document.getElementById('editSubmissionId').textContent = id;
+            document.getElementById('defaultAmount').textContent = defaultAmt.toFixed(2);
+            document.getElementById('editAwardAmount').value = currentAmt.toFixed(2);
+
+            document.getElementById('editAwardModal').classList.add('active');
+        }
+
+        function closeEditAwardModal() {
+            document.getElementById('editAwardModal').classList.remove('active');
+            currentEditSubmissionId = null;
+        }
+
+        async function saveAwardAmount() {
+            if (!currentEditSubmissionId) return;
+
+            const amountInput = document.getElementById('editAwardAmount');
+            const amount = parseFloat(amountInput.value);
+
+            if (isNaN(amount) || amount < 0) {
+                alert('Please enter a valid amount');
+                return;
+            }
+
+            try {
+                const { error } = await supabase
+                    .from('review_rewards')
+                    .update({ award_amount: amount })
+                    .eq('id', currentEditSubmissionId);
+
+                if (error) throw error;
+
+                // Update local data
+                const submission = submissions.find(s => s.id === currentEditSubmissionId);
+                if (submission) {
+                    submission.award_amount = amount;
+                }
+
+                // Refresh the display
+                renderSubmissions(submissions);
+                closeEditAwardModal();
+
+                // Show success message
+                alert(`Award amount updated to $${amount.toFixed(2)}`);
+
+            } catch (error) {
+                console.error('Error updating award amount:', error);
+                alert('Failed to update award amount: ' + error.message);
+            }
+        }
+
+        // Toggle method expansion
+        function toggleMethodExpansion(rowId, method) {
+            const icon = document.getElementById(`icon-${rowId}`);
+            const handleRows = document.querySelectorAll(`tr[data-parent="${rowId}"]`);
+
+            if (icon.classList.contains('expanded')) {
+                icon.classList.remove('expanded');
+                handleRows.forEach(row => row.classList.remove('visible'));
+            } else {
+                icon.classList.add('expanded');
+                handleRows.forEach(row => row.classList.add('visible'));
+            }
+        }
+
+        // Toggle handle breakdown
+        function toggleHandleBreakdown() {
+            loadSummary();
+        }
+
         // Initialize on load
         checkAuth();
 
         // Load summary data
         async function loadSummary() {
             try {
-                const { data, error } = await supabase.from('review_rewards_summary').select('*');
+                // Load summary from view
+                const { data: summaryData, error: summaryError } = await supabase.from('review_rewards_summary').select('*');
 
-                if (error) {
-                    console.error('Error loading summary:', error);
-                    alert('Error loading summary: ' + error.message);
+                if (summaryError) {
+                    console.error('Error loading summary:', summaryError);
+                    alert('Error loading summary: ' + summaryError.message);
                     return;
                 }
 
-                renderSummary(data || []);
+                // Load detailed data for handle breakdown if needed
+                const showHandles = document.getElementById('showHandleBreakdown')?.checked;
+                let handleData = null;
+
+                if (showHandles) {
+                    const { data: detailData, error: detailError } = await supabase
+                        .from('review_rewards')
+                        .select('payment_method, payment_handle, status, award_amount')
+                        .in('status', ['awarded', 'paid']);
+
+                    if (detailError) {
+                        console.error('Error loading handle data:', detailError);
+                    } else {
+                        handleData = detailData;
+                    }
+                }
+
+                renderSummary(summaryData || [], handleData);
             } catch (err) {
                 console.error('Unexpected error in loadSummary:', err);
                 alert('Unexpected error loading summary: ' + err.message);
@@ -1507,19 +1546,64 @@
         }
 
         // Render summary data
-        function renderSummary(data) {
+        function renderSummary(data, handleData) {
             const tbody = document.getElementById('summaryBody');
             tbody.innerHTML = '';
 
             let totalAwarded = 0;
             let totalPaid = 0;
 
-            data.forEach(row => {
+            // Process handle data if provided
+            const handlesByMethod = {};
+            if (handleData) {
+                handleData.forEach(item => {
+                    const method = item.payment_method || 'unknown';
+                    if (!handlesByMethod[method]) {
+                        handlesByMethod[method] = {};
+                    }
+                    const handle = item.payment_handle || 'Unknown';
+                    if (!handlesByMethod[method][handle]) {
+                        handlesByMethod[method][handle] = {
+                            count: 0,
+                            awardedCount: 0,
+                            paidCount: 0,
+                            awardedAmount: 0,
+                            paidAmount: 0
+                        };
+                    }
+
+                    const amount = item.award_amount || 10;
+                    handlesByMethod[method][handle].count++;
+
+                    if (item.status === 'awarded') {
+                        handlesByMethod[method][handle].awardedCount++;
+                        handlesByMethod[method][handle].awardedAmount += amount;
+                    } else if (item.status === 'paid') {
+                        handlesByMethod[method][handle].paidCount++;
+                        handlesByMethod[method][handle].awardedAmount += amount;
+                        handlesByMethod[method][handle].paidAmount += amount;
+                    }
+                });
+            }
+
+            data.forEach((row, index) => {
                 if (row.payment_method !== 'TOTAL') {
                     const tr = document.createElement('tr');
                     const outstanding = row.total_awarded_amount - row.total_paid_amount;
+                    const hasHandles = handleData && handlesByMethod[row.payment_method];
+                    const rowId = `method-row-${index}`;
+
+                    if (hasHandles) {
+                        tr.className = 'expandable-row';
+                        tr.setAttribute('data-method', row.payment_method);
+                        tr.onclick = () => toggleMethodExpansion(rowId, row.payment_method);
+                    }
+
                     tr.innerHTML = `
-                        <td>${(row.payment_method || 'Unknown').toUpperCase()}</td>
+                        <td>
+                            ${hasHandles ? '<span class="expand-icon" id="icon-' + rowId + '">▶</span> ' : ''}
+                            ${(row.payment_method || 'Unknown').toUpperCase()}
+                        </td>
                         <td>${row.total_submissions}</td>
                         <td>${row.awarded_count}</td>
                         <td>${row.paid_count}</td>
@@ -1528,6 +1612,28 @@
                         <td>$${outstanding.toFixed(2)}</td>
                     `;
                     tbody.appendChild(tr);
+
+                    // Add handle rows if available
+                    if (hasHandles) {
+                        const handles = handlesByMethod[row.payment_method];
+                        Object.entries(handles).forEach(([handle, stats]) => {
+                            const handleRow = document.createElement('tr');
+                            handleRow.className = 'handle-row';
+                            handleRow.setAttribute('data-parent', rowId);
+                            const handleOutstanding = stats.awardedAmount - stats.paidAmount;
+
+                            handleRow.innerHTML = `
+                                <td>${handle}</td>
+                                <td>${stats.count}</td>
+                                <td>${stats.awardedCount}</td>
+                                <td>${stats.paidCount}</td>
+                                <td>$${stats.awardedAmount.toFixed(2)}</td>
+                                <td>$${stats.paidAmount.toFixed(2)}</td>
+                                <td>$${handleOutstanding.toFixed(2)}</td>
+                            `;
+                            tbody.appendChild(handleRow);
+                        });
+                    }
                 } else {
                     totalAwarded = row.total_awarded_amount;
                     totalPaid = row.total_paid_amount;
@@ -1558,11 +1664,7 @@
 
         // Tabs events
         document.getElementById('tabRewards').addEventListener('click', () => switchTab('rewards'));
-        document.getElementById('tabClaims').addEventListener('click', () => switchTab('claims'));
         document.getElementById('tabSummary').addEventListener('click', () => switchTab('summary'));
-        document.getElementById('refreshClaimsBtn').addEventListener('click', loadClaimsAdmin);
-        document.getElementById('claimStatusFilter').addEventListener('change', loadClaimsAdmin);
-        document.getElementById('claimSearch').addEventListener('input', () => { loadClaimsAdmin(); });
 
         // Set up filters
         document.getElementById('statusFilter').addEventListener('change', loadSubmissions);
@@ -1572,6 +1674,12 @@
         document.getElementById('detailModal').addEventListener('click', (e) => {
             if (e.target === document.getElementById('detailModal')) {
                 closeModal();
+            }
+        });
+
+        document.getElementById('editAwardModal').addEventListener('click', (e) => {
+            if (e.target === document.getElementById('editAwardModal')) {
+                closeEditAwardModal();
             }
         });
     </script>
