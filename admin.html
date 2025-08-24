@@ -548,15 +548,25 @@
             background: var(--surface-2);
         }
 
-        .expand-icon {
-            display: inline-block;
-            width: 20px;
+        .expandable-row td:first-child {
+            position: relative;
+            padding-left: 30px;
+        }
+
+        .expandable-row td:first-child::before {
+            content: '▶';
+            position: absolute;
+            left: 10px;
+            color: var(--subtext);
+            font-size: 12px;
             transition: transform 0.2s;
         }
 
-        .expand-icon.expanded {
+        .expandable-row.expanded td:first-child::before {
             transform: rotate(90deg);
         }
+
+
 
         .handle-row {
             background: var(--surface);
@@ -932,16 +942,19 @@
 
         <div class="filter-bar">
             <h3>Payment Summary by Method</h3>
-            <label style="margin-left: 20px;">
-                <input type="checkbox" id="showHandleBreakdown" onchange="toggleHandleBreakdown()"
-                    style="margin-right: 5px;">
-                Show breakdown by payment handle
-            </label>
-            <div class="refresh-icon" onclick="loadSummary()" title="Refresh data">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                </svg>
+            <span style="margin-left: 20px; color: var(--subtext); font-size: 14px;">
+                Click any row to expand details
+            </span>
+            <div style="margin-left: auto; display: flex; gap: 10px; align-items: center;">
+                <button class="btn" onclick="exportSummaryCSV()" style="padding: 8px 16px; font-size: 14px;">
+                    Export CSV
+                </button>
+                <div class="refresh-icon" onclick="loadSummary()" title="Refresh data">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                    </svg>
+                </div>
             </div>
         </div>
 
@@ -1532,21 +1545,74 @@
 
         // Toggle method expansion
         function toggleMethodExpansion(rowId, method) {
-            const icon = document.getElementById(`icon-${rowId}`);
+            const row = document.querySelector(`tr[data-method="${method}"]`);
             const handleRows = document.querySelectorAll(`tr[data-parent="${rowId}"]`);
 
-            if (icon.classList.contains('expanded')) {
-                icon.classList.remove('expanded');
+            if (row.classList.contains('expanded')) {
+                row.classList.remove('expanded');
                 handleRows.forEach(row => row.classList.remove('visible'));
             } else {
-                icon.classList.add('expanded');
+                row.classList.add('expanded');
                 handleRows.forEach(row => row.classList.add('visible'));
             }
         }
 
-        // Toggle handle breakdown
-        function toggleHandleBreakdown() {
-            loadSummary();
+        // Export summary to CSV
+        async function exportSummaryCSV() {
+            try {
+                // Get all submissions data for detailed export
+                const { data, error } = await supabase
+                    .from('review_rewards')
+                    .select('*')
+                    .order('created_at', { ascending: false });
+
+                if (error) {
+                    alert('Error loading data for export: ' + error.message);
+                    return;
+                }
+
+                // Create CSV content
+                let csv = 'ID,Payment Method,Payment Handle,Review Link,Status,Award Amount,User Email,Created At,Awarded At,Paid At\n';
+
+                data.forEach(row => {
+                    const fields = [
+                        row.id,
+                        row.payment_method || '',
+                        row.payment_handle || '',
+                        row.review_link || '',
+                        row.status || 'pending',
+                        row.award_amount || '10.00',
+                        row.user_email || '',
+                        row.created_at || '',
+                        row.awarded_at || '',
+                        row.paid_at || ''
+                    ];
+
+                    // Escape fields that contain commas or quotes
+                    const escapedFields = fields.map(field => {
+                        const str = String(field);
+                        if (str.includes(',') || str.includes('"') || str.includes('\n')) {
+                            return `"${str.replace(/"/g, '""')}"`;
+                        }
+                        return str;
+                    });
+
+                    csv += escapedFields.join(',') + '\n';
+                });
+
+                // Create download link
+                const blob = new Blob([csv], { type: 'text/csv' });
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `review_rewards_export_${new Date().toISOString().split('T')[0]}.csv`;
+                a.click();
+                window.URL.revokeObjectURL(url);
+
+            } catch (err) {
+                console.error('Error exporting CSV:', err);
+                alert('Error exporting CSV: ' + err.message);
+            }
         }
 
         // Auto-refresh functionality
@@ -1585,21 +1651,17 @@
                     return;
                 }
 
-                // Load detailed data for handle breakdown if needed
-                const showHandles = document.getElementById('showHandleBreakdown')?.checked;
+                // Always load detailed data for handle breakdown
+                const { data: detailData, error: detailError } = await supabase
+                    .from('review_rewards')
+                    .select('payment_method, payment_handle, status, award_amount')
+                    .in('status', ['awarded', 'paid']);
+
                 let handleData = null;
-
-                if (showHandles) {
-                    const { data: detailData, error: detailError } = await supabase
-                        .from('review_rewards')
-                        .select('payment_method, payment_handle, status, award_amount')
-                        .in('status', ['awarded', 'paid']);
-
-                    if (detailError) {
-                        console.error('Error loading handle data:', detailError);
-                    } else {
-                        handleData = detailData;
-                    }
+                if (detailError) {
+                    console.error('Error loading handle data:', detailError);
+                } else {
+                    handleData = detailData;
                 }
 
                 renderSummary(summaryData || [], handleData);
@@ -1664,10 +1726,7 @@
                     }
 
                     tr.innerHTML = `
-                        <td>
-                            ${hasHandles ? '<span class="expand-icon" id="icon-' + rowId + '">▶</span> ' : ''}
-                            ${(row.payment_method || 'Unknown').toUpperCase()}
-                        </td>
+                        <td>${(row.payment_method || 'Unknown').toUpperCase()}</td>
                         <td>${row.total_submissions}</td>
                         <td>${row.awarded_count}</td>
                         <td>${row.paid_count}</td>

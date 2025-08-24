@@ -19,12 +19,13 @@ let mySubmissions = [];
 
 // Check URL parameters
 const urlParams = new URLSearchParams(window.location.search);
-const rewardParam = urlParams.get('reward');
-const warningParam = urlParams.get('warning');
+const rewardParam = urlParams.get('r') || urlParams.get('reward'); // Support both for backwards compatibility
+const warningParam = urlParams.get('v') || urlParams.get('warning'); // 'v' for validation
 let rewardAmount = 10; // Default reward
 
-// Secret code: hyatus2024premium
-if (rewardParam === 'hyatus2024premium') {
+// Secret codes:
+// r=h24p or reward=hyatus2024premium for $20
+if (rewardParam === 'h24p' || rewardParam === 'hyatus2024premium') {
     rewardAmount = 20;
 }
 
@@ -39,9 +40,10 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // Show/hide account requirements warning based on URL parameter
+    // v=x7k or warning=true to show warning
     const warningElement = document.getElementById('accountRequirementsWarning');
     if (warningElement) {
-        if (warningParam === 'true') {
+        if (warningParam === 'x7k' || warningParam === 'true') {
             warningElement.style.display = 'block';
         } else {
             warningElement.style.display = 'none';
