@@ -17,9 +17,10 @@ let selectedMethod = '';
 let uploadedFile = null;
 let mySubmissions = [];
 
-// Check URL parameter for reward amount
+// Check URL parameters
 const urlParams = new URLSearchParams(window.location.search);
 const rewardParam = urlParams.get('reward');
+const warningParam = urlParams.get('warning');
 let rewardAmount = 10; // Default reward
 
 // Secret code: hyatus2024premium
@@ -27,7 +28,7 @@ if (rewardParam === 'hyatus2024premium') {
     rewardAmount = 20;
 }
 
-// Update all reward amount displays
+// Update all reward amount displays and handle warning
 document.addEventListener('DOMContentLoaded', () => {
     const amountElements = ['rewardAmount', 'submitRewardAmount', 'disclaimerAmount', 'successRewardAmount'];
     amountElements.forEach(id => {
@@ -36,6 +37,16 @@ document.addEventListener('DOMContentLoaded', () => {
             element.textContent = `$${rewardAmount}`;
         }
     });
+
+    // Show/hide account requirements warning based on URL parameter
+    const warningElement = document.getElementById('accountRequirementsWarning');
+    if (warningElement) {
+        if (warningParam === 'true') {
+            warningElement.style.display = 'block';
+        } else {
+            warningElement.style.display = 'none';
+        }
+    }
 });
 
 // Toggle tutorial visibility
