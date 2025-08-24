@@ -999,7 +999,19 @@
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR1Z2pnbXdsenlqaWxsa2Vtemh6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTU3MjE3MTIsImV4cCI6MjA3MTI5NzcxMn0.s9uM3exfI3hBvbiT3nZrC_whJ03IAy18202qmgJ4GOg';
 
         // Initialize Supabase client
-        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        let supabase;
+        try {
+            if (!window.supabase) {
+                console.error('Supabase library not loaded');
+                alert('Error: Database library not loaded. Please check your internet connection and refresh the page.');
+            } else {
+                supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+                console.log('Supabase client initialized successfully');
+            }
+        } catch (err) {
+            console.error('Error initializing Supabase:', err);
+            alert('Error initializing database connection: ' + err.message);
+        }
 
         // Allowlisted admin emails (replace with your real admin emails). Kept as fallback.
         const ADMIN_EMAILS = ['admin@example.com', 'michaelort@hyatus.com'];
@@ -1135,14 +1147,26 @@
         // Load submissions
         async function loadSubmissions() {
             try {
-                const statusFilter = document.getElementById('statusFilter').value;
-                const paymentFilter = document.getElementById('paymentFilter').value;
-                const searchHandle = document.getElementById('searchHandle').value.toLowerCase().trim();
+                // Check if we have Supabase client
+                if (!supabase) {
+                    console.error('Supabase client not initialized');
+                    alert('Database connection not initialized. Please refresh the page.');
+                    return;
+                }
+
+                const statusFilter = document.getElementById('statusFilter') ? document.getElementById('statusFilter').value : 'all';
+                const paymentFilter = document.getElementById('paymentFilter') ? document.getElementById('paymentFilter').value : 'all';
+                const searchHandle = document.getElementById('searchHandle') ? document.getElementById('searchHandle').value.toLowerCase().trim() : '';
 
                 let query = supabase.from('review_rewards').select('*').order('created_at', { ascending: false });
 
                 if (statusFilter !== 'all') {
-                    query = query.eq('status', statusFilter);
+                    if (statusFilter === 'pending') {
+                        // Include null status as pending
+                        query = query.or('status.eq.pending,status.is.null');
+                    } else {
+                        query = query.eq('status', statusFilter);
+                    }
                 }
                 if (paymentFilter !== 'all') {
                     query = query.eq('payment_method', paymentFilter);
@@ -1151,12 +1175,28 @@
                 const { data, error } = await query;
 
                 if (error) {
-                    console.error('Error loading submissions:', error);
-                    alert('Error loading submissions: ' + error.message);
+                    console.error('Supabase error:', error);
+                    console.error('Error details:', {
+                        message: error.message,
+                        details: error.details,
+                        hint: error.hint,
+                        code: error.code
+                    });
+
+                    // More helpful error messages
+                    if (error.message.includes('Failed to fetch')) {
+                        alert('Network error: Unable to connect to the database. Please check your internet connection and try again.');
+                    } else if (error.code === 'PGRST301') {
+                        alert('Authentication error: Please log in again.');
+                        window.location.reload();
+                    } else {
+                        alert('Error loading submissions: ' + error.message);
+                    }
                     return;
                 }
 
                 submissions = data || [];
+                console.log('Loaded submissions:', submissions.length);
 
                 // Apply client-side search filter
                 let filteredSubmissions = submissions;
@@ -1164,6 +1204,7 @@
                     filteredSubmissions = submissions.filter(sub =>
                         sub.payment_handle && sub.payment_handle.toLowerCase().includes(searchHandle)
                     );
+                    console.log('Filtered to:', filteredSubmissions.length);
                 }
 
                 updateStats(submissions); // Stats should show all, not filtered
@@ -1204,7 +1245,7 @@
         // Update statistics
         function updateStats(data) {
             document.getElementById('totalSubmissions').textContent = data.length;
-            document.getElementById('pendingCount').textContent = data.filter(s => s.status === 'pending').length;
+            document.getElementById('pendingCount').textContent = data.filter(s => !s.status || s.status === 'pending').length;
             document.getElementById('awardedCount').textContent = data.filter(s => s.status === 'awarded').length;
             document.getElementById('paidCount').textContent = data.filter(s => s.status === 'paid').length;
             document.getElementById('rejectedCount').textContent = data.filter(s => s.status === 'rejected').length;
@@ -1213,6 +1254,7 @@
         // Render submissions table
         function renderSubmissions(data) {
             try {
+                console.log('renderSubmissions called with', data?.length || 0, 'items');
                 const tbody = document.getElementById('submissionsBody');
                 if (!tbody) {
                     console.error('Submissions table body not found');
@@ -1920,12 +1962,15 @@
 
         // Set up search input with debounce
         let searchTimeout;
-        document.getElementById('searchHandle').addEventListener('input', (e) => {
-            clearTimeout(searchTimeout);
-            searchTimeout = setTimeout(() => {
-                loadSubmissions();
-            }, 300); // 300ms debounce
-        });
+        const searchInput = document.getElementById('searchHandle');
+        if (searchInput) {
+            searchInput.addEventListener('input', (e) => {
+                clearTimeout(searchTimeout);
+                searchTimeout = setTimeout(() => {
+                    loadSubmissions();
+                }, 300); // 300ms debounce
+            });
+        }
 
         // Close modal on outside click
         document.getElementById('detailModal').addEventListener('click', (e) => {
