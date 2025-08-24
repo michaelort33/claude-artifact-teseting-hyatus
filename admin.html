@@ -1155,8 +1155,18 @@
             loadSubmissions();
         }
 
+        // Prevent multiple simultaneous loads
+        let isLoadingSubmissions = false;
+
         // Load submissions
         async function loadSubmissions(retryCount = 0) {
+            // Prevent multiple simultaneous calls
+            if (isLoadingSubmissions && retryCount === 0) {
+                console.log('Load already in progress, skipping...');
+                return;
+            }
+
+            isLoadingSubmissions = true;
             const maxRetries = 3;
             const retryDelay = 1000 * Math.pow(2, retryCount); // Exponential backoff
 
@@ -1236,6 +1246,7 @@
                 submissions = data || [];
                 const queryEnd = performance.now();
                 console.log(`Loaded ${submissions.length} submissions in ${(queryEnd - queryStart).toFixed(2)}ms`);
+                console.log('Sample submission:', submissions[0]); // Debug first submission
 
                 updateStats(submissions); // Stats should show all, not filtered
 
@@ -1244,6 +1255,9 @@
             } catch (err) {
                 console.error('Unexpected error in loadSubmissions:', err);
                 alert('Unexpected error loading submissions: ' + err.message);
+            } finally {
+                // Always reset loading flag
+                isLoadingSubmissions = false;
             }
         }
 
@@ -1269,7 +1283,13 @@
             } else {
                 rewardsTab.style.display = 'block'; rewardsTab.classList.add('active');
                 btnRewards.classList.add('active');
-                loadSubmissions();
+                // Don't reload submissions if we already have data
+                if (!submissions || submissions.length === 0) {
+                    loadSubmissions();
+                } else {
+                    // Just re-render existing data
+                    renderSubmissions(submissions);
+                }
             }
         }
 
@@ -1286,21 +1306,26 @@
         function renderSubmissions(data) {
             try {
                 console.log('renderSubmissions called with', data?.length || 0, 'items');
+                console.log('Data type:', typeof data, 'Is array:', Array.isArray(data));
                 const tbody = document.getElementById('submissionsBody');
                 if (!tbody) {
                     console.error('Submissions table body not found');
                     return;
                 }
 
+                console.log('Found tbody, clearing...');
                 tbody.innerHTML = '';
 
                 if (!data || data.length === 0) {
+                    console.log('No data to render, showing "No submissions found"');
                     tbody.innerHTML = '<tr><td colspan="10" style="text-align: center; color: #999;">No submissions found</td></tr>';
                     return;
                 }
 
-                data.forEach(submission => {
+                console.log('Starting to render', data.length, 'submissions...');
+                data.forEach((submission, index) => {
                     try {
+                        console.log(`Rendering submission ${index + 1}/${data.length}:`, submission.id);
                         const row = document.createElement('tr');
                         const date = new Date(submission.created_at || Date.now()).toLocaleDateString();
                         const reviewType = submission.review_link ? 'Link' : 'Screenshot';
@@ -1334,11 +1359,13 @@
                             </td>
                         `;
                         tbody.appendChild(row);
+                        console.log(`Added row for submission ${submission.id}`);
                     } catch (submissionError) {
                         console.error('Error rendering submission:', submissionError, submission);
                         // Continue with other submissions
                     }
                 });
+                console.log('Finished rendering all submissions');
             } catch (err) {
                 console.error('Error in renderSubmissions:', err);
                 const tbody = document.getElementById('submissionsBody');
@@ -2020,6 +2047,7 @@
             }
 
             console.log('Filtering:', submissions.length, 'to', filteredSubmissions.length, 'with search:', searchHandle);
+            console.log('About to render submissions...');
             renderSubmissions(filteredSubmissions);
             updateSelection(); // Clear selection when filtering
         }
