@@ -1118,7 +1118,6 @@
         document.getElementById('logoutBtn').addEventListener('click', async () => {
             await supabase.auth.signOut();
             currentUser = null;
-            stopAutoRefresh();
             document.querySelector('.login-wrapper').style.display = 'flex';
             document.getElementById('dashboard').classList.remove('active');
             document.getElementById('logoutBtn').style.display = 'none';
@@ -1154,7 +1153,6 @@
             document.getElementById('logoutBtn').style.display = 'block';
             document.getElementById('navTabs').classList.add('active');
             loadSubmissions();
-            startAutoRefresh();
         }
 
         // Load submissions
@@ -1835,26 +1833,8 @@
             }
         }
 
-        // Auto-refresh functionality
-        let autoRefreshInterval = null;
-
-        function startAutoRefresh() {
-            // Refresh every 30 seconds when on dashboard
-            autoRefreshInterval = setInterval(() => {
-                if (document.getElementById('dashboard').classList.contains('active')) {
-                    loadSubmissions();
-                } else if (document.getElementById('summaryDashboard').style.display === 'block') {
-                    loadSummary();
-                }
-            }, 30000); // 30 seconds
-        }
-
-        function stopAutoRefresh() {
-            if (autoRefreshInterval) {
-                clearInterval(autoRefreshInterval);
-                autoRefreshInterval = null;
-            }
-        }
+        // Manual refresh only - no auto-refresh
+        // Users must click the refresh button to get updated data
 
         // Initialize on load
         checkAuth();
@@ -2060,17 +2040,25 @@
         // Check session on page load
         async function checkSession() {
             try {
-                // Show checking message
+                // Show loading state immediately
                 const loginMessage = document.getElementById('loginMessage');
+                const loginForm = document.getElementById('loginForm');
+                const dashboard = document.getElementById('dashboard');
+
                 if (loginMessage) {
                     loginMessage.textContent = 'Checking session...';
                 }
+
+                // Hide both forms initially to prevent flash
+                if (loginForm) loginForm.style.display = 'none';
+                if (dashboard) dashboard.style.display = 'none';
 
                 console.log('Checking existing session...');
                 const { data: { session }, error } = await supabase.auth.getSession();
 
                 if (error) {
                     console.error('Session check error:', error);
+                    showLoginForm();
                     return;
                 }
 
@@ -2088,6 +2076,7 @@
                     if (adminError || !adminData) {
                         console.log('User is not an admin');
                         await supabase.auth.signOut();
+                        showLoginForm();
                         return;
                     }
 
@@ -2095,13 +2084,24 @@
                     showDashboard();
                 } else {
                     console.log('No existing session found');
-                    // Reset login message
-                    if (loginMessage) {
-                        loginMessage.textContent = 'Sign in to manage rewards and claims';
-                    }
+                    showLoginForm();
                 }
             } catch (err) {
                 console.error('Unexpected error checking session:', err);
+                showLoginForm();
+            }
+        }
+
+        // Helper function to show login form
+        function showLoginForm() {
+            const loginForm = document.getElementById('loginForm');
+            const dashboard = document.getElementById('dashboard');
+            const loginMessage = document.getElementById('loginMessage');
+
+            if (loginForm) loginForm.style.display = 'block';
+            if (dashboard) dashboard.style.display = 'none';
+            if (loginMessage) {
+                loginMessage.textContent = 'Sign in to manage rewards and claims';
             }
         }
 
