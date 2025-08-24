@@ -21,12 +21,19 @@ let mySubmissions = [];
 const urlParams = new URLSearchParams(window.location.search);
 const rewardParam = urlParams.get('r') || urlParams.get('reward'); // Support both for backwards compatibility
 const warningParam = urlParams.get('v') || urlParams.get('warning'); // 'v' for validation
+const guestParam = urlParams.get('g') || urlParams.get('guest'); // 'g' for guest
 let rewardAmount = 10; // Default reward
+let isPreviousGuest = false; // Default not a previous guest
 
 // Secret codes:
 // r=h24p or reward=hyatus2024premium for $20
 if (rewardParam === 'h24p' || rewardParam === 'hyatus2024premium') {
     rewardAmount = 20;
+}
+
+// g=vip2024 or guest=returning for previous guest
+if (guestParam === 'vip2024' || guestParam === 'returning') {
+    isPreviousGuest = true;
 }
 
 // Update all reward amount displays and handle warning
@@ -292,6 +299,7 @@ if (form) {
                         status: 'pending',
                         user_id: userId,
                         award_amount: rewardAmount,
+                        previous_guest: isPreviousGuest,
                     },
                 ]);
 

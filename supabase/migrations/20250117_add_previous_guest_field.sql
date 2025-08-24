@@ -1,4 +1,11 @@
--- Fix the review_rewards_summary view with proper ordering
+-- Add previous_guest field to review_rewards table
+ALTER TABLE review_rewards
+ADD COLUMN previous_guest boolean DEFAULT false;
+
+-- Add index for previous_guest field for better query performance
+CREATE INDEX idx_review_rewards_previous_guest ON review_rewards (previous_guest);
+
+-- Update the summary view to include previous guest data
 DROP VIEW IF EXISTS review_rewards_summary;
 
 CREATE VIEW review_rewards_summary AS

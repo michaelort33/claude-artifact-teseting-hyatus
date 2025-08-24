@@ -884,6 +884,7 @@
                         <th>Payment Handle</th>
                         <th>Review Type</th>
                         <th>Award</th>
+                        <th>Previous Guest</th>
                         <th>Status</th>
                         <th>Actions</th>
                     </tr>
@@ -1269,7 +1270,7 @@
                 tbody.innerHTML = '';
 
                 if (!data || data.length === 0) {
-                    tbody.innerHTML = '<tr><td colspan="9" style="text-align: center; color: #999;">No submissions found</td></tr>';
+                    tbody.innerHTML = '<tr><td colspan="10" style="text-align: center; color: #999;">No submissions found</td></tr>';
                     return;
                 }
 
@@ -1287,6 +1288,7 @@
                             <td>${submission.payment_handle || ''}</td>
                             <td>${reviewType}</td>
                             <td>$${(submission.award_amount || getAwardAmount(submission.id)).toFixed(2)}</td>
+                            <td>${submission.previous_guest ? '✓ Yes' : 'No'}</td>
                             <td><span class="status-badge status-${submission.status || 'pending'}">${(submission.status || 'pending').toUpperCase()}</span></td>
                             <td>
                                 <div class="action-buttons">
@@ -1311,7 +1313,7 @@
                 console.error('Error in renderSubmissions:', err);
                 const tbody = document.getElementById('submissionsBody');
                 if (tbody) {
-                    tbody.innerHTML = '<tr><td colspan="9" style="text-align: center; color: #f00;">Error loading submissions</td></tr>';
+                    tbody.innerHTML = '<tr><td colspan="10" style="text-align: center; color: #f00;">Error loading submissions</td></tr>';
                 }
             }
         }
@@ -1344,6 +1346,10 @@
                 <div class="detail-row">
                     <div class="detail-label">Award Amount:</div>
                     <div class="detail-value">$${(submission.award_amount || getAwardAmount(submission.id)).toFixed(2)}</div>
+                </div>
+                <div class="detail-row">
+                    <div class="detail-label">Previous Guest:</div>
+                    <div class="detail-value">${submission.previous_guest ? '✓ Yes' : 'No'}</div>
                 </div>
                 <div class="detail-row">
                     <div class="detail-label">Status:</div>
