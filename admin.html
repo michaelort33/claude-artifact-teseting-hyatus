@@ -484,6 +484,11 @@
             color: #ff9b9b;
         }
 
+        .status-paid {
+            background: #142a3e;
+            color: #58a6ff;
+        }
+
         /* Claim statuses */
         .status-open {
             background: var(--badge-open-bg);
@@ -529,6 +534,12 @@
             background: #0f1a2a;
             border-color: #153154;
             color: var(--accent);
+        }
+
+        .btn-paid {
+            background: #142a3e;
+            border-color: #1c3a54;
+            color: #58a6ff;
         }
 
         .modal {
@@ -694,6 +705,7 @@
     <div class="nav-tabs" id="navTabs">
         <button class="nav-tab active" id="tabRewards">Rewards</button>
         <button class="nav-tab" id="tabClaims">Claims</button>
+        <button class="nav-tab" id="tabSummary">Summary</button>
     </div>
 
     <!-- Login Form -->
@@ -746,6 +758,10 @@
                 <div class="stat-value" id="awardedCount">0</div>
             </div>
             <div class="stat-card">
+                <div class="stat-label">Paid</div>
+                <div class="stat-value" id="paidCount">0</div>
+            </div>
+            <div class="stat-card">
                 <div class="stat-label">Rejected</div>
                 <div class="stat-value" id="rejectedCount">0</div>
             </div>
@@ -757,6 +773,7 @@
                 <option value="all">All Status</option>
                 <option value="pending">Pending</option>
                 <option value="awarded">Awarded</option>
+                <option value="paid">Paid</option>
                 <option value="rejected">Rejected</option>
             </select>
             <select id="paymentFilter">
@@ -779,6 +796,7 @@
                         <th>Payment Method</th>
                         <th>Payment Handle</th>
                         <th>Review Type</th>
+                        <th>Award</th>
                         <th>Status</th>
                         <th>Actions</th>
                     </tr>
@@ -846,6 +864,48 @@
         </div>
     </div>
 
+    <!-- Summary Dashboard -->
+    <div class="dashboard" id="summaryDashboard" style="display:none;">
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-label">Total Awarded Amount</div>
+                <div class="stat-value" id="totalAwardedAmount">$0.00</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Total Paid Amount</div>
+                <div class="stat-value" id="totalPaidAmount">$0.00</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Outstanding Balance</div>
+                <div class="stat-value" id="outstandingBalance">$0.00</div>
+            </div>
+        </div>
+
+        <div class="filter-bar">
+            <h3>Payment Summary by Method</h3>
+            <button class="btn" onclick="loadSummary()">Refresh</button>
+        </div>
+
+        <div class="submissions-table">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Payment Method</th>
+                        <th>Total Submissions</th>
+                        <th>Awarded Count</th>
+                        <th>Paid Count</th>
+                        <th>Total Awarded Amount</th>
+                        <th>Total Paid Amount</th>
+                        <th>Outstanding</th>
+                    </tr>
+                </thead>
+                <tbody id="summaryBody">
+                    <!-- Summary will be loaded here -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
     <script>
         // Supabase configuration
         const SUPABASE_URL = 'https://dugjgmwlzyjillkemzhz.supabase.co';
@@ -885,6 +945,12 @@
 
         let currentUser = null;
         let submissions = [];
+
+        // Get award amount based on ID
+        function getAwardAmount(submissionId) {
+            // $20 for ID <= 95, $10 for others
+            return submissionId <= 95 ? 20.00 : 10.00;
+        }
 
         // Check authentication on load
         async function checkAuth() {
@@ -1089,17 +1155,30 @@
         function switchTab(which) {
             const rewardsTab = document.getElementById('dashboard');
             const claimsTab = document.getElementById('claimsDashboard');
+            const summaryTab = document.getElementById('summaryDashboard');
             const btnRewards = document.getElementById('tabRewards');
             const btnClaims = document.getElementById('tabClaims');
+            const btnSummary = document.getElementById('tabSummary');
+
+            // Hide all tabs
+            rewardsTab.classList.remove('active'); rewardsTab.style.display = 'none';
+            claimsTab.classList.remove('active'); claimsTab.style.display = 'none';
+            summaryTab.classList.remove('active'); summaryTab.style.display = 'none';
+            btnRewards.classList.remove('active');
+            btnClaims.classList.remove('active');
+            btnSummary.classList.remove('active');
+
             if (which === 'claims') {
-                rewardsTab.classList.remove('active'); rewardsTab.style.display = 'none';
                 claimsTab.style.display = 'block'; claimsTab.classList.add('active');
-                btnRewards.classList.remove('active'); btnClaims.classList.add('active');
+                btnClaims.classList.add('active');
                 loadClaimsAdmin();
+            } else if (which === 'summary') {
+                summaryTab.style.display = 'block'; summaryTab.classList.add('active');
+                btnSummary.classList.add('active');
+                loadSummary();
             } else {
-                claimsTab.classList.remove('active'); claimsTab.style.display = 'none';
                 rewardsTab.style.display = 'block'; rewardsTab.classList.add('active');
-                btnClaims.classList.remove('active'); btnRewards.classList.add('active');
+                btnRewards.classList.add('active');
                 loadSubmissions();
             }
         }
@@ -1109,6 +1188,7 @@
             document.getElementById('totalSubmissions').textContent = data.length;
             document.getElementById('pendingCount').textContent = data.filter(s => s.status === 'pending').length;
             document.getElementById('awardedCount').textContent = data.filter(s => s.status === 'awarded').length;
+            document.getElementById('paidCount').textContent = data.filter(s => s.status === 'paid').length;
             document.getElementById('rejectedCount').textContent = data.filter(s => s.status === 'rejected').length;
         }
 
@@ -1124,7 +1204,7 @@
                 tbody.innerHTML = '';
 
                 if (!data || data.length === 0) {
-                    tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; color: #999;">No submissions found</td></tr>';
+                    tbody.innerHTML = '<tr><td colspan="8" style="text-align: center; color: #999;">No submissions found</td></tr>';
                     return;
                 }
 
@@ -1140,6 +1220,7 @@
                             <td>${(submission.payment_method || '').toUpperCase()}</td>
                             <td>${submission.payment_handle || ''}</td>
                             <td>${reviewType}</td>
+                            <td>$${getAwardAmount(submission.id).toFixed(2)}</td>
                             <td><span class="status-badge status-${submission.status || 'pending'}">${(submission.status || 'pending').toUpperCase()}</span></td>
                             <td>
                                 <div class="action-buttons">
@@ -1147,7 +1228,9 @@
                                     ${(submission.status || 'pending') === 'pending' ? `
                                         <button class="action-btn btn-award" onclick="updateStatus(${submission.id}, 'awarded')">Award</button>
                                         <button class="action-btn btn-reject" onclick="updateStatus(${submission.id}, 'rejected')">Reject</button>
-                                    ` : ''}
+                                    ` : (submission.status === 'awarded' ? `
+                                        <button class="action-btn btn-paid" onclick="updateStatus(${submission.id}, 'paid')">Mark Paid</button>
+                                    ` : '')}
                                 </div>
                             </td>
                         `;
@@ -1161,7 +1244,7 @@
                 console.error('Error in renderSubmissions:', err);
                 const tbody = document.getElementById('submissionsBody');
                 if (tbody) {
-                    tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; color: #f00;">Error loading submissions</td></tr>';
+                    tbody.innerHTML = '<tr><td colspan="8" style="text-align: center; color: #f00;">Error loading submissions</td></tr>';
                 }
             }
         }
@@ -1192,6 +1275,10 @@
                     <div class="detail-value">${submission.payment_handle || ''}</div>
                 </div>
                 <div class="detail-row">
+                    <div class="detail-label">Award Amount:</div>
+                    <div class="detail-value">$${(submission.award_amount || getAwardAmount(submission.id)).toFixed(2)}</div>
+                </div>
+                <div class="detail-row">
                     <div class="detail-label">Status:</div>
                     <div class="detail-value"><span class="status-badge status-${submission.status}">${submission.status.toUpperCase()}</span></div>
                 </div>
@@ -1213,6 +1300,12 @@
                     <div class="detail-row">
                         <div class="detail-label">Awarded At:</div>
                         <div class="detail-value">${new Date(submission.awarded_at).toLocaleString()}</div>
+                    </div>
+                ` : ''}
+                ${submission.paid_at ? `
+                    <div class="detail-row">
+                        <div class="detail-label">Paid At:</div>
+                        <div class="detail-value">${new Date(submission.paid_at).toLocaleString()}</div>
                     </div>
                 ` : ''}
                 <div class="detail-row">
@@ -1247,6 +1340,9 @@
 
                 if (newStatus === 'awarded') {
                     updateData.awarded_at = new Date().toISOString();
+                    updateData.award_amount = getAwardAmount(id);
+                } else if (newStatus === 'paid') {
+                    updateData.paid_at = new Date().toISOString();
                 }
 
                 // Retry logic for better reliability
@@ -1271,6 +1367,9 @@
                             submission.status = newStatus;
                             if (newStatus === 'awarded') {
                                 submission.awarded_at = updateData.awarded_at;
+                                submission.award_amount = updateData.award_amount;
+                            } else if (newStatus === 'paid') {
+                                submission.paid_at = updateData.paid_at;
                             }
                         }
 
@@ -1279,7 +1378,8 @@
                         renderSubmissions(submissions);
 
                         // Show success feedback
-                        button.textContent = '✓ ' + (newStatus === 'awarded' ? 'Awarded' : 'Rejected');
+                        const statusText = newStatus === 'awarded' ? 'Awarded' : (newStatus === 'paid' ? 'Paid' : 'Rejected');
+                        button.textContent = '✓ ' + statusText;
                         button.style.background = '#4caf50';
                         button.style.color = 'white';
 
@@ -1388,9 +1488,78 @@
         // Initialize on load
         checkAuth();
 
+        // Load summary data
+        async function loadSummary() {
+            try {
+                const { data, error } = await supabase.from('review_rewards_summary').select('*');
+
+                if (error) {
+                    console.error('Error loading summary:', error);
+                    alert('Error loading summary: ' + error.message);
+                    return;
+                }
+
+                renderSummary(data || []);
+            } catch (err) {
+                console.error('Unexpected error in loadSummary:', err);
+                alert('Unexpected error loading summary: ' + err.message);
+            }
+        }
+
+        // Render summary data
+        function renderSummary(data) {
+            const tbody = document.getElementById('summaryBody');
+            tbody.innerHTML = '';
+
+            let totalAwarded = 0;
+            let totalPaid = 0;
+
+            data.forEach(row => {
+                if (row.payment_method !== 'TOTAL') {
+                    const tr = document.createElement('tr');
+                    const outstanding = row.total_awarded_amount - row.total_paid_amount;
+                    tr.innerHTML = `
+                        <td>${(row.payment_method || 'Unknown').toUpperCase()}</td>
+                        <td>${row.total_submissions}</td>
+                        <td>${row.awarded_count}</td>
+                        <td>${row.paid_count}</td>
+                        <td>$${row.total_awarded_amount.toFixed(2)}</td>
+                        <td>$${row.total_paid_amount.toFixed(2)}</td>
+                        <td>$${outstanding.toFixed(2)}</td>
+                    `;
+                    tbody.appendChild(tr);
+                } else {
+                    totalAwarded = row.total_awarded_amount;
+                    totalPaid = row.total_paid_amount;
+                }
+            });
+
+            // Add total row
+            const totalRow = document.createElement('tr');
+            totalRow.style.fontWeight = 'bold';
+            totalRow.style.background = 'var(--surface-2)';
+            const outstanding = totalAwarded - totalPaid;
+            totalRow.innerHTML = `
+                <td>TOTAL</td>
+                <td>${data.find(r => r.payment_method === 'TOTAL')?.total_submissions || 0}</td>
+                <td>${data.find(r => r.payment_method === 'TOTAL')?.awarded_count || 0}</td>
+                <td>${data.find(r => r.payment_method === 'TOTAL')?.paid_count || 0}</td>
+                <td>$${totalAwarded.toFixed(2)}</td>
+                <td>$${totalPaid.toFixed(2)}</td>
+                <td>$${outstanding.toFixed(2)}</td>
+            `;
+            tbody.appendChild(totalRow);
+
+            // Update summary stats
+            document.getElementById('totalAwardedAmount').textContent = `$${totalAwarded.toFixed(2)}`;
+            document.getElementById('totalPaidAmount').textContent = `$${totalPaid.toFixed(2)}`;
+            document.getElementById('outstandingBalance').textContent = `$${outstanding.toFixed(2)}`;
+        }
+
         // Tabs events
         document.getElementById('tabRewards').addEventListener('click', () => switchTab('rewards'));
         document.getElementById('tabClaims').addEventListener('click', () => switchTab('claims'));
+        document.getElementById('tabSummary').addEventListener('click', () => switchTab('summary'));
         document.getElementById('refreshClaimsBtn').addEventListener('click', loadClaimsAdmin);
         document.getElementById('claimStatusFilter').addEventListener('change', loadClaimsAdmin);
         document.getElementById('claimSearch').addEventListener('input', () => { loadClaimsAdmin(); });

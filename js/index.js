@@ -227,7 +227,8 @@ if (form) {
 
         if (!selectedMethod) return showError('Please select a payment method');
         if (!paymentHandle || !paymentHandle.value) return showError('Please enter your payment information');
-        if (!reviewLink && !hasScreenshot) return showError('Please provide either a review link or upload a screenshot');
+        if (!reviewLink) return showError('Please paste your Google review link');
+        if (!hasScreenshot) return showError('Please upload a screenshot of your review');
 
         if (submitButton) {
             submitButton.textContent = 'Submitting...';

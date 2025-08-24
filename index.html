@@ -422,7 +422,8 @@
             font-size: 13px;
         }
 
-        .or-divider {
+        .or-divider,
+        .and-divider {
             text-align: center;
             margin: 15px 0;
             color: var(--subtext);
@@ -430,8 +431,15 @@
             font-size: 14px;
         }
 
+        .and-divider {
+            color: #3fb950;
+            font-weight: 600;
+        }
+
         .or-divider::before,
-        .or-divider::after {
+        .or-divider::after,
+        .and-divider::before,
+        .and-divider::after {
             content: '';
             position: absolute;
             top: 50%;
@@ -440,11 +448,13 @@
             background: linear-gradient(90deg, transparent, var(--border));
         }
 
-        .or-divider::before {
+        .or-divider::before,
+        .and-divider::before {
             left: 0;
         }
 
-        .or-divider::after {
+        .or-divider::after,
+        .and-divider::after {
             right: 0;
         }
 
@@ -1614,6 +1624,10 @@
         <div class="header">
             <h1>🎉 Claim Your Review Reward</h1>
             <p>Thank you for your review! Submit proof below to receive your reward.</p>
+            <p
+                style="margin-top: 12px; background: rgba(47, 129, 247, 0.1); padding: 10px; border-radius: 8px; border: 1px solid rgba(47, 129, 247, 0.3);">
+                <strong>📋 Important:</strong> We now require BOTH a review link AND a screenshot for verification
+            </p>
             <p class="mobile-optional-signin" style="margin-top: 10px; font-size: 13px; opacity: 0.8; display: none;">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                     stroke-linecap="round" stroke-linejoin="round"
@@ -1668,7 +1682,8 @@
                         <h2>Provide Review Proof</h2>
                     </div>
                     <p style="color: #666; font-size: 14px; margin-bottom: 15px;">
-                        Show us your review to claim your reward - we just need to verify you left it.
+                        <strong>Both link AND screenshot are required</strong> - we need to verify your review for
+                        security.
                     </p>
 
                     <!-- Tutorial -->
@@ -1710,14 +1725,15 @@
                     </div>
 
                     <div class="form-group">
-                        <label for="reviewLink">Paste Your Google Review Link</label>
-                        <input type="url" id="reviewLink" name="reviewLink" placeholder="https://g.page/r/...">
+                        <label for="reviewLink">Step 1: Paste Your Google Review Link <span
+                                style="color: #e74c3c;">*</span></label>
+                        <input type="url" id="reviewLink" name="reviewLink" placeholder="https://g.page/r/..." required>
                     </div>
 
-                    <div class="or-divider">OR</div>
+                    <div class="and-divider">AND</div>
 
                     <div class="form-group">
-                        <label>Upload Proof Screenshot</label>
+                        <label>Step 2: Upload Proof Screenshot <span style="color: #e74c3c;">*</span></label>
                         <div class="file-upload" id="fileUploadArea" role="button" tabindex="0"
                             aria-label="Upload screenshot of your review">
                             <div class="dz-content">
@@ -1735,7 +1751,7 @@
                                 </div>
                             </div>
                         </div>
-                        <input type="file" id="reviewScreenshot" name="reviewScreenshot" accept="image/*">
+                        <input type="file" id="reviewScreenshot" name="reviewScreenshot" accept="image/*" required>
                     </div>
                 </div>
 
