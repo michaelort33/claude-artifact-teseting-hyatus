@@ -1234,49 +1234,155 @@
 
         // Update submission status
         async function updateStatus(id, newStatus) {
-            const confirmMsg = newStatus === 'awarded'
-                ? 'Mark this submission as AWARDED? This means payment has been sent.'
-                : 'Mark this submission as REJECTED?';
+            try {
+                // Disable the button to prevent double-clicks
+                const button = event.target;
+                const originalText = button.textContent;
+                button.disabled = true;
+                button.textContent = 'Updating...';
 
-            if (!confirm(confirmMsg)) return;
+                const updateData = {
+                    status: newStatus
+                };
 
-            const updateData = {
-                status: newStatus
-            };
+                if (newStatus === 'awarded') {
+                    updateData.awarded_at = new Date().toISOString();
+                }
 
-            if (newStatus === 'awarded') {
-                updateData.awarded_at = new Date().toISOString();
+                // Retry logic for better reliability
+                let retries = 3;
+                let lastError = null;
+
+                while (retries > 0) {
+                    try {
+                        const { data, error } = await supabase
+                            .from('review_rewards')
+                            .update(updateData)
+                            .eq('id', id)
+                            .select();
+
+                        if (error) {
+                            throw error;
+                        }
+
+                        // Success - update the UI immediately
+                        const submission = submissions.find(s => s.id === id);
+                        if (submission) {
+                            submission.status = newStatus;
+                            if (newStatus === 'awarded') {
+                                submission.awarded_at = updateData.awarded_at;
+                            }
+                        }
+
+                        // Refresh the display
+                        updateStats(submissions);
+                        renderSubmissions(submissions);
+
+                        // Show success feedback
+                        button.textContent = '✓ ' + (newStatus === 'awarded' ? 'Awarded' : 'Rejected');
+                        button.style.background = '#4caf50';
+                        button.style.color = 'white';
+
+                        setTimeout(() => {
+                            button.disabled = false;
+                            button.textContent = originalText;
+                            button.style.background = '';
+                            button.style.color = '';
+                        }, 2000);
+
+                        return; // Success, exit retry loop
+                    } catch (error) {
+                        lastError = error;
+                        retries--;
+                        if (retries > 0) {
+                            // Wait before retrying
+                            await new Promise(resolve => setTimeout(resolve, 1000));
+                        }
+                    }
+                }
+
+                // All retries failed
+                throw lastError;
+
+            } catch (error) {
+                console.error('Error updating status:', error);
+
+                // Re-enable button
+                const button = event.target;
+                button.disabled = false;
+                button.textContent = originalText;
+
+                // Show error message
+                alert(`Failed to update status: ${error.message || 'Unknown error'}`);
             }
-
-            const { error } = await supabase
-                .from('review_rewards')
-                .update(updateData)
-                .eq('id', id);
-
-            if (error) {
-                alert('Error updating status: ' + error.message);
-                return;
-            }
-
-            loadSubmissions();
         }
 
         // Save notes
         async function saveNotes(id) {
-            const notes = document.getElementById(`notes-${id}`).value;
+            try {
+                const notes = document.getElementById(`notes-${id}`).value;
+                const button = event.target;
+                const originalText = button.textContent;
 
-            const { error } = await supabase
-                .from('review_rewards')
-                .update({ notes: notes })
-                .eq('id', id);
+                button.disabled = true;
+                button.textContent = 'Saving...';
 
-            if (error) {
-                alert('Error saving notes: ' + error.message);
-                return;
+                // Retry logic for better reliability
+                let retries = 3;
+                let lastError = null;
+
+                while (retries > 0) {
+                    try {
+                        const { error } = await supabase
+                            .from('review_rewards')
+                            .update({ notes: notes })
+                            .eq('id', id);
+
+                        if (error) {
+                            throw error;
+                        }
+
+                        // Success - update local data
+                        const submission = submissions.find(s => s.id === id);
+                        if (submission) {
+                            submission.notes = notes;
+                        }
+
+                        // Show success feedback
+                        button.textContent = '✓ Saved';
+                        button.style.background = '#4caf50';
+                        button.style.color = 'white';
+
+                        setTimeout(() => {
+                            button.disabled = false;
+                            button.textContent = originalText;
+                            button.style.background = '';
+                            button.style.color = '';
+                        }, 2000);
+
+                        return; // Success, exit retry loop
+                    } catch (error) {
+                        lastError = error;
+                        retries--;
+                        if (retries > 0) {
+                            await new Promise(resolve => setTimeout(resolve, 1000));
+                        }
+                    }
+                }
+
+                // All retries failed
+                throw lastError;
+
+            } catch (error) {
+                console.error('Error saving notes:', error);
+
+                // Re-enable button
+                const button = event.target;
+                button.disabled = false;
+                button.textContent = originalText;
+
+                alert(`Failed to save notes: ${error.message || 'Unknown error'}`);
             }
-
-            alert('Notes saved successfully!');
-            loadSubmissions();
         }
 
         // Initialize on load
