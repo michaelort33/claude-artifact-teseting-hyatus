@@ -1005,7 +1005,7 @@
         let currentUser = null;
         let submissions = [];
 
-        // Get award amount based on ID
+        // Get award amount based on ID (fallback for existing records)
         function getAwardAmount(submissionId) {
             // $20 for ID <= 95, $10 for others
             return submissionId <= 95 ? 20.00 : 10.00;
@@ -1320,7 +1320,11 @@
 
                 if (newStatus === 'awarded') {
                     updateData.awarded_at = new Date().toISOString();
-                    updateData.award_amount = getAwardAmount(id);
+                    // Only set award_amount if not already set (for backward compatibility)
+                    const submission = submissions.find(s => s.id === id);
+                    if (!submission?.award_amount) {
+                        updateData.award_amount = getAwardAmount(id);
+                    }
                 } else if (newStatus === 'paid') {
                     updateData.paid_at = new Date().toISOString();
                 }

@@ -17,6 +17,27 @@ let selectedMethod = '';
 let uploadedFile = null;
 let mySubmissions = [];
 
+// Check URL parameter for reward amount
+const urlParams = new URLSearchParams(window.location.search);
+const rewardParam = urlParams.get('reward');
+let rewardAmount = 10; // Default reward
+
+// Secret code: hyatus2024premium
+if (rewardParam === 'hyatus2024premium') {
+    rewardAmount = 20;
+}
+
+// Update all reward amount displays
+document.addEventListener('DOMContentLoaded', () => {
+    const amountElements = ['rewardAmount', 'submitRewardAmount', 'disclaimerAmount', 'successRewardAmount'];
+    amountElements.forEach(id => {
+        const element = document.getElementById(id);
+        if (element) {
+            element.textContent = `$${rewardAmount}`;
+        }
+    });
+});
+
 // Toggle tutorial visibility
 function toggleTutorial() {
     const tutorial = document.getElementById('tutorialContent');
@@ -257,6 +278,7 @@ if (form) {
                         screenshot_url: screenshotData,
                         status: 'pending',
                         user_id: userId,
+                        award_amount: rewardAmount,
                     },
                 ]);
 

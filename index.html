@@ -1622,16 +1622,9 @@
     <div class="container">
 
         <div class="header">
-            <h1>🎉 Claim Your $10 Review Reward</h1>
+            <h1>🎉 Claim Your <span id="rewardAmount">$10</span> Review Reward</h1>
             <p>Thank you for your review! Submit proof below to receive your reward.</p>
-            <div
-                style="margin-top: 12px; background: rgba(255, 193, 7, 0.1); padding: 12px; border-radius: 8px; border: 1px solid rgba(255, 193, 7, 0.3); text-align: center;">
-                <strong style="font-size: 18px; color: #f39c12;">💰 Current Reward: $10 per review</strong>
-                <p style="margin-top: 6px; font-size: 13px; color: #666;">
-                    Due to overwhelming demand, the reward has been adjusted from $20 to $10 (effective for all new
-                    submissions)
-                </p>
-            </div>
+
             <p
                 style="margin-top: 12px; background: rgba(47, 129, 247, 0.1); padding: 10px; border-radius: 8px; border: 1px solid rgba(47, 129, 247, 0.3);">
                 <strong>📋 Important:</strong> We now require BOTH a review link AND a screenshot for verification
@@ -1769,10 +1762,12 @@
                     </div>
                 </div>
 
-                <button type="submit" class="submit-button" id="submitButton">Submit & Claim $10 Reward</button>
+                <button type="submit" class="submit-button" id="submitButton">Submit & Claim <span
+                        id="submitRewardAmount">$10</span> Reward</button>
 
                 <p style="text-align: center; margin-top: 15px; font-size: 12px; color: #666;">
-                    * Reward amounts are subject to change based on demand. Current submissions earn $10.
+                    * Reward amounts are subject to change based on demand. Current submissions earn <span
+                        id="disclaimerAmount">$10</span>.
                 </p>
             </form>
 
@@ -1784,7 +1779,7 @@
         <div class="success-message" id="successMessage">
             <div class="success-icon">💰</div>
             <h2>Thank You! <span class="success-best">You're the Best!</span></h2>
-            <p>Your $10 reward claim has been submitted successfully.</p>
+            <p>Your <span id="successRewardAmount">$10</span> reward claim has been submitted successfully.</p>
             <p>We'll process your payment within 24-48 hours.</p>
             <div style="margin-top: 18px; display: flex; gap: 10px; justify-content: center;">
                 <button class="btn-primary-small" id="viewMySubsBtn">View My Submissions</button>
