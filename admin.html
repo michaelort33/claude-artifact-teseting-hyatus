@@ -836,6 +836,8 @@
 
         <!-- Filter Bar -->
         <div class="filter-bar">
+            <input type="text" id="searchHandle" placeholder="Search by payment handle..."
+                style="padding: 8px 12px; background: var(--surface-2); color: var(--text); border: 1px solid var(--border); border-radius: 5px; width: 250px;">
             <select id="statusFilter">
                 <option value="all">All Status</option>
                 <option value="pending">Pending</option>
@@ -858,11 +860,24 @@
             </div>
         </div>
 
+        <!-- Bulk Actions Bar -->
+        <div class="bulk-actions-bar" id="bulkActionsBar"
+            style="display: none; padding: 15px; background: var(--surface-2); margin-bottom: 10px; border-radius: 8px; display: flex; align-items: center; gap: 15px;">
+            <span id="selectedCount" style="font-weight: 500;">0 selected</span>
+            <button class="btn" onclick="bulkMarkPaid()" style="padding: 6px 12px; font-size: 14px;">Mark as
+                Paid</button>
+            <button class="btn btn-secondary" onclick="clearSelection()"
+                style="padding: 6px 12px; font-size: 14px; background: var(--surface-3);">Clear Selection</button>
+        </div>
+
         <!-- Submissions Table -->
         <div class="submissions-table">
             <table>
                 <thead>
                     <tr>
+                        <th style="width: 40px;">
+                            <input type="checkbox" id="selectAll" onchange="toggleSelectAll()" style="cursor: pointer;">
+                        </th>
                         <th>ID</th>
                         <th>Date</th>
                         <th>Payment Method</th>
@@ -1122,6 +1137,7 @@
             try {
                 const statusFilter = document.getElementById('statusFilter').value;
                 const paymentFilter = document.getElementById('paymentFilter').value;
+                const searchHandle = document.getElementById('searchHandle').value.toLowerCase().trim();
 
                 let query = supabase.from('review_rewards').select('*').order('created_at', { ascending: false });
 
@@ -1141,8 +1157,18 @@
                 }
 
                 submissions = data || [];
-                updateStats(submissions);
-                renderSubmissions(submissions);
+
+                // Apply client-side search filter
+                let filteredSubmissions = submissions;
+                if (searchHandle) {
+                    filteredSubmissions = submissions.filter(sub =>
+                        sub.payment_handle && sub.payment_handle.toLowerCase().includes(searchHandle)
+                    );
+                }
+
+                updateStats(submissions); // Stats should show all, not filtered
+                renderSubmissions(filteredSubmissions);
+                updateSelection(); // Clear selection when reloading
             } catch (err) {
                 console.error('Unexpected error in loadSubmissions:', err);
                 alert('Unexpected error loading submissions: ' + err.message);
@@ -1196,7 +1222,7 @@
                 tbody.innerHTML = '';
 
                 if (!data || data.length === 0) {
-                    tbody.innerHTML = '<tr><td colspan="8" style="text-align: center; color: #999;">No submissions found</td></tr>';
+                    tbody.innerHTML = '<tr><td colspan="9" style="text-align: center; color: #999;">No submissions found</td></tr>';
                     return;
                 }
 
@@ -1207,6 +1233,7 @@
                         const reviewType = submission.review_link ? 'Link' : 'Screenshot';
 
                         row.innerHTML = `
+                            <td><input type="checkbox" class="submission-checkbox" data-id="${submission.id}" onchange="updateSelection()"></td>
                             <td>#${submission.id || 'N/A'}</td>
                             <td>${date}</td>
                             <td>${(submission.payment_method || '').toUpperCase()}</td>
@@ -1237,7 +1264,7 @@
                 console.error('Error in renderSubmissions:', err);
                 const tbody = document.getElementById('submissionsBody');
                 if (tbody) {
-                    tbody.innerHTML = '<tr><td colspan="8" style="text-align: center; color: #f00;">Error loading submissions</td></tr>';
+                    tbody.innerHTML = '<tr><td colspan="9" style="text-align: center; color: #f00;">Error loading submissions</td></tr>';
                 }
             }
         }
@@ -1615,6 +1642,104 @@
             }
         }
 
+        // Selection management
+        let selectedIds = new Set();
+
+        function toggleSelectAll() {
+            const selectAll = document.getElementById('selectAll');
+            const checkboxes = document.querySelectorAll('.submission-checkbox');
+
+            checkboxes.forEach(checkbox => {
+                checkbox.checked = selectAll.checked;
+                const id = parseInt(checkbox.dataset.id);
+                if (selectAll.checked) {
+                    selectedIds.add(id);
+                } else {
+                    selectedIds.delete(id);
+                }
+            });
+
+            updateBulkActionsBar();
+        }
+
+        function updateSelection() {
+            selectedIds.clear();
+            const checkboxes = document.querySelectorAll('.submission-checkbox:checked');
+            checkboxes.forEach(checkbox => {
+                selectedIds.add(parseInt(checkbox.dataset.id));
+            });
+
+            // Update select all checkbox
+            const selectAll = document.getElementById('selectAll');
+            const allCheckboxes = document.querySelectorAll('.submission-checkbox');
+            if (selectAll) {
+                selectAll.checked = allCheckboxes.length > 0 && checkboxes.length === allCheckboxes.length;
+            }
+
+            updateBulkActionsBar();
+        }
+
+        function updateBulkActionsBar() {
+            const bulkBar = document.getElementById('bulkActionsBar');
+            const selectedCount = document.getElementById('selectedCount');
+
+            if (selectedIds.size > 0) {
+                bulkBar.style.display = 'flex';
+                selectedCount.textContent = `${selectedIds.size} selected`;
+            } else {
+                bulkBar.style.display = 'none';
+            }
+        }
+
+        function clearSelection() {
+            selectedIds.clear();
+            document.querySelectorAll('.submission-checkbox').forEach(cb => cb.checked = false);
+            const selectAll = document.getElementById('selectAll');
+            if (selectAll) selectAll.checked = false;
+            updateBulkActionsBar();
+        }
+
+        async function bulkMarkPaid() {
+            if (selectedIds.size === 0) return;
+
+            if (!confirm(`Mark ${selectedIds.size} submissions as paid?`)) return;
+
+            try {
+                // Get only awarded submissions from selected
+                const awardedSubmissions = submissions.filter(sub =>
+                    selectedIds.has(sub.id) && sub.status === 'awarded'
+                );
+
+                if (awardedSubmissions.length === 0) {
+                    alert('No awarded submissions selected. Only awarded submissions can be marked as paid.');
+                    return;
+                }
+
+                // Update each submission
+                for (const sub of awardedSubmissions) {
+                    const { error } = await supabase
+                        .from('review_rewards')
+                        .update({
+                            status: 'paid',
+                            paid_at: new Date().toISOString()
+                        })
+                        .eq('id', sub.id);
+
+                    if (error) {
+                        console.error(`Error updating submission ${sub.id}:`, error);
+                    }
+                }
+
+                alert(`Successfully marked ${awardedSubmissions.length} submissions as paid`);
+                clearSelection();
+                await loadSubmissions();
+
+            } catch (err) {
+                console.error('Error in bulk update:', err);
+                alert('Error updating submissions: ' + err.message);
+            }
+        }
+
         // Auto-refresh functionality
         let autoRefreshInterval = null;
 
@@ -1792,6 +1917,15 @@
         // Set up filters
         document.getElementById('statusFilter').addEventListener('change', loadSubmissions);
         document.getElementById('paymentFilter').addEventListener('change', loadSubmissions);
+
+        // Set up search input with debounce
+        let searchTimeout;
+        document.getElementById('searchHandle').addEventListener('input', (e) => {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(() => {
+                loadSubmissions();
+            }, 300); // 300ms debounce
+        });
 
         // Close modal on outside click
         document.getElementById('detailModal').addEventListener('click', (e) => {
