@@ -1801,7 +1801,10 @@
         // Load summary data
         async function loadSummary() {
             try {
-                // Load summary from view
+                // Load summary from function (if using function instead of view)
+                // const { data: summaryData, error: summaryError } = await supabase.rpc('get_review_rewards_summary');
+
+                // Load summary from view (current implementation)
                 const { data: summaryData, error: summaryError } = await supabase.from('review_rewards_summary').select('*');
 
                 if (summaryError) {
