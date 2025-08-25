@@ -1902,9 +1902,11 @@
         <div class="reset-content">
             <h2>Reset Your Password</h2>
             <p style="margin-bottom: 20px; color: #666;">Enter your new password below:</p>
-            <input type="password" id="newPassword" placeholder="New Password" minlength="6">
-            <input type="password" id="confirmPassword" placeholder="Confirm Password" minlength="6">
-            <button class="reset-button" onclick="resetPassword()">Update Password</button>
+            <form id="resetPasswordForm" onsubmit="event.preventDefault(); resetPassword();">
+                <input type="password" id="newPassword" placeholder="New Password" minlength="6" required>
+                <input type="password" id="confirmPassword" placeholder="Confirm Password" minlength="6" required>
+                <button type="submit" class="reset-button">Update Password</button>
+            </form>
             <p style="margin-top: 15px; text-align: center;">
                 <a href="#" onclick="closeResetModal()" style="color: #667eea;">Cancel</a>
             </p>
@@ -1917,15 +1919,19 @@
             <button class="modal-close-btn" id="closeAuthModal">&times;</button>
             <h2 id="authTitle">Sign In</h2>
             <div id="authError" class="error-message" style="display:none; margin-bottom: 20px;"></div>
-            <div class="form-group">
-                <label for="authEmail">Email</label>
-                <input type="email" id="authEmail" placeholder="you@example.com" autocomplete="email">
-            </div>
-            <div class="form-group" id="passwordGroup">
-                <label for="authPassword">Password</label>
-                <input type="password" id="authPassword" placeholder="Your password" autocomplete="current-password">
-            </div>
-            <button class="submit-button" id="authSubmitBtn" style="width: 100%; margin-top: 24px;">Sign In</button>
+            <form id="authForm" onsubmit="event.preventDefault(); handleAuthSubmit();">
+                <div class="form-group">
+                    <label for="authEmail">Email</label>
+                    <input type="email" id="authEmail" placeholder="you@example.com" autocomplete="email" required>
+                </div>
+                <div class="form-group" id="passwordGroup">
+                    <label for="authPassword">Password</label>
+                    <input type="password" id="authPassword" placeholder="Your password" autocomplete="current-password"
+                        required>
+                </div>
+                <button type="submit" class="submit-button" id="authSubmitBtn"
+                    style="width: 100%; margin-top: 24px;">Sign In</button>
+            </form>
             <div class="auth-actions-row">
                 <button class="link-btn" id="toggleAuthMode">Create an account</button>
                 <button class="link-btn" id="forgotPasswordBtn">Forgot password?</button>
@@ -2191,7 +2197,8 @@
             setAuthMode(authMode === 'signin' ? 'signup' : 'signin');
             });
     
-            authSubmitBtn.addEventListener('click', async () => {
+            // Handle auth form submission
+            async function handleAuthSubmit() {
             authError.style.display = 'none';
             const email = authEmail.value.trim();
             const password = authPassword.value.trim();
@@ -2220,7 +2227,7 @@
             authSubmitBtn.disabled = false;
             authSubmitBtn.textContent = authMode === 'signin' ? 'Sign In' : 'Create Account';
             }
-            });
+            }
     
             forgotPasswordBtn.addEventListener('click', async (e) => {
             e.preventDefault();
