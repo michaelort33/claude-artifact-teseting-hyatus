@@ -80,11 +80,26 @@
             color: #1e293b;
             min-height: 100vh;
             min-height: 100dvh;
-            padding: 20px;
+            padding: 84px 20px 20px 20px;
             display: flex;
             align-items: center;
             justify-content: center;
             line-height: 1.6;
+        }
+
+        /* Subtle neon beam like Stripe */
+        body::after {
+            content: '';
+            position: fixed;
+            left: -10vw;
+            bottom: -22vh;
+            width: 130vw;
+            height: 48vh;
+            background: linear-gradient(90deg, #7c3aed 0%, #3b82f6 35%, #10b981 70%, #f43f5e 100%);
+            filter: blur(48px) saturate(120%);
+            opacity: 0.45;
+            transform: rotate(-8deg);
+            z-index: -1;
         }
 
         .container {
@@ -94,7 +109,7 @@
             color: #1e293b;
             border-radius: 20px;
             box-shadow:
-                0 25px 50px -12px rgba(0, 0, 0, 0.15),
+                0 25px 50px -20px rgba(2, 6, 23, 0.25),
                 0 0 0 1px rgba(255, 255, 255, 0.8) inset;
             border: 1px solid rgba(255, 255, 255, 0.2);
             backdrop-filter: blur(20px);
@@ -102,6 +117,73 @@
             overflow: hidden;
             animation: slideUp 0.5s ease-out;
             backdrop-filter: blur(10px);
+        }
+
+        /* Top navigation (Stripe-like) */
+        .topbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 56px;
+            background: rgba(255, 255, 255, 0.8);
+            border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            z-index: 1200;
+        }
+
+        .topbar-content {
+            max-width: 1080px;
+            margin: 0 auto;
+            height: 56px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 16px;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+        }
+
+        .brand-badge {
+            width: 28px;
+            height: 28px;
+            border-radius: 8px;
+            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+            box-shadow: 0 6px 16px rgba(59, 130, 246, .35);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-size: 16px;
+        }
+
+        .topbar-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .topbar-actions a {
+            text-decoration: none;
+            font-weight: 600;
+            color: #334155;
+            padding: 8px 12px;
+            border-radius: 10px;
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            background: rgba(255, 255, 255, 0.7);
+            transition: .2s ease;
+        }
+
+        .topbar-actions a:hover {
+            color: #111827;
+            border-color: #3b82f6;
+            box-shadow: 0 6px 16px rgba(59, 130, 246, .15);
         }
 
         @keyframes slideUp {
@@ -126,11 +208,12 @@
         }
 
         .header h1 {
-            font-size: 28px;
+            font-size: 30px;
             margin-bottom: 8px;
             font-weight: 700;
             color: white;
             line-height: 1.2;
+            letter-spacing: -0.02em;
         }
 
         .header p {
