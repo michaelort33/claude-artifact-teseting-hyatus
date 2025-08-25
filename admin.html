@@ -1327,20 +1327,20 @@
                         row.innerHTML = `
                             <td><input type="checkbox" class="submission-checkbox" data-id="${submission.id}" onchange="updateSelection()"></td>
                             <td>#${submission.id || 'N/A'}</td>
-                            <td>${date}</td>
+                    <td>${date}</td>
                             <td>${(submission.payment_method || '').toUpperCase()}</td>
                             <td>${submission.payment_handle || ''}</td>
-                            <td>${reviewType}</td>
+                    <td>${reviewType}</td>
                             <td>$${(submission.award_amount || getAwardAmount(submission.id)).toFixed(2)}</td>
                             <td>${submission.previous_guest ? '✓ Yes' : 'No'}</td>
                             <td><span class="status-badge status-${submission.status || 'pending'}">${(submission.status || 'pending').toUpperCase()}</span></td>
-                            <td>
-                                <div class="action-buttons">
-                                    <button class="action-btn btn-view" onclick="viewDetails(${submission.id})">View</button>
+                    <td>
+                        <div class="action-buttons">
+                            <button class="action-btn btn-view" onclick="viewDetails(${submission.id})">View</button>
                                     <button class="action-btn btn-edit" onclick="editAward(${submission.id})">Edit Award</button>
                                     ${(submission.status || 'pending') === 'pending' ? `
-                                        <button class="action-btn btn-award" onclick="updateStatus(${submission.id}, 'awarded')">Award</button>
-                                        <button class="action-btn btn-reject" onclick="updateStatus(${submission.id}, 'rejected')">Reject</button>
+                                <button class="action-btn btn-award" onclick="updateStatus(${submission.id}, 'awarded')">Award</button>
+                                <button class="action-btn btn-reject" onclick="updateStatus(${submission.id}, 'rejected')">Reject</button>
                                     ` : (submission.status === 'awarded' ? `
                                         <button class="action-btn btn-paid" onclick="updateStatus(${submission.id}, 'paid')">Mark Paid</button>
                                         <button class="action-btn btn-revert" onclick="updateStatus(${submission.id}, 'pending')">Revert to Pending</button>
@@ -1349,9 +1349,9 @@
                                     ` : (submission.status === 'rejected' ? `
                                         <button class="action-btn btn-revert" onclick="updateStatus(${submission.id}, 'pending')">Revert to Pending</button>
                                     ` : '')))}
-                                </div>
-                            </td>
-                        `;
+                        </div>
+                    </td>
+                `;
                         tbody.appendChild(row);
                     } catch (submissionError) {
                         console.error('Error rendering submission:', submissionError, submission);
