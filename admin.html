@@ -1118,10 +1118,21 @@
         document.getElementById('logoutBtn').addEventListener('click', async () => {
             await supabase.auth.signOut();
             currentUser = null;
-            document.querySelector('.login-wrapper').style.display = 'flex';
-            document.getElementById('dashboard').classList.remove('active');
+            // Reset UI back to login state
+            showLoginForm();
+            const loginWrapper = document.querySelector('.login-wrapper');
+            if (loginWrapper) loginWrapper.style.display = 'flex';
+            const dashboardEl = document.getElementById('dashboard');
+            if (dashboardEl) {
+                dashboardEl.classList.remove('active');
+                dashboardEl.style.display = 'none';
+            }
             document.getElementById('logoutBtn').style.display = 'none';
             document.getElementById('navTabs').classList.remove('active');
+            // Clear any previously rendered rows to avoid stale UI
+            const tbody = document.getElementById('submissionsBody');
+            if (tbody) tbody.innerHTML = '';
+            submissions = [];
         });
 
         // Forgot password handler
