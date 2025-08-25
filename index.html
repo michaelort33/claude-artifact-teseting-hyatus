@@ -149,6 +149,7 @@
             gap: 10px;
             font-weight: 700;
             letter-spacing: -0.02em;
+            flex-shrink: 0;
         }
 
         .brand-badge {
@@ -167,6 +168,8 @@
         .topbar-actions {
             display: flex;
             gap: 10px;
+            min-width: 0;
+            flex-shrink: 1;
         }
 
         .topbar-actions a {
@@ -178,6 +181,11 @@
             border: 1px solid rgba(0, 0, 0, 0.05);
             background: rgba(255, 255, 255, 0.7);
             transition: .2s ease;
+            min-width: 0;
+            flex-shrink: 1;
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
         }
 
         .topbar-actions a:hover {
@@ -1043,6 +1051,17 @@
                 max-width: 100px;
                 overflow: hidden;
                 text-overflow: ellipsis;
+            }
+
+            /* Ensure topbar actions don't overflow on small screens */
+            .topbar-actions {
+                max-width: 60%;
+            }
+
+            .topbar-actions a {
+                max-width: 120px;
+                padding: 6px 8px;
+                font-size: 13px;
             }
         }
 
