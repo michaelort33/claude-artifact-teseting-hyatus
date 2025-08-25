@@ -1028,6 +1028,22 @@
         .auth-button-text-mobile {
             font-weight: 500;
             white-space: nowrap;
+            max-width: 120px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        /* Truncate long emails on mobile */
+        .auth-button-text {
+            white-space: nowrap;
+        }
+
+        @media (max-width: 768px) {
+            .auth-button-text {
+                max-width: 100px;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
         }
 
         @media (max-width: 768px) {
@@ -2250,7 +2266,7 @@
                 <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
                 <circle cx="12" cy="7" r="4"></circle>
             </svg>
-            <span class="auth-button-text">${currentUser.email}</span>
+            <span class="auth-button-text" title="${currentUser.email}">${currentUser.email}</span>
             `;
             userAuthLink.innerHTML = userHTML;
     
