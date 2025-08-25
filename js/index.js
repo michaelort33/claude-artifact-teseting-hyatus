@@ -155,10 +155,17 @@ function fileToBase64(file) {
 
 // Show error message
 function showError(message) {
+    console.log('Showing error:', message);
     const errorDiv = document.getElementById('errorMessage');
-    if (!errorDiv) return;
+    if (!errorDiv) {
+        console.error('Error message div not found!');
+        alert(message); // Fallback to alert if div not found
+        return;
+    }
     errorDiv.textContent = message;
     errorDiv.classList.add('show');
+    console.log('Error div classes:', errorDiv.className);
+    console.log('Error div display:', window.getComputedStyle(errorDiv).display);
     setTimeout(() => {
         errorDiv.classList.remove('show');
     }, 5000);
@@ -265,6 +272,15 @@ if (form) {
         const reviewLinkInput = document.getElementById('reviewLink');
         const reviewLink = reviewLinkInput ? reviewLinkInput.value : '';
         const hasScreenshot = fileInput && fileInput.files && fileInput.files.length > 0;
+
+        console.log('Validation check:', {
+            selectedMethod,
+            paymentHandleValue: paymentHandle ? paymentHandle.value : 'no handle',
+            reviewLink,
+            hasScreenshot,
+            fileInputExists: !!fileInput,
+            fileInputFiles: fileInput ? fileInput.files : 'no files'
+        });
 
         if (!selectedMethod) return showError('Please select a payment method');
         if (!paymentHandle || !paymentHandle.value) return showError('Please enter your payment information');
