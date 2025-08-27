@@ -1945,6 +1945,13 @@
                 });
             }
 
+            // First, find the TOTAL row to get the correct totals
+            const totalDataRow = data.find(row => row.payment_method === 'TOTAL');
+            if (totalDataRow) {
+                totalAwarded = totalDataRow.total_awarded_amount;
+                totalPaid = totalDataRow.total_paid_amount;
+            }
+
             data.forEach((row, index) => {
                 if (row.payment_method !== 'TOTAL') {
                     const tr = document.createElement('tr');
@@ -1990,9 +1997,6 @@
                             tbody.appendChild(handleRow);
                         });
                     }
-                } else {
-                    totalAwarded = row.total_awarded_amount;
-                    totalPaid = row.total_paid_amount;
                 }
             });
 
