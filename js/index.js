@@ -56,6 +56,46 @@ document.addEventListener('DOMContentLoaded', () => {
             warningElement.style.display = 'none';
         }
     }
+
+    // Campaign pause logic for non-previous guests
+    if (!isPreviousGuest) {
+        // Disable all form elements
+        const formElements = document.querySelectorAll('#rewardForm input, #rewardForm button, #rewardForm .payment-method, #rewardForm .file-upload-area');
+        formElements.forEach(element => {
+            element.disabled = true;
+            element.style.opacity = '0.5';
+            element.style.cursor = 'not-allowed';
+        });
+
+        // Replace submit button with disabled message
+        const submitButton = document.getElementById('submitButton');
+        if (submitButton) {
+            submitButton.textContent = 'Campaign Paused';
+            submitButton.style.background = '#ccc';
+            submitButton.style.cursor = 'not-allowed';
+        }
+
+        // Show campaign pause alert
+        const formContainer = document.getElementById('formContainer');
+        if (formContainer) {
+            const pauseAlert = document.createElement('div');
+            pauseAlert.style.cssText = `
+                background: #fff3cd;
+                border: 1px solid #ffeaa7;
+                color: #856404;
+                padding: 15px;
+                border-radius: 8px;
+                margin-bottom: 20px;
+                text-align: center;
+                font-weight: 500;
+            `;
+            pauseAlert.innerHTML = `
+                <strong>⏸️ Campaign Paused</strong><br>
+                Our current review campaign is paused due to high demand. We will be back soon!
+            `;
+            formContainer.insertBefore(pauseAlert, formContainer.firstChild);
+        }
+    }
 });
 
 // Toggle tutorial visibility
