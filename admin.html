@@ -1163,6 +1163,12 @@
             document.getElementById('logoutBtn').style.display = 'block';
             document.getElementById('navTabs').classList.add('active');
 
+            // Show loading message immediately
+            const tbody = document.getElementById('submissionsBody');
+            if (tbody) {
+                tbody.innerHTML = '<tr><td colspan="10" style="text-align: center; color: #666;">Loading dashboard...</td></tr>';
+            }
+
             // Properly initialize the rewards tab as active
             switchTab('rewards');
         }
@@ -1203,12 +1209,13 @@
                 console.log('Starting database query...');
                 const queryStart = performance.now();
 
-                // Start with a more efficient query
+                // Start with a more efficient query with timeout
                 let query = supabase
                     .from('review_rewards')
                     .select('*')
                     .order('created_at', { ascending: false })
-                    .limit(500); // Limit initial load for better performance
+                    .limit(200) // Reduce limit for faster loading
+                    .abortSignal(AbortSignal.timeout(15000)); // 15 second timeout
 
                 if (statusFilter !== 'all') {
                     if (statusFilter === 'pending') {
@@ -1234,15 +1241,19 @@
                     });
 
                     // More helpful error messages
-                    if (error.message.includes('Failed to fetch')) {
-                        console.error('Network error details:', error);
+                    if (error.message.includes('Failed to fetch') || error.name === 'AbortError') {
+                        console.error('Network/timeout error details:', error);
                         // Retry with exponential backoff
                         if (retryCount < maxRetries) {
                             console.log(`Retrying in ${retryDelay}ms... (attempt ${retryCount + 1}/${maxRetries})`);
+                            // Show retry message to user
+                            if (tbody) {
+                                tbody.innerHTML = `<tr><td colspan="10" style="text-align: center; color: #666;">Connection timeout, retrying... (${retryCount + 1}/${maxRetries})</td></tr>`;
+                            }
                             setTimeout(() => loadSubmissions(retryCount + 1), retryDelay);
                             return;
                         } else {
-                            alert('Network error: Unable to connect to the database after multiple attempts. Please check your internet connection and try again.\n\nTip: If this persists, try refreshing the page or logging out and back in.');
+                            alert('Network error: Unable to connect to the database after multiple attempts. This may be due to slow connection or database performance issues.\n\nTip: Try refreshing the page or try again in a few moments.');
                         }
                     } else if (error.code === 'PGRST301') {
                         alert('Authentication error: Please log in again.');
@@ -1866,8 +1877,101 @@
         // Manual refresh only - no auto-refresh
         // Users must click the refresh button to get updated data
 
+        // Test database connection
+        async function testConnection() {
+            try {
+                const { data, error } = await supabase
+                    .from('review_rewards')
+                    .select('id')
+                    .limit(1)
+                    .abortSignal(AbortSignal.timeout(5000));
+
+                if (error) {
+                    console.error('Connection test failed:', error);
+                    return false;
+                }
+                console.log('Database connection test passed');
+                return true;
+            } catch (err) {
+                console.error('Connection test error:', err);
+                return false;
+            }
+        }
+
         // Initialize on load
         checkAuth();
+
+        // Fallback summary aggregation when view fails
+        async function loadSummaryFallback() {
+            try {
+                console.log('Using fallback summary aggregation...');
+
+                // Get basic counts and totals directly from main table
+                const { data: allData, error } = await supabase
+                    .from('review_rewards')
+                    .select('payment_method, status, award_amount, id')
+                    .abortSignal(AbortSignal.timeout(15000));
+
+                if (error) {
+                    console.error('Fallback query failed:', error);
+                    alert('Unable to load summary data. Please try refreshing the page.');
+                    return;
+                }
+
+                // Aggregate data manually
+                const summary = {};
+                let totalSubmissions = 0;
+                let totalAwarded = 0;
+                let totalPaid = 0;
+
+                allData.forEach(row => {
+                    const method = row.payment_method || 'unknown';
+                    if (!summary[method]) {
+                        summary[method] = {
+                            payment_method: method,
+                            total_submissions: 0,
+                            awarded_count: 0,
+                            paid_count: 0,
+                            total_awarded_amount: 0,
+                            total_paid_amount: 0
+                        };
+                    }
+
+                    summary[method].total_submissions++;
+                    totalSubmissions++;
+
+                    const amount = row.award_amount || (row.id <= 95 ? 20 : 10);
+
+                    if (row.status === 'awarded' || row.status === 'paid') {
+                        summary[method].awarded_count++;
+                        summary[method].total_awarded_amount += amount;
+                        totalAwarded += amount;
+                    }
+
+                    if (row.status === 'paid') {
+                        summary[method].paid_count++;
+                        summary[method].total_paid_amount += amount;
+                        totalPaid += amount;
+                    }
+                });
+
+                // Convert to array and add totals row
+                const summaryArray = Object.values(summary);
+                summaryArray.push({
+                    payment_method: 'TOTAL',
+                    total_submissions: totalSubmissions,
+                    awarded_count: summaryArray.reduce((sum, s) => sum + s.awarded_count, 0),
+                    paid_count: summaryArray.reduce((sum, s) => sum + s.paid_count, 0),
+                    total_awarded_amount: totalAwarded,
+                    total_paid_amount: totalPaid
+                });
+
+                renderSummary(summaryArray, null);
+            } catch (err) {
+                console.error('Fallback summary failed:', err);
+                alert('Unable to load summary data. Please try refreshing the page.');
+            }
+        }
 
         // Load summary data
         async function loadSummary() {
@@ -1875,11 +1979,19 @@
                 // Load summary from function (if using function instead of view)
                 // const { data: summaryData, error: summaryError } = await supabase.rpc('get_review_rewards_summary');
 
-                // Load summary from view (current implementation)
-                const { data: summaryData, error: summaryError } = await supabase.from('review_rewards_summary').select('*');
+                // Load summary from view with timeout
+                const { data: summaryData, error: summaryError } = await supabase
+                    .from('review_rewards_summary')
+                    .select('*')
+                    .abortSignal(AbortSignal.timeout(10000)); // 10 second timeout
 
                 if (summaryError) {
                     console.error('Error loading summary:', summaryError);
+                    // If summary view fails, try fallback aggregation
+                    if (summaryError.message.includes('does not exist') || summaryError.name === 'AbortError') {
+                        console.log('Summary view failed, trying fallback aggregation...');
+                        return loadSummaryFallback();
+                    }
                     alert('Error loading summary: ' + summaryError.message);
                     return;
                 }
