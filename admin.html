@@ -909,6 +909,13 @@
                     <!-- Submissions will be loaded here -->
                 </tbody>
             </table>
+
+            <!-- Load More Button -->
+            <div id="loadMoreContainer" style="text-align: center; margin-top: 20px; display: none;">
+                <button id="loadMoreBtn" class="btn btn-secondary" style="padding: 10px 20px;">
+                    Load More Submissions
+                </button>
+            </div>
         </div>
     </div>
 
@@ -1061,6 +1068,8 @@
 
         let currentUser = null;
         let submissions = [];
+        let currentPage = 0;
+        let hasMoreData = true;
         const SUBMISSION_COLUMNS = [
             'id',
             'created_at',
@@ -1075,7 +1084,8 @@
             'paid_at',
             'notes'
         ].join(', ');
-        const MAX_SUBMISSION_ROWS = 200;
+        const MAX_SUBMISSION_ROWS = 50; // Reduced further for better performance
+        const ROWS_PER_PAGE = 50;
 
         // Get award amount based on ID (fallback for existing records)
         function getAwardAmount(submissionId) {
@@ -1195,8 +1205,8 @@
         // Prevent multiple simultaneous loads
         let isLoadingSubmissions = false;
 
-        // Load submissions
-        async function loadSubmissions(retryCount = 0) {
+        // Load submissions with pagination
+        async function loadSubmissions(retryCount = 0, resetPagination = true) {
             // Prevent multiple simultaneous calls
             if (isLoadingSubmissions && retryCount === 0) {
                 console.log('Load already in progress, skipping...');
@@ -1207,10 +1217,21 @@
             const maxRetries = 3;
             const retryDelay = 1000 * Math.pow(2, retryCount); // Exponential backoff
 
+            // Reset pagination if requested
+            if (resetPagination) {
+                currentPage = 0;
+                hasMoreData = true;
+                submissions = [];
+            }
+
             // Show loading state
             const tbody = document.getElementById('submissionsBody');
             if (tbody && retryCount === 0) {
-                tbody.innerHTML = '<tr><td colspan="10" style="text-align: center; color: #666;">Loading submissions...</td></tr>';
+                if (resetPagination) {
+                    tbody.innerHTML = '<tr><td colspan="10" style="text-align: center; color: #666;">Loading submissions...</td></tr>';
+                } else {
+                    tbody.innerHTML += '<tr><td colspan="10" style="text-align: center; color: #666;">Loading more...</td></tr>';
+                }
             }
 
             try {
@@ -1233,8 +1254,8 @@
                     .from('review_rewards')
                     .select(SUBMISSION_COLUMNS)
                     .order('created_at', { ascending: false })
-                    .limit(MAX_SUBMISSION_ROWS)
-                    .abortSignal(AbortSignal.timeout(15000)); // 15 second timeout
+                    .range(currentPage * ROWS_PER_PAGE, (currentPage + 1) * ROWS_PER_PAGE - 1)
+                    .abortSignal(AbortSignal.timeout(30000)); // Increased to 30 seconds for complex queries
 
                 if (statusFilter !== 'all') {
                     if (statusFilter === 'pending') {
@@ -1289,11 +1310,24 @@
                     return;
                 }
 
-                submissions = data || [];
+                const newData = data || [];
                 const queryEnd = performance.now();
-                console.log(`Loaded ${submissions.length} submissions in ${(queryEnd - queryStart).toFixed(2)}ms`);
+                console.log(`Loaded ${newData.length} submissions in ${(queryEnd - queryStart).toFixed(2)}ms`);
+
+                // Check if we have more data
+                hasMoreData = newData.length === ROWS_PER_PAGE;
+
+                // Add new data to existing submissions
+                if (resetPagination) {
+                    submissions = newData;
+                } else {
+                    submissions = [...submissions, ...newData];
+                }
 
                 updateStats(submissions); // Stats should show all, not filtered
+
+                // Update Load More button visibility
+                updateLoadMoreButton();
 
                 // Apply search filter if there's a search term
                 filterSubmissions();
@@ -1306,7 +1340,31 @@
             }
         }
 
+        // Update Load More button visibility
+        function updateLoadMoreButton() {
+            const loadMoreContainer = document.getElementById('loadMoreContainer');
+            const loadMoreBtn = document.getElementById('loadMoreBtn');
 
+            if (loadMoreContainer && loadMoreBtn) {
+                if (hasMoreData && submissions.length > 0) {
+                    loadMoreContainer.style.display = 'block';
+                    loadMoreBtn.disabled = isLoadingSubmissions;
+                    loadMoreBtn.textContent = isLoadingSubmissions ? 'Loading...' : 'Load More Submissions';
+                } else {
+                    loadMoreContainer.style.display = 'none';
+                }
+            }
+        }
+
+        // Load more submissions
+        async function loadMoreSubmissions() {
+            if (isLoadingSubmissions || !hasMoreData) {
+                return;
+            }
+
+            currentPage++;
+            await loadSubmissions(0, false); // Don't reset pagination
+        }
 
         // Tabs logic
         function switchTab(which) {
@@ -1974,6 +2032,14 @@
         // Initialize on load
         checkAuth();
 
+        // Add event listener for Load More button
+        document.addEventListener('DOMContentLoaded', function () {
+            const loadMoreBtn = document.getElementById('loadMoreBtn');
+            if (loadMoreBtn) {
+                loadMoreBtn.addEventListener('click', loadMoreSubmissions);
+            }
+        });
+
         // Fallback summary aggregation when view fails
         async function loadSummaryFallback() {
             try {
@@ -2246,6 +2312,7 @@
 
             renderSubmissions(filteredSubmissions);
             updateSelection(); // Clear selection when filtering
+            updateLoadMoreButton(); // Update Load More button visibility
         }
 
         // Close modal on outside click
