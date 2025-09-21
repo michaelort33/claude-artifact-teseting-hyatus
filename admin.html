@@ -1084,8 +1084,29 @@
             'paid_at',
             'notes'
         ].join(', ');
-        const MAX_SUBMISSION_ROWS = 50; // Reduced further for better performance
         const ROWS_PER_PAGE = 50;
+        const supportsAbortTimeout = typeof AbortSignal !== 'undefined' && typeof AbortSignal.timeout === 'function';
+        let loggedAbortTimeoutWarning = false;
+
+        function applyTimeout(query, timeoutMs) {
+            if (!supportsAbortTimeout) {
+                if (!loggedAbortTimeoutWarning) {
+                    console.warn('AbortSignal.timeout not supported; continuing without request timeouts.');
+                    loggedAbortTimeoutWarning = true;
+                }
+                return query;
+            }
+
+            try {
+                return query.abortSignal(AbortSignal.timeout(timeoutMs));
+            } catch (timeoutErr) {
+                if (!loggedAbortTimeoutWarning) {
+                    console.warn('Failed to apply AbortSignal timeout; continuing without request timeouts.', timeoutErr);
+                    loggedAbortTimeoutWarning = true;
+                }
+                return query;
+            }
+        }
 
         // Get award amount based on ID (fallback for existing records)
         function getAwardAmount(submissionId) {
@@ -1207,6 +1228,10 @@
 
         // Load submissions with pagination
         async function loadSubmissions(retryCount = 0, resetPagination = true) {
+            const normalizedRetryCount = Number(retryCount);
+            retryCount = Number.isFinite(normalizedRetryCount) && normalizedRetryCount >= 0 ? normalizedRetryCount : 0;
+            const shouldResetPagination = typeof resetPagination === 'boolean' ? resetPagination : true;
+
             // Prevent multiple simultaneous calls
             if (isLoadingSubmissions && retryCount === 0) {
                 console.log('Load already in progress, skipping...');
@@ -1216,9 +1241,10 @@
             isLoadingSubmissions = true;
             const maxRetries = 3;
             const retryDelay = 1000 * Math.pow(2, retryCount); // Exponential backoff
+            const retryShouldReset = shouldResetPagination;
 
             // Reset pagination if requested
-            if (resetPagination) {
+            if (shouldResetPagination) {
                 currentPage = 0;
                 hasMoreData = true;
                 submissions = [];
@@ -1227,7 +1253,7 @@
             // Show loading state
             const tbody = document.getElementById('submissionsBody');
             if (tbody && retryCount === 0) {
-                if (resetPagination) {
+                if (shouldResetPagination) {
                     tbody.innerHTML = '<tr><td colspan="10" style="text-align: center; color: #666;">Loading submissions...</td></tr>';
                 } else {
                     tbody.innerHTML += '<tr><td colspan="10" style="text-align: center; color: #666;">Loading more...</td></tr>';
@@ -1254,8 +1280,9 @@
                     .from('review_rewards')
                     .select(SUBMISSION_COLUMNS)
                     .order('created_at', { ascending: false })
-                    .range(currentPage * ROWS_PER_PAGE, (currentPage + 1) * ROWS_PER_PAGE - 1)
-                    .abortSignal(AbortSignal.timeout(30000)); // Increased to 30 seconds for complex queries
+                    .range(currentPage * ROWS_PER_PAGE, (currentPage + 1) * ROWS_PER_PAGE - 1);
+
+                query = applyTimeout(query, 30000); // Increased to 30 seconds for complex queries
 
                 if (statusFilter !== 'all') {
                     if (statusFilter === 'pending') {
@@ -1292,10 +1319,13 @@
                             if (tbody) {
                                 tbody.innerHTML = `<tr><td colspan="10" style="text-align: center; color: #666;">Connection timeout, retrying... (${retryCount + 1}/${maxRetries})</td></tr>`;
                             }
-                            setTimeout(() => loadSubmissions(retryCount + 1), retryDelay);
+                            setTimeout(() => loadSubmissions(retryCount + 1, retryShouldReset), retryDelay);
                             return;
                         } else {
                             alert('Network error: Unable to connect to the database after multiple attempts. This may be due to slow connection or database performance issues.\n\nTip: Try refreshing the page or try again in a few moments.');
+                            if (tbody) {
+                                tbody.innerHTML = '<tr><td colspan="10" style="text-align: center; color: #f88;">Unable to load submissions. Please try refreshing.</td></tr>';
+                            }
                         }
                     } else if (error.code === 'PGRST301') {
                         alert('Authentication error: Please log in again.');
@@ -1306,6 +1336,9 @@
                         alert('Server Error (500): The database server encountered an error.\n\nCommon causes:\n1. Row Level Security (RLS) policies are blocking access\n2. Table permissions are not set correctly\n3. Database function or trigger error\n\nPlease check your Supabase dashboard:\n- Go to Authentication > Policies\n- Check the review_rewards table policies\n- Ensure your user has proper permissions');
                     } else {
                         alert('Error loading submissions: ' + error.message + '\n\nError code: ' + (error.code || 'Unknown') + '\nStatus: ' + (error.status || 'Unknown'));
+                        if (tbody) {
+                            tbody.innerHTML = '<tr><td colspan="10" style="text-align: center; color: #f88;">Failed to load submissions. Please refresh the page.</td></tr>';
+                        }
                     }
                     return;
                 }
@@ -1318,7 +1351,7 @@
                 hasMoreData = newData.length === ROWS_PER_PAGE;
 
                 // Add new data to existing submissions
-                if (resetPagination) {
+                if (shouldResetPagination) {
                     submissions = newData;
                 } else {
                     submissions = [...submissions, ...newData];
@@ -1964,11 +1997,14 @@
         // Test database connection
         async function testConnection() {
             try {
-                const { data, error } = await supabase
+                let testQuery = supabase
                     .from('review_rewards')
                     .select('id')
-                    .limit(1)
-                    .abortSignal(AbortSignal.timeout(5000));
+                    .limit(1);
+
+                testQuery = applyTimeout(testQuery, 5000);
+
+                const { data, error } = await testQuery;
 
                 if (error) {
                     console.error('Connection test failed:', error);
@@ -2033,12 +2069,10 @@
         checkAuth();
 
         // Add event listener for Load More button
-        document.addEventListener('DOMContentLoaded', function () {
-            const loadMoreBtn = document.getElementById('loadMoreBtn');
-            if (loadMoreBtn) {
-                loadMoreBtn.addEventListener('click', loadMoreSubmissions);
-            }
-        });
+        const loadMoreBtn = document.getElementById('loadMoreBtn');
+        if (loadMoreBtn) {
+            loadMoreBtn.addEventListener('click', loadMoreSubmissions);
+        }
 
         // Fallback summary aggregation when view fails
         async function loadSummaryFallback() {
@@ -2046,10 +2080,13 @@
                 console.log('Using fallback summary aggregation...');
 
                 // Get basic counts and totals directly from main table
-                const { data: allData, error } = await supabase
+                let fallbackQuery = supabase
                     .from('review_rewards')
-                    .select('payment_method, status, award_amount, id')
-                    .abortSignal(AbortSignal.timeout(15000));
+                    .select('payment_method, status, award_amount, id');
+
+                fallbackQuery = applyTimeout(fallbackQuery, 15000);
+
+                const { data: allData, error } = await fallbackQuery;
 
                 if (error) {
                     console.error('Fallback query failed:', error);
@@ -2119,10 +2156,13 @@
                 // const { data: summaryData, error: summaryError } = await supabase.rpc('get_review_rewards_summary');
 
                 // Load summary from view with timeout
-                const { data: summaryData, error: summaryError } = await supabase
+                let summaryQuery = supabase
                     .from('review_rewards_summary')
-                    .select('payment_method, total_submissions, awarded_count, paid_count, total_awarded_amount, total_paid_amount')
-                    .abortSignal(AbortSignal.timeout(10000)); // 10 second timeout
+                    .select('payment_method, total_submissions, awarded_count, paid_count, total_awarded_amount, total_paid_amount');
+
+                summaryQuery = applyTimeout(summaryQuery, 10000); // 10 second timeout
+
+                const { data: summaryData, error: summaryError } = await summaryQuery;
 
                 if (summaryError) {
                     console.error('Error loading summary:', summaryError);
@@ -2141,11 +2181,14 @@
                 );
 
                 if (needsHandleData) {
-                    const { data: detailData, error: detailError } = await supabase
+                    let detailQuery = supabase
                         .from('review_rewards')
                         .select('payment_method, payment_handle, status, award_amount')
-                        .in('status', ['awarded', 'paid'])
-                        .abortSignal(AbortSignal.timeout(10000));
+                        .in('status', ['awarded', 'paid']);
+
+                    detailQuery = applyTimeout(detailQuery, 10000);
+
+                    const { data: detailData, error: detailError } = await detailQuery;
 
                     if (detailError) {
                         console.error('Error loading handle data:', detailError);
@@ -2284,8 +2327,15 @@
         document.getElementById('tabSummary').addEventListener('click', () => switchTab('summary'));
 
         // Set up filters
-        document.getElementById('statusFilter').addEventListener('change', loadSubmissions);
-        document.getElementById('paymentFilter').addEventListener('change', loadSubmissions);
+        const statusFilterEl = document.getElementById('statusFilter');
+        if (statusFilterEl) {
+            statusFilterEl.addEventListener('change', () => loadSubmissions(0, true));
+        }
+
+        const paymentFilterEl = document.getElementById('paymentFilter');
+        if (paymentFilterEl) {
+            paymentFilterEl.addEventListener('change', () => loadSubmissions(0, true));
+        }
 
         // Set up search input with debounce
         let searchTimeout;
