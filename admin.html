@@ -864,6 +864,10 @@
                 <option value="paypal">PayPal</option>
                 <option value="other">Other</option>
             </select>
+            <button class="btn btn-secondary" onclick="debugDatabase()"
+                style="padding: 8px 12px; font-size: 14px; background: var(--surface-3); color: var(--text); border: 1px solid var(--border);">
+                Debug DB
+            </button>
             <div class="refresh-icon" onclick="loadSubmissions()" title="Refresh data">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -1209,6 +1213,21 @@
                 console.log('Starting database query...');
                 const queryStart = performance.now();
 
+                // First, test with a simple query to isolate the issue
+                console.log('Testing basic table access...');
+                const { data: testData, error: testError } = await supabase
+                    .from('review_rewards')
+                    .select('id')
+                    .limit(1);
+
+                if (testError) {
+                    console.error('Basic table access failed:', testError);
+                    alert('Database access error: ' + testError.message + '\n\nThis might be due to:\n1. Row Level Security (RLS) policies\n2. Table permissions\n3. Database connection issues\n\nPlease check your Supabase dashboard for RLS policies on the review_rewards table.');
+                    return;
+                }
+
+                console.log('Basic table access successful, proceeding with full query...');
+
                 // Start with a more efficient query with timeout
                 let query = supabase
                     .from('review_rewards')
@@ -1237,7 +1256,9 @@
                         message: error.message,
                         details: error.details,
                         hint: error.hint,
-                        code: error.code
+                        code: error.code,
+                        status: error.status,
+                        statusText: error.statusText
                     });
 
                     // More helpful error messages
@@ -1260,8 +1281,10 @@
                         window.location.reload();
                     } else if (error.message.includes('infinite recursion')) {
                         alert('Database policy error detected. Please contact support to fix RLS policies.');
+                    } else if (error.status === 500) {
+                        alert('Server Error (500): The database server encountered an error.\n\nCommon causes:\n1. Row Level Security (RLS) policies are blocking access\n2. Table permissions are not set correctly\n3. Database function or trigger error\n\nPlease check your Supabase dashboard:\n- Go to Authentication > Policies\n- Check the review_rewards table policies\n- Ensure your user has proper permissions');
                     } else {
-                        alert('Error loading submissions: ' + error.message);
+                        alert('Error loading submissions: ' + error.message + '\n\nError code: ' + (error.code || 'Unknown') + '\nStatus: ' + (error.status || 'Unknown'));
                     }
                     return;
                 }
@@ -1898,6 +1921,53 @@
             }
         }
 
+        // Test table structure and permissions
+        async function testTableAccess() {
+            try {
+                console.log('Testing table access...');
+
+                // Test 1: Basic select
+                const { data: basicData, error: basicError } = await supabase
+                    .from('review_rewards')
+                    .select('id')
+                    .limit(1);
+
+                if (basicError) {
+                    console.error('Basic select failed:', basicError);
+                    return { success: false, error: basicError, test: 'basic_select' };
+                }
+
+                // Test 2: Count query
+                const { count, error: countError } = await supabase
+                    .from('review_rewards')
+                    .select('*', { count: 'exact', head: true });
+
+                if (countError) {
+                    console.error('Count query failed:', countError);
+                    return { success: false, error: countError, test: 'count' };
+                }
+
+                // Test 3: Order by query
+                const { data: orderData, error: orderError } = await supabase
+                    .from('review_rewards')
+                    .select('id, created_at')
+                    .order('created_at', { ascending: false })
+                    .limit(5);
+
+                if (orderError) {
+                    console.error('Order by query failed:', orderError);
+                    return { success: false, error: orderError, test: 'order_by' };
+                }
+
+                console.log('All table access tests passed');
+                return { success: true, count: count, sampleData: orderData };
+
+            } catch (err) {
+                console.error('Table access test error:', err);
+                return { success: false, error: err, test: 'general' };
+            }
+        }
+
         // Initialize on load
         checkAuth();
 
@@ -2248,6 +2318,78 @@
             if (loginMessage) {
                 loginMessage.textContent = 'Sign in to manage rewards and claims';
             }
+        }
+
+        // Debug database function
+        async function debugDatabase() {
+            console.log('=== DATABASE DEBUG START ===');
+
+            try {
+                // Test 1: Basic connection
+                console.log('1. Testing basic connection...');
+                const connectionTest = await testConnection();
+                console.log('Connection test result:', connectionTest);
+
+                // Test 2: Table access
+                console.log('2. Testing table access...');
+                const tableTest = await testTableAccess();
+                console.log('Table access test result:', tableTest);
+
+                // Test 3: User authentication
+                console.log('3. Testing user authentication...');
+                const { data: { user }, error: userError } = await supabase.auth.getUser();
+                console.log('User:', user);
+                console.log('User error:', userError);
+
+                // Test 4: Admin check
+                console.log('4. Testing admin permissions...');
+                if (user) {
+                    const { data: adminData, error: adminError } = await supabase
+                        .from('admins')
+                        .select('*')
+                        .eq('email', user.email);
+                    console.log('Admin data:', adminData);
+                    console.log('Admin error:', adminError);
+                }
+
+                // Test 5: RLS policies
+                console.log('5. Testing RLS policies...');
+                const { data: rlsTest, error: rlsError } = await supabase
+                    .from('review_rewards')
+                    .select('id, created_at, status')
+                    .limit(1);
+                console.log('RLS test result:', rlsTest);
+                console.log('RLS error:', rlsError);
+
+                // Show results to user
+                let debugMessage = 'Database Debug Results:\n\n';
+                debugMessage += `1. Connection: ${connectionTest ? 'PASS' : 'FAIL'}\n`;
+                debugMessage += `2. Table Access: ${tableTest.success ? 'PASS' : 'FAIL'}\n`;
+                debugMessage += `3. User Auth: ${user ? 'PASS' : 'FAIL'}\n`;
+                debugMessage += `4. Admin Check: ${user ? 'PASS' : 'N/A'}\n`;
+                debugMessage += `5. RLS Policies: ${rlsTest ? 'PASS' : 'FAIL'}\n\n`;
+
+                if (!connectionTest) {
+                    debugMessage += 'Connection failed - check your internet connection and Supabase URL.\n';
+                }
+                if (!tableTest.success) {
+                    debugMessage += `Table access failed: ${tableTest.error?.message || 'Unknown error'}\n`;
+                }
+                if (!user) {
+                    debugMessage += 'User not authenticated - please log in.\n';
+                }
+                if (user && !rlsTest) {
+                    debugMessage += `RLS policy error: ${rlsError?.message || 'Unknown error'}\n`;
+                }
+
+                alert(debugMessage);
+
+            } catch (err) {
+                console.error('Debug error:', err);
+                alert('Debug failed: ' + err.message);
+            }
+
+            console.log('=== DATABASE DEBUG END ===');
         }
 
         // Check session when page loads
