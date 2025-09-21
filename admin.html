@@ -1061,6 +1061,21 @@
 
         let currentUser = null;
         let submissions = [];
+        const SUBMISSION_COLUMNS = [
+            'id',
+            'created_at',
+            'payment_method',
+            'payment_handle',
+            'review_link',
+            'screenshot_url',
+            'award_amount',
+            'previous_guest',
+            'status',
+            'awarded_at',
+            'paid_at',
+            'notes'
+        ].join(', ');
+        const MAX_SUBMISSION_ROWS = 200;
 
         // Get award amount based on ID (fallback for existing records)
         function getAwardAmount(submissionId) {
@@ -1213,27 +1228,12 @@
                 console.log('Starting database query...');
                 const queryStart = performance.now();
 
-                // First, test with a simple query to isolate the issue
-                console.log('Testing basic table access...');
-                const { data: testData, error: testError } = await supabase
-                    .from('review_rewards')
-                    .select('id')
-                    .limit(1);
-
-                if (testError) {
-                    console.error('Basic table access failed:', testError);
-                    alert('Database access error: ' + testError.message + '\n\nThis might be due to:\n1. Row Level Security (RLS) policies\n2. Table permissions\n3. Database connection issues\n\nPlease check your Supabase dashboard for RLS policies on the review_rewards table.');
-                    return;
-                }
-
-                console.log('Basic table access successful, proceeding with full query...');
-
-                // Start with a more efficient query with timeout
+                // Query only the fields the UI uses to keep payloads small
                 let query = supabase
                     .from('review_rewards')
-                    .select('*')
+                    .select(SUBMISSION_COLUMNS)
                     .order('created_at', { ascending: false })
-                    .limit(200) // Reduce limit for faster loading
+                    .limit(MAX_SUBMISSION_ROWS)
                     .abortSignal(AbortSignal.timeout(15000)); // 15 second timeout
 
                 if (statusFilter !== 'all') {
@@ -1363,6 +1363,7 @@
                     return;
                 }
 
+                const fragment = document.createDocumentFragment();
                 data.forEach((submission, index) => {
                     try {
                         const row = document.createElement('tr');
@@ -1397,12 +1398,14 @@
                         </div>
                     </td>
                 `;
-                        tbody.appendChild(row);
+                        fragment.appendChild(row);
                     } catch (submissionError) {
                         console.error('Error rendering submission:', submissionError, submission);
                         // Continue with other submissions
                     }
                 });
+
+                tbody.appendChild(fragment);
             } catch (err) {
                 console.error('Error in renderSubmissions:', err);
                 const tbody = document.getElementById('submissionsBody');
@@ -1747,7 +1750,7 @@
                 // Get all submissions data for detailed export
                 const { data, error } = await supabase
                     .from('review_rewards')
-                    .select('*')
+                    .select('id, payment_method, payment_handle, review_link, status, award_amount, user_email, created_at, awarded_at, paid_at')
                     .order('created_at', { ascending: false });
 
                 if (error) {
@@ -1940,7 +1943,7 @@
                 // Test 2: Count query
                 const { count, error: countError } = await supabase
                     .from('review_rewards')
-                    .select('*', { count: 'exact', head: true });
+                    .select('id', { count: 'exact', head: true });
 
                 if (countError) {
                     console.error('Count query failed:', countError);
@@ -2052,7 +2055,7 @@
                 // Load summary from view with timeout
                 const { data: summaryData, error: summaryError } = await supabase
                     .from('review_rewards_summary')
-                    .select('*')
+                    .select('payment_method, total_submissions, awarded_count, paid_count, total_awarded_amount, total_paid_amount')
                     .abortSignal(AbortSignal.timeout(10000)); // 10 second timeout
 
                 if (summaryError) {
@@ -2066,17 +2069,23 @@
                     return;
                 }
 
-                // Always load detailed data for handle breakdown
-                const { data: detailData, error: detailError } = await supabase
-                    .from('review_rewards')
-                    .select('payment_method, payment_handle, status, award_amount')
-                    .in('status', ['awarded', 'paid']);
-
                 let handleData = null;
-                if (detailError) {
-                    console.error('Error loading handle data:', detailError);
-                } else {
-                    handleData = detailData;
+                const needsHandleData = (summaryData || []).some(row =>
+                    row.payment_method !== 'TOTAL' && (row.awarded_count > 0 || row.paid_count > 0)
+                );
+
+                if (needsHandleData) {
+                    const { data: detailData, error: detailError } = await supabase
+                        .from('review_rewards')
+                        .select('payment_method, payment_handle, status, award_amount')
+                        .in('status', ['awarded', 'paid'])
+                        .abortSignal(AbortSignal.timeout(10000));
+
+                    if (detailError) {
+                        console.error('Error loading handle data:', detailError);
+                    } else {
+                        handleData = detailData;
+                    }
                 }
 
                 renderSummary(summaryData || [], handleData);
@@ -2284,7 +2293,7 @@
                     // Check if user is admin
                     const { data: adminData, error: adminError } = await supabase
                         .from('admins')
-                        .select('*')
+                        .select('email')
                         .eq('email', session.user.email)
                         .single();
 
@@ -2346,7 +2355,7 @@
                 if (user) {
                     const { data: adminData, error: adminError } = await supabase
                         .from('admins')
-                        .select('*')
+                        .select('email')
                         .eq('email', user.email);
                     console.log('Admin data:', adminData);
                     console.log('Admin error:', adminError);
