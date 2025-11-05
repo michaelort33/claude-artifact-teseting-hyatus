@@ -1610,14 +1610,19 @@
             color: #1967d2;
         }
 
-        .pill.zelle {
-            background: #f0e9ff;
-            color: #6633cc;
-        }
-
         .pill.paypal {
             background: #e6f4ea;
             color: #0b8043;
+        }
+
+        .pill.cashapp {
+            background: #e8f5e9;
+            color: #0f9d58;
+        }
+
+        .pill.booking {
+            background: #fff3e0;
+            color: #e65100;
         }
 
         .pill.other {
@@ -1703,17 +1708,17 @@
                             <div>💳</div>
                             <div>Venmo</div>
                         </div>
-                        <div class="payment-method" data-method="zelle">
-                            <div>🏦</div>
-                            <div>Zelle</div>
-                        </div>
                         <div class="payment-method" data-method="paypal">
                             <div>💰</div>
                             <div>PayPal</div>
                         </div>
-                        <div class="payment-method" data-method="other">
-                            <div>📝</div>
-                            <div>Other</div>
+                        <div class="payment-method" data-method="cashapp">
+                            <div>💵</div>
+                            <div>Cash App</div>
+                        </div>
+                        <div class="payment-method" data-method="booking">
+                            <div>🏨</div>
+                            <div>Booking Platform Refund</div>
                         </div>
                     </div>
                     <div class="form-group">
@@ -1923,15 +1928,18 @@
                 if (selectedMethod === 'venmo') {
                     paymentLabel.textContent = 'Venmo Username';
                     paymentHandle.placeholder = '@username';
-                } else if (selectedMethod === 'zelle') {
-                    paymentLabel.textContent = 'Zelle Email or Phone';
-                    paymentHandle.placeholder = 'email@example.com or (555) 123-4567';
                 } else if (selectedMethod === 'paypal') {
                     paymentLabel.textContent = 'PayPal Email';
                     paymentHandle.placeholder = 'email@example.com';
+                } else if (selectedMethod === 'cashapp') {
+                    paymentLabel.textContent = 'Cash App $Cashtag';
+                    paymentHandle.placeholder = '$cashtag';
+                } else if (selectedMethod === 'booking') {
+                    paymentLabel.textContent = 'Booking Platform Details';
+                    paymentHandle.placeholder = 'Platform + reservation email or code';
                 } else if (selectedMethod === 'other') {
                     paymentLabel.textContent = 'Preferred Payment Method';
-                    paymentHandle.placeholder = 'e.g., Cash App, Apple Pay, etc.';
+                    paymentHandle.placeholder = 'Provide payment details';
                 }
             });
         });

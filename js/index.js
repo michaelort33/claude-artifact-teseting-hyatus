@@ -126,15 +126,18 @@ paymentMethods.forEach((method) => {
         if (selectedMethod === 'venmo') {
             paymentLabel.textContent = 'Venmo Username';
             if (paymentHandle) paymentHandle.placeholder = '@username';
-        } else if (selectedMethod === 'zelle') {
-            paymentLabel.textContent = 'Zelle Email or Phone';
-            if (paymentHandle) paymentHandle.placeholder = 'email@example.com or (555) 123-4567';
         } else if (selectedMethod === 'paypal') {
             paymentLabel.textContent = 'PayPal Email';
             if (paymentHandle) paymentHandle.placeholder = 'email@example.com';
+        } else if (selectedMethod === 'cashapp') {
+            paymentLabel.textContent = 'Cash App $Cashtag';
+            if (paymentHandle) paymentHandle.placeholder = '$cashtag';
+        } else if (selectedMethod === 'booking') {
+            paymentLabel.textContent = 'Booking Platform Details';
+            if (paymentHandle) paymentHandle.placeholder = 'Platform + reservation email or code';
         } else if (selectedMethod === 'other') {
             paymentLabel.textContent = 'Preferred Payment Method';
-            if (paymentHandle) paymentHandle.placeholder = 'e.g., Cash App, Apple Pay, etc.';
+            if (paymentHandle) paymentHandle.placeholder = 'Provide payment details';
         }
     });
 });

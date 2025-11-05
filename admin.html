@@ -764,8 +764,9 @@
             <select id="paymentFilter">
                 <option value="all">All Payment Methods</option>
                 <option value="venmo">Venmo</option>
-                <option value="zelle">Zelle</option>
                 <option value="paypal">PayPal</option>
+                <option value="cashapp">Cash App</option>
+                <option value="booking">Booking Platform Refund</option>
                 <option value="other">Other</option>
             </select>
             <button class="btn btn-secondary" onclick="debugDatabase()"
@@ -974,6 +975,7 @@
         let submissions = [];
         let currentPage = 0;
         let hasMoreData = true;
+        let currentSearchTerm = '';
         const SUBMISSION_COLUMNS = [
             'id',
             'created_at',
@@ -1152,6 +1154,7 @@
                 currentPage = 0;
                 hasMoreData = true;
                 submissions = [];
+                clearSelection();
             }
 
             // Show loading state
@@ -1174,7 +1177,9 @@
 
                 const statusFilter = document.getElementById('statusFilter') ? document.getElementById('statusFilter').value : 'all';
                 const paymentFilter = document.getElementById('paymentFilter') ? document.getElementById('paymentFilter').value : 'all';
-                const searchHandle = document.getElementById('searchHandle') ? document.getElementById('searchHandle').value.toLowerCase().trim() : '';
+                const searchInputEl = document.getElementById('searchHandle');
+                const searchHandle = searchInputEl ? searchInputEl.value.trim() : '';
+                currentSearchTerm = searchHandle;
 
                 console.log('Starting database query...');
                 const queryStart = performance.now();
@@ -1198,6 +1203,9 @@
                 }
                 if (paymentFilter !== 'all') {
                     query = query.eq('payment_method', paymentFilter);
+                }
+                if (searchHandle) {
+                    query = query.ilike('payment_handle', `%${searchHandle}%`);
                 }
 
                 const { data, error } = await query;
@@ -1262,12 +1270,9 @@
                 }
 
                 updateStats(submissions); // Stats should show all, not filtered
-
-                // Update Load More button visibility
+                renderSubmissions(submissions);
+                updateSelection();
                 updateLoadMoreButton();
-
-                // Apply search filter if there's a search term
-                filterSubmissions();
             } catch (err) {
                 console.error('Unexpected error in loadSubmissions:', err);
                 alert('Unexpected error loading submissions: ' + err.message);
@@ -2242,28 +2247,28 @@
         let searchTimeout;
         const searchInput = document.getElementById('searchHandle');
         if (searchInput) {
-            searchInput.addEventListener('input', (e) => {
+            searchInput.addEventListener('input', () => {
                 clearTimeout(searchTimeout);
                 searchTimeout = setTimeout(() => {
-                    filterSubmissions();
+                    handleSearchInput();
                 }, 300); // 300ms debounce
             });
         }
 
-        // Client-side filtering function
-        function filterSubmissions() {
-            const searchHandle = document.getElementById('searchHandle') ? document.getElementById('searchHandle').value.toLowerCase().trim() : '';
+        function handleSearchInput() {
+            const inputEl = document.getElementById('searchHandle');
+            const searchValue = inputEl ? inputEl.value.trim() : '';
 
-            let filteredSubmissions = submissions;
-            if (searchHandle) {
-                filteredSubmissions = submissions.filter(sub =>
-                    sub.payment_handle && sub.payment_handle.toLowerCase().includes(searchHandle)
-                );
+            if (searchValue === currentSearchTerm) {
+                renderSubmissions(submissions);
+                updateSelection();
+                updateLoadMoreButton();
+                return;
             }
 
-            renderSubmissions(filteredSubmissions);
-            updateSelection(); // Clear selection when filtering
-            updateLoadMoreButton(); // Update Load More button visibility
+            currentSearchTerm = searchValue;
+            clearSelection();
+            loadSubmissions(0, true);
         }
 
         // Close modal on outside click
