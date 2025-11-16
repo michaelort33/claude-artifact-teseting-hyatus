@@ -733,7 +733,7 @@ if (backHomeBtn) {
         if (successMessage) successMessage.style.display = 'none';
         if (formContainer) formContainer.style.display = 'block';
         if (submitButton) {
-            submitButton.textContent = 'Submit & Claim Reward';
+                    submitButton.textContent = 'Send Details & Receive Your Gift';
             submitButton.disabled = false;
         }
         if (form) form.reset();

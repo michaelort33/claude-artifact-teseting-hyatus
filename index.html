@@ -1674,7 +1674,7 @@
                             fill="white" />
                     </svg>
                 </div>
-                <span>Review Rewards</span>
+                <span>Guest Appreciation</span>
             </div>
             <div class="topbar-actions">
                 <a href="#" id="userAuthLink">Sign in</a>
@@ -1687,15 +1687,13 @@
     <div class="container">
 
         <div class="header">
-            <h1>Claim Your <span id="rewardAmount">$10</span> Review Reward</h1>
-            <p>Thank you for your review! Submit proof below to receive your reward.</p>
+            <h1>Your Thank‑You Gift</h1>
+            <p>We’re grateful for your review. Let us know where to send your gift.</p>
 
 
             <p id="accountRequirementsWarning"
                 style="margin-top: 12px; background: rgba(231, 76, 60, 0.1); padding: 10px; border-radius: 8px; border: 1px solid rgba(231, 76, 60, 0.3); color: #e74c3c; display: none;">
-                <strong>⚠️ Review Account Requirements:</strong> Reviews must be left from an established Google account
-                with a history of giving reviews. New accounts or accounts without review history will have their
-                reviews removed by Google and will NOT be accepted for reward.
+                <strong>Thank you!</strong> We appreciate your time and thoughtful feedback.
             </p>
             <p class="mobile-optional-signin" style="margin-top: 10px; font-size: 13px; opacity: 0.8; display: none;">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
@@ -1717,7 +1715,7 @@
                 <div class="section">
                     <div class="section-title">
                         <div class="step-number">1</div>
-                        <h2>Reward Choice</h2>
+                        <h2>Choose Your Gift</h2>
                     </div>
                     <div class="payment-methods">
                         <div class="payment-method" data-method="amazon">
@@ -1740,21 +1738,18 @@
                     </div>
                 </div>
 
-                <!-- Step 2: Review Proof -->
+                <!-- Step 2: Review Details -->
                 <div class="section">
                     <div class="section-title">
                         <div class="step-number">2</div>
-                        <h2>Provide Review Proof</h2>
+                        <h2>Help Us Find Your Review</h2>
                     </div>
-                    <p style="color: #666; font-size: 14px; margin-bottom: 15px;">
-                        <strong>Both link AND screenshot are required</strong> - we need to verify your review for
-                        security.
-                    </p>
+                    <p style="color: #666; font-size: 14px; margin-bottom: 15px;">Including your review link and a
+                        screenshot helps us share a small token of appreciation.</p>
 
                     <!-- Tutorial -->
-                    <button type="button" class="tutorial-toggle" onclick="toggleTutorial()">
-                        📱 Need help finding your review link? Click here
-                    </button>
+                    <button type="button" class="tutorial-toggle" onclick="toggleTutorial()">📱 Need a hand finding your
+                        review link? Tap here</button>
 
                     <div class="tutorial-box tutorial-content" id="tutorialContent">
                         <div class="tutorial-title">How to Get Your Review Link:</div>
@@ -1790,7 +1785,7 @@
                     </div>
 
                     <div class="form-group">
-                        <label for="reviewLink">Step 1: Paste Your Google Review Link <span
+                        <label for="reviewLink">Step 1: Paste Your Review Link <span
                                 style="color: #e74c3c;">*</span></label>
                         <input type="url" id="reviewLink" name="reviewLink" placeholder="https://g.page/r/..." required>
                     </div>
@@ -1798,7 +1793,7 @@
                     <div class="and-divider">AND</div>
 
                     <div class="form-group">
-                        <label>Step 2: Upload Proof Screenshot <span style="color: #e74c3c;">*</span></label>
+                        <label>Step 2: Upload a Screenshot <span style="color: #e74c3c;">*</span></label>
                         <div class="file-upload" id="fileUploadArea" role="button" tabindex="0"
                             aria-label="Upload screenshot of your review">
                             <div class="dz-content">
@@ -1820,13 +1815,10 @@
                     </div>
                 </div>
 
-                <button type="submit" class="submit-button" id="submitButton">Submit & Claim <span
-                        id="submitRewardAmount">$10</span> Reward</button>
+                <button type="submit" class="submit-button" id="submitButton">Send Details & Receive Your Gift</button>
 
-                <p style="text-align: center; margin-top: 15px; font-size: 12px; color: #666;">
-                    * Reward amounts are subject to change based on demand. Current submissions earn <span
-                        id="disclaimerAmount">$10</span>.
-                </p>
+                <p style="text-align: center; margin-top: 15px; font-size: 12px; color: #666;">We appreciate your
+                    feedback—thank you for helping us improve.</p>
             </form>
 
 
@@ -1837,7 +1829,7 @@
         <div class="success-message" id="successMessage">
             <div class="success-icon">🎁</div>
             <h2>Thank You! <span class="success-best">You're the Best!</span></h2>
-            <p>Your <span id="successRewardAmount">$10</span> reward claim has been submitted successfully.</p>
+            <p>Your gift request has been received.</p>
             <p>We'll email your gift within 24-48 hours.</p>
             <div style="margin-top: 18px; display: flex; gap: 10px; justify-content: center;">
                 <button class="btn-primary-small" id="viewMySubsBtn">View My Submissions</button>
