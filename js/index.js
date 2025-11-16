@@ -123,21 +123,9 @@ paymentMethods.forEach((method) => {
         }
 
         if (!paymentLabel) return;
-        if (selectedMethod === 'venmo') {
-            paymentLabel.textContent = 'Venmo Username';
-            if (paymentHandle) paymentHandle.placeholder = '@username';
-        } else if (selectedMethod === 'paypal') {
-            paymentLabel.textContent = 'PayPal Email';
-            if (paymentHandle) paymentHandle.placeholder = 'email@example.com';
-        } else if (selectedMethod === 'cashapp') {
-            paymentLabel.textContent = 'Cash App $Cashtag';
-            if (paymentHandle) paymentHandle.placeholder = '$cashtag';
-        } else if (selectedMethod === 'booking') {
-            paymentLabel.textContent = 'Booking Platform Details';
-            if (paymentHandle) paymentHandle.placeholder = 'Platform + reservation email or code';
-        } else if (selectedMethod === 'other') {
-            paymentLabel.textContent = 'Preferred Payment Method';
-            if (paymentHandle) paymentHandle.placeholder = 'Provide payment details';
+        if (selectedMethod === 'amazon' || selectedMethod === 'starbucks' || selectedMethod === 'surprise') {
+            paymentLabel.textContent = 'Delivery Email';
+            if (paymentHandle) paymentHandle.placeholder = 'name@example.com';
         }
     });
 });
@@ -261,7 +249,7 @@ function createFloatingDollars() {
     for (let i = 0; i < dollarCount; i++) {
         const dollar = document.createElement('div');
         dollar.className = 'dollar-sign';
-        dollar.textContent = '$';
+        dollar.textContent = '🎁';
         dollar.style.left = Math.random() * 100 + '%';
         dollar.style.animationDelay = Math.random() * 2 + 's';
         dollar.style.animationDuration = 3 + Math.random() * 2 + 's';
@@ -325,8 +313,8 @@ if (form) {
             fileInputFiles: fileInput ? fileInput.files : 'no files'
         });
 
-        if (!selectedMethod) return showError('Please select a payment method');
-        if (!paymentHandle || !paymentHandle.value) return showError('Please enter your payment information');
+        if (!selectedMethod) return showError('Please select a reward choice');
+        if (!paymentHandle || !paymentHandle.value) return showError('Please enter your delivery email');
         if (!reviewLink) return showError('Please paste your Google review link');
         if (!hasScreenshot) return showError('Please upload a screenshot of your review');
 
@@ -635,8 +623,8 @@ function renderMySubmissions(rows) {
         <thead>
           <tr>
             <th>Date</th>
-            <th>Payment</th>
-            <th>Handle</th>
+            <th>Reward</th>
+            <th>Delivery Email</th>
             <th>Type</th>
             <th>Status</th>
           </tr>
@@ -755,7 +743,7 @@ if (backHomeBtn) {
             paymentHandle.disabled = true;
             paymentHandle.value = '';
         }
-        if (paymentLabel) paymentLabel.textContent = 'Select a payment method above';
+        if (paymentLabel) paymentLabel.textContent = 'Delivery Email';
         if (fileUploadArea) fileUploadArea.classList.remove('has-file');
         if (fileName) fileName.textContent = '';
     });

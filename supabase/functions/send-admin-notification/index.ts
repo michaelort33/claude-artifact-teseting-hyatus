@@ -88,8 +88,8 @@ serve(async (req) => {
             subject: 'New Review Reward Submission!',
             html: `
                 <h2>New Submission Received</h2>
-                <p><strong>Payment Method:</strong> ${record.payment_method}</p>
-                <p><strong>Payment Handle:</strong> ${record.payment_handle}</p>
+                <p><strong>Reward Choice:</strong> ${record.payment_method}</p>
+                <p><strong>Delivery Email:</strong> ${record.payment_handle}</p>
                 <p><strong>Submitted:</strong> ${new Date(record.created_at).toLocaleString()}</p>
                 <p><a href="https://feedback.hyatus.com/admin.html">View in Admin Dashboard</a></p>
             `,

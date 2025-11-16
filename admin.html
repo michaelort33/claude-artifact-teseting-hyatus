@@ -752,7 +752,7 @@
 
         <!-- Filter Bar -->
         <div class="filter-bar">
-            <input type="text" id="searchHandle" placeholder="Search by payment handle..."
+            <input type="text" id="searchHandle" placeholder="Search by delivery email..."
                 style="padding: 8px 12px; background: var(--surface-2); color: var(--text); border: 1px solid var(--border); border-radius: 5px; width: 250px;">
             <select id="statusFilter">
                 <option value="all">All Status</option>
@@ -762,12 +762,10 @@
                 <option value="rejected">Rejected</option>
             </select>
             <select id="paymentFilter">
-                <option value="all">All Payment Methods</option>
-                <option value="venmo">Venmo</option>
-                <option value="paypal">PayPal</option>
-                <option value="cashapp">Cash App</option>
-                <option value="booking">Booking Platform Refund</option>
-                <option value="other">Other</option>
+                <option value="all">All Reward Choices</option>
+                <option value="amazon">Amazon Gift Card</option>
+                <option value="starbucks">Starbucks Gift Card</option>
+                <option value="surprise">Surprise Gift</option>
             </select>
             <button class="btn btn-secondary" onclick="debugDatabase()"
                 style="padding: 8px 12px; font-size: 14px; background: var(--surface-3); color: var(--text); border: 1px solid var(--border);">
@@ -801,8 +799,8 @@
                         </th>
                         <th>ID</th>
                         <th>Date</th>
-                        <th>Payment Method</th>
-                        <th>Payment Handle</th>
+                        <th>Reward Choice</th>
+                        <th>Delivery Email</th>
                         <th>Review Type</th>
                         <th>Award</th>
                         <th>Previous Guest</th>
@@ -885,7 +883,7 @@
         </div>
 
         <div class="filter-bar">
-            <h3>Payment Summary by Method</h3>
+            <h3>Reward Summary by Choice</h3>
             <span style="margin-left: 20px; color: var(--subtext); font-size: 14px;">
                 Click any row to expand details
             </span>
@@ -906,7 +904,7 @@
             <table>
                 <thead>
                     <tr>
-                        <th>Payment Method</th>
+                        <th>Reward Choice</th>
                         <th>Total Submissions</th>
                         <th>Awarded Count</th>
                         <th>Paid Count</th>
@@ -1433,11 +1431,11 @@
                     <div class="detail-value">${new Date(submission.created_at).toLocaleString()}</div>
                 </div>
                 <div class="detail-row">
-                    <div class="detail-label">Payment Method:</div>
+                    <div class="detail-label">Reward Choice:</div>
                     <div class="detail-value">${(submission.payment_method || '').toUpperCase()}</div>
                 </div>
                 <div class="detail-row">
-                    <div class="detail-label">Payment Handle:</div>
+                    <div class="detail-label">Delivery Email:</div>
                     <div class="detail-value">${submission.payment_handle || ''}</div>
                 </div>
                 <div class="detail-row">
@@ -1759,7 +1757,7 @@
                 }
 
                 // Create CSV content
-                let csv = 'ID,Payment Method,Payment Handle,Review Link,Status,Award Amount,User Email,Created At,Awarded At,Paid At\n';
+                let csv = 'ID,Reward Choice,Delivery Email,Review Link,Status,Award Amount,User Email,Created At,Awarded At,Paid At\n';
 
                 data.forEach(row => {
                     const fields = [

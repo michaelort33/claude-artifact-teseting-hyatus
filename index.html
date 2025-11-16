@@ -1125,11 +1125,11 @@
             }
 
             .subs-table tbody td:nth-child(2):before {
-                content: "Payment";
+                content: "Reward";
             }
 
             .subs-table tbody td:nth-child(3):before {
-                content: "Handle";
+                content: "Delivery";
             }
 
             .subs-table tbody td:nth-child(4):before {
@@ -1639,6 +1639,22 @@
             background: #fff4e5;
             color: #b06f00;
         }
+
+        /* New gift reward pill styles */
+        .pill.amazon {
+            background: #fff7e6;
+            color: #ff9900;
+        }
+
+        .pill.starbucks {
+            background: #e6f4ea;
+            color: #00754a;
+        }
+
+        .pill.surprise {
+            background: #f3e5f5;
+            color: #7b1fa2;
+        }
     </style>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
@@ -1679,7 +1695,7 @@
                 style="margin-top: 12px; background: rgba(231, 76, 60, 0.1); padding: 10px; border-radius: 8px; border: 1px solid rgba(231, 76, 60, 0.3); color: #e74c3c; display: none;">
                 <strong>⚠️ Review Account Requirements:</strong> Reviews must be left from an established Google account
                 with a history of giving reviews. New accounts or accounts without review history will have their
-                reviews removed by Google and will NOT be accepted for payment.
+                reviews removed by Google and will NOT be accepted for reward.
             </p>
             <p class="mobile-optional-signin" style="margin-top: 10px; font-size: 13px; opacity: 0.8; display: none;">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
@@ -1701,30 +1717,26 @@
                 <div class="section">
                     <div class="section-title">
                         <div class="step-number">1</div>
-                        <h2>Payment Method</h2>
+                        <h2>Reward Choice</h2>
                     </div>
                     <div class="payment-methods">
-                        <div class="payment-method" data-method="venmo">
-                            <div>💳</div>
-                            <div>Venmo</div>
+                        <div class="payment-method" data-method="amazon">
+                            <div>🛒</div>
+                            <div>Amazon Gift Card</div>
                         </div>
-                        <div class="payment-method" data-method="paypal">
-                            <div>💰</div>
-                            <div>PayPal</div>
+                        <div class="payment-method" data-method="starbucks">
+                            <div>☕️</div>
+                            <div>Starbucks Gift Card</div>
                         </div>
-                        <div class="payment-method" data-method="cashapp">
-                            <div>💵</div>
-                            <div>Cash App</div>
-                        </div>
-                        <div class="payment-method" data-method="booking">
-                            <div>🏨</div>
-                            <div>Booking Platform Refund</div>
+                        <div class="payment-method" data-method="surprise">
+                            <div>🎁</div>
+                            <div>Surprise Gift</div>
                         </div>
                     </div>
                     <div class="form-group">
-                        <label for="paymentHandle" id="paymentLabel">Select a payment method above</label>
+                        <label for="paymentHandle" id="paymentLabel">Delivery Email</label>
                         <input type="text" id="paymentHandle" name="paymentHandle" required
-                            placeholder="Select payment method first" disabled>
+                            placeholder="name@example.com" disabled>
                     </div>
                 </div>
 
@@ -1823,10 +1835,10 @@
         </div>
 
         <div class="success-message" id="successMessage">
-            <div class="success-icon">💰</div>
+            <div class="success-icon">🎁</div>
             <h2>Thank You! <span class="success-best">You're the Best!</span></h2>
             <p>Your <span id="successRewardAmount">$10</span> reward claim has been submitted successfully.</p>
-            <p>We'll process your payment within 24-48 hours.</p>
+            <p>We'll email your gift within 24-48 hours.</p>
             <div style="margin-top: 18px; display: flex; gap: 10px; justify-content: center;">
                 <button class="btn-primary-small" id="viewMySubsBtn">View My Submissions</button>
                 <button class="btn-secondary-small" id="backHomeBtn">Back to Home</button>
