@@ -1,0 +1,1 @@
+INSERT INTO "public"."admins" ("email", "created_at") VALUES ('aahim7406@gmail.com', '2025-08-24 07:46:17.539661+00'), ('michaelort@hyatus.com', '2025-08-21 05:08:36.269305+00'), ('uri@deepersignals.com', '2025-08-24 09:08:24.349049+00');
