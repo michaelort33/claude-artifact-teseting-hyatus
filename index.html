@@ -23,11 +23,11 @@
     <meta name="Claude-Web" content="nofollow">
     
     <link rel="icon" type="image/svg+xml"
-        href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Ccircle cx='8' cy='8' r='8' fill='%23D97757'/%3E%3Ctext x='8' y='11' text-anchor='middle' font-size='8' fill='white'%3E%E2%9C%A8%3C/text%3E%3C/svg%3E">
+        href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Ccircle cx='8' cy='8' r='8' fill='%23722F37'/%3E%3Ctext x='8' y='11' text-anchor='middle' font-size='7' fill='%23D4A574'%3E%E2%9C%A8%3C/text%3E%3C/svg%3E">
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet">
     
     <style>
         * {
@@ -36,61 +36,87 @@
             box-sizing: border-box;
         }
 
+        :root {
+            --wine: #722F37;
+            --wine-dark: #5A252C;
+            --wine-light: #8B4049;
+            --gold: #C4956A;
+            --gold-light: #D4B896;
+            --gold-pale: #E8DBC8;
+            --cream: #FAF6F1;
+            --cream-warm: #F5EDE3;
+            --cream-dark: #EDE4D8;
+            --sage: #7A8B6E;
+            --sage-light: #B8C4AD;
+            --charcoal: #2C2826;
+            --charcoal-light: #4A4542;
+            --text: #2C2826;
+            --text-secondary: #6B635B;
+            --text-muted: #9A928A;
+            --border: rgba(114, 47, 55, 0.12);
+            --border-gold: rgba(196, 149, 106, 0.3);
+            --shadow-soft: 0 4px 20px rgba(44, 40, 38, 0.08);
+            --shadow-medium: 0 8px 40px rgba(44, 40, 38, 0.12);
+            --shadow-strong: 0 16px 64px rgba(44, 40, 38, 0.16);
+        }
+
+        ::selection {
+            background: var(--wine);
+            color: var(--gold-pale);
+        }
+
         html {
             scroll-behavior: smooth;
         }
 
-        :root {
-            --primary: #D97757;
-            --primary-light: #E8A592;
-            --primary-soft: rgba(217, 119, 87, 0.1);
-            --secondary: #8B5A3C;
-            --accent: #C4A67C;
-            --accent-light: #E5D4BC;
-            --sage: #7D9A78;
-            --sage-light: #C5D5C3;
-            --cream: #FAF8F5;
-            --cream-dark: #F0EBE3;
-            --white: #FFFFFF;
-            --text: #3D3833;
-            --text-secondary: #6B635B;
-            --text-muted: #9A938A;
-            --border: rgba(61, 56, 51, 0.1);
-            --border-strong: rgba(61, 56, 51, 0.15);
-            --shadow-sm: 0 1px 2px rgba(61, 56, 51, 0.06);
-            --shadow: 0 4px 16px rgba(61, 56, 51, 0.08);
-            --shadow-lg: 0 8px 32px rgba(61, 56, 51, 0.12);
-        }
-
-        ::selection {
-            background: var(--primary);
-            color: white;
-        }
-
         body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
             background: var(--cream);
             color: var(--text);
             min-height: 100vh;
             min-height: 100dvh;
-            padding: 90px 20px 40px 20px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
             line-height: 1.6;
             -webkit-font-smoothing: antialiased;
             position: relative;
+            overflow-x: hidden;
         }
 
-        .container {
-            max-width: 540px;
-            width: 100%;
-            background: var(--white);
-            border-radius: 20px;
-            box-shadow: var(--shadow-lg);
-            border: 1px solid var(--border);
-            overflow: hidden;
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                radial-gradient(ellipse 80% 50% at 20% 40%, rgba(196, 149, 106, 0.08) 0%, transparent 50%),
+                radial-gradient(ellipse 60% 40% at 80% 20%, rgba(114, 47, 55, 0.06) 0%, transparent 50%),
+                radial-gradient(ellipse 50% 60% at 60% 80%, rgba(122, 139, 110, 0.05) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        body::after {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23722F37' fill-opacity='0.02'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+            pointer-events: none;
+            z-index: 0;
+            opacity: 0.5;
+        }
+
+        .page-wrapper {
             position: relative;
+            z-index: 1;
+            padding: 100px 24px 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
         }
 
         .topbar {
@@ -98,166 +124,257 @@
             top: 0;
             left: 0;
             right: 0;
-            height: 60px;
-            background: var(--white);
+            height: 72px;
+            background: rgba(250, 246, 241, 0.85);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
             z-index: 1200;
             border-bottom: 1px solid var(--border);
+            animation: slideDown 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        @keyframes slideDown {
+            from { transform: translateY(-100%); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
         }
 
         .topbar-content {
-            max-width: 1080px;
+            max-width: 1200px;
             margin: 0 auto;
-            height: 60px;
+            height: 72px;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 0 20px;
+            padding: 0 32px;
         }
 
         .brand {
             display: flex;
             align-items: center;
-            gap: 10px;
-            font-weight: 600;
-            font-size: 15px;
-            color: var(--text);
-            letter-spacing: -0.01em;
+            gap: 14px;
+            animation: fadeIn 0.8s 0.2s cubic-bezier(0.16, 1, 0.3, 1) both;
         }
 
-        .brand-badge {
-            width: 32px;
-            height: 32px;
-            border-radius: 8px;
-            background: var(--primary);
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .brand-mark {
+            width: 42px;
+            height: 42px;
+            background: linear-gradient(135deg, var(--wine) 0%, var(--wine-dark) 100%);
+            border-radius: 12px;
             display: flex;
             align-items: center;
             justify-content: center;
+            box-shadow: 0 4px 12px rgba(114, 47, 55, 0.25);
         }
 
-        .brand-badge svg {
-            width: 18px;
-            height: 18px;
-            color: white;
+        .brand-mark svg {
+            width: 22px;
+            height: 22px;
+            color: var(--gold);
+        }
+
+        .brand-text {
+            font-family: 'Instrument Serif', Georgia, serif;
+            font-size: 20px;
+            color: var(--charcoal);
+            letter-spacing: -0.02em;
         }
 
         .topbar-actions {
             display: flex;
-            gap: 8px;
+            gap: 12px;
+            animation: fadeIn 0.8s 0.3s cubic-bezier(0.16, 1, 0.3, 1) both;
         }
 
         .topbar-actions a {
             text-decoration: none;
             font-weight: 500;
             color: var(--text-secondary);
-            padding: 8px 14px;
-            border-radius: 8px;
-            background: var(--cream);
-            transition: all 0.2s ease;
+            padding: 10px 18px;
+            border-radius: 10px;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
             display: flex;
             align-items: center;
-            gap: 6px;
+            gap: 8px;
             font-size: 14px;
-            border: 1px solid var(--border);
+            border: 1px solid transparent;
         }
 
         .topbar-actions a:hover {
-            background: var(--cream-dark);
-            color: var(--text);
+            color: var(--wine);
+            background: rgba(114, 47, 55, 0.06);
+            border-color: var(--border);
         }
 
-        .header {
-            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
-            color: white;
-            padding: 40px 32px;
-            text-align: center;
+        .container {
+            max-width: 520px;
+            width: 100%;
+            animation: containerReveal 0.8s 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
+        }
+
+        @keyframes containerReveal {
+            from { opacity: 0; transform: translateY(30px) scale(0.98); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        .card {
+            background: white;
+            border-radius: 24px;
+            box-shadow: var(--shadow-strong);
+            border: 1px solid rgba(255, 255, 255, 0.8);
+            overflow: hidden;
             position: relative;
         }
 
-        .header-icon {
-            width: 56px;
-            height: 56px;
-            background: rgba(255, 255, 255, 0.2);
-            border-radius: 14px;
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--wine), var(--gold), var(--wine));
+            background-size: 200% 100%;
+            animation: shimmer 3s ease-in-out infinite;
+        }
+
+        @keyframes shimmer {
+            0%, 100% { background-position: 200% 0; }
+            50% { background-position: -200% 0; }
+        }
+
+        .header {
+            background: linear-gradient(135deg, var(--wine) 0%, var(--wine-dark) 100%);
+            color: white;
+            padding: 48px 40px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm29 22c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zM32 63c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm57-13c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-9-21c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM60 91c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM35 41c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2z' fill='%23ffffff' fill-opacity='0.03'/%3E%3C/svg%3E");
+            pointer-events: none;
+        }
+
+        .header-badge {
+            width: 64px;
+            height: 64px;
+            background: rgba(255, 255, 255, 0.12);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
             display: flex;
             align-items: center;
             justify-content: center;
-            margin: 0 auto 16px;
+            margin: 0 auto 20px;
+            animation: float 4s ease-in-out infinite;
         }
 
-        .header-icon svg {
-            width: 28px;
-            height: 28px;
-            color: white;
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-6px); }
+        }
+
+        .header-badge svg {
+            width: 32px;
+            height: 32px;
+            color: var(--gold);
         }
 
         .header h1 {
-            font-size: 26px;
-            margin-bottom: 10px;
-            font-weight: 700;
+            font-family: 'Instrument Serif', Georgia, serif;
+            font-size: 32px;
+            margin-bottom: 12px;
+            font-weight: 400;
             color: white;
-            line-height: 1.25;
+            line-height: 1.2;
             letter-spacing: -0.02em;
         }
 
         .header p {
-            opacity: 0.9;
+            opacity: 0.85;
             font-size: 15px;
             font-weight: 400;
-            line-height: 1.5;
-            max-width: 380px;
+            line-height: 1.6;
+            max-width: 340px;
             margin: 0 auto;
+            color: var(--gold-pale);
         }
 
         .form-container {
-            padding: 32px;
+            padding: 40px;
             position: relative;
         }
 
         .section {
-            margin-bottom: 32px;
+            margin-bottom: 36px;
+            animation: sectionReveal 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
+        }
+
+        .section:nth-child(1) { animation-delay: 0.5s; }
+        .section:nth-child(2) { animation-delay: 0.6s; }
+
+        @keyframes sectionReveal {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         .section:last-of-type {
             margin-bottom: 0;
         }
 
-        .section-title {
+        .section-header {
             display: flex;
             align-items: center;
             margin-bottom: 20px;
-            gap: 12px;
+            gap: 14px;
         }
 
-        .step-number {
-            background: var(--primary);
-            color: white;
-            width: 28px;
-            height: 28px;
-            border-radius: 8px;
+        .step-indicator {
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, var(--wine) 0%, var(--wine-dark) 100%);
+            color: var(--gold);
+            border-radius: 10px;
             display: flex;
             align-items: center;
             justify-content: center;
             font-weight: 600;
-            font-size: 13px;
+            font-size: 14px;
             flex-shrink: 0;
+            box-shadow: 0 2px 8px rgba(114, 47, 55, 0.2);
         }
 
-        .section-title h2 {
-            font-size: 16px;
-            font-weight: 600;
-            color: var(--text);
+        .section-title {
+            font-family: 'Instrument Serif', Georgia, serif;
+            font-size: 20px;
+            font-weight: 400;
+            color: var(--charcoal);
+            letter-spacing: -0.01em;
         }
 
         .form-group {
-            margin-bottom: 16px;
+            margin-bottom: 18px;
         }
 
         label {
             display: block;
-            margin-bottom: 6px;
-            color: var(--text);
+            margin-bottom: 8px;
+            color: var(--text-secondary);
             font-weight: 500;
-            font-size: 14px;
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
         }
 
         input[type="text"],
@@ -266,175 +383,215 @@
         input[type="password"],
         select {
             width: 100%;
-            padding: 12px 14px;
-            border: 1px solid var(--border-strong);
-            background: var(--white);
+            padding: 14px 18px;
+            border: 1px solid var(--border);
+            background: var(--cream);
             color: var(--text);
-            border-radius: 10px;
+            border-radius: 12px;
             font-size: 15px;
-            font-family: 'Inter', sans-serif;
+            font-family: 'DM Sans', sans-serif;
             font-weight: 400;
-            transition: all 0.2s ease;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        input:hover {
+            border-color: var(--border-gold);
         }
 
         input:focus,
         select:focus {
             outline: none;
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px var(--primary-soft);
+            border-color: var(--gold);
+            background: white;
+            box-shadow: 0 0 0 4px rgba(196, 149, 106, 0.15);
         }
 
         input::placeholder {
             color: var(--text-muted);
         }
 
-        .payment-methods {
+        .gift-options {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 10px;
-            margin-bottom: 16px;
+            gap: 12px;
+            margin-bottom: 20px;
         }
 
-        .payment-method {
-            padding: 16px 12px;
-            border: 1px solid var(--border-strong);
-            border-radius: 12px;
+        .gift-option {
+            padding: 20px 14px;
+            border: 1px solid var(--border);
+            border-radius: 16px;
             text-align: center;
             cursor: pointer;
-            transition: all 0.2s ease;
-            background: var(--white);
-            color: var(--text);
-            font-weight: 500;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            background: white;
+            position: relative;
+            overflow: hidden;
         }
 
-        .payment-method:hover {
-            border-color: var(--primary-light);
-            background: var(--primary-soft);
+        .gift-option::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(114, 47, 55, 0.03) 0%, rgba(196, 149, 106, 0.05) 100%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
         }
 
-        .payment-method.selected {
-            border-color: var(--primary);
-            background: var(--primary-soft);
-            box-shadow: 0 0 0 1px var(--primary);
+        .gift-option:hover {
+            border-color: var(--gold);
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-soft);
         }
 
-        .payment-method-icon {
-            width: 36px;
-            height: 36px;
-            margin: 0 auto 8px;
-            background: var(--cream);
-            border-radius: 10px;
+        .gift-option:hover::before {
+            opacity: 1;
+        }
+
+        .gift-option.selected {
+            border-color: var(--wine);
+            background: linear-gradient(135deg, rgba(114, 47, 55, 0.04) 0%, rgba(196, 149, 106, 0.06) 100%);
+            box-shadow: 0 0 0 3px rgba(114, 47, 55, 0.1);
+        }
+
+        .gift-icon {
+            width: 44px;
+            height: 44px;
+            margin: 0 auto 10px;
+            background: var(--cream-warm);
+            border-radius: 12px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 18px;
+            font-size: 22px;
+            transition: all 0.3s ease;
+            position: relative;
+            z-index: 1;
         }
 
-        .payment-method.selected .payment-method-icon {
-            background: var(--primary-light);
+        .gift-option.selected .gift-icon {
+            background: var(--wine);
+            box-shadow: 0 4px 12px rgba(114, 47, 55, 0.25);
         }
 
-        .payment-method-label {
+        .gift-option.selected .gift-icon span {
+            filter: grayscale(1) brightness(2);
+        }
+
+        .gift-label {
             font-size: 12px;
+            font-weight: 500;
+            color: var(--text-secondary);
             line-height: 1.3;
-            color: var(--text-secondary);
+            position: relative;
+            z-index: 1;
         }
 
-        .payment-method.selected .payment-method-label {
-            color: var(--text);
+        .gift-option.selected .gift-label {
+            color: var(--wine);
+            font-weight: 600;
         }
 
-        .tutorial-box {
-            background: var(--cream);
-            border-radius: 12px;
-            padding: 16px;
-            margin-bottom: 16px;
+        .help-toggle {
+            background: var(--cream-warm);
             border: 1px solid var(--border);
-        }
-
-        .tutorial-toggle {
-            background: var(--white);
-            border: 1px solid var(--border-strong);
             color: var(--text-secondary);
-            padding: 10px 14px;
-            border-radius: 8px;
+            padding: 12px 18px;
+            border-radius: 10px;
             cursor: pointer;
             font-size: 13px;
             font-weight: 500;
-            font-family: 'Inter', sans-serif;
-            margin-bottom: 12px;
-            transition: all 0.2s ease;
+            font-family: 'DM Sans', sans-serif;
+            margin-bottom: 16px;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 10px;
         }
 
-        .tutorial-toggle:hover {
-            background: var(--cream);
-            border-color: var(--primary-light);
+        .help-toggle:hover {
+            background: var(--cream-dark);
+            border-color: var(--gold);
+            color: var(--wine);
         }
 
-        .tutorial-content {
+        .help-toggle svg {
+            width: 16px;
+            height: 16px;
+            opacity: 0.7;
+        }
+
+        .help-content {
             display: none;
+            background: var(--cream-warm);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border: 1px solid var(--border);
         }
 
-        .tutorial-content.show {
+        .help-content.show {
             display: block;
-            animation: fadeIn 0.3s ease;
+            animation: expandIn 0.4s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(-8px); }
-            to { opacity: 1; transform: translateY(0); }
+        @keyframes expandIn {
+            from { opacity: 0; transform: scaleY(0.9); transform-origin: top; }
+            to { opacity: 1; transform: scaleY(1); }
         }
 
-        .tutorial-title {
-            font-weight: 600;
-            margin-bottom: 12px;
-            color: var(--text);
-            font-size: 14px;
+        .help-title {
+            font-family: 'Instrument Serif', Georgia, serif;
+            font-weight: 400;
+            margin-bottom: 14px;
+            color: var(--charcoal);
+            font-size: 16px;
         }
 
-        .demo-browser {
-            background: var(--white);
-            border-radius: 10px;
-            box-shadow: var(--shadow-sm);
+        .demo-window {
+            background: white;
+            border-radius: 12px;
+            box-shadow: var(--shadow-soft);
             border: 1px solid var(--border);
             overflow: hidden;
         }
 
-        .browser-bar {
+        .demo-bar {
             background: var(--cream-dark);
-            padding: 10px 12px;
+            padding: 10px 14px;
             display: flex;
             align-items: center;
             gap: 6px;
             border-bottom: 1px solid var(--border);
         }
 
-        .browser-dot {
+        .demo-dot {
             width: 10px;
             height: 10px;
             border-radius: 50%;
         }
 
-        .browser-dot:nth-child(1) { background: #E5746C; }
-        .browser-dot:nth-child(2) { background: #E5C36C; }
-        .browser-dot:nth-child(3) { background: #7D9A78; }
+        .demo-dot:nth-child(1) { background: #E5746C; }
+        .demo-dot:nth-child(2) { background: #E5C36C; }
+        .demo-dot:nth-child(3) { background: var(--sage); }
 
-        .browser-content {
-            padding: 14px;
-            height: 140px;
+        .demo-body {
+            padding: 16px;
+            height: 130px;
             position: relative;
             overflow: hidden;
         }
 
         .demo-step {
             position: absolute;
-            width: calc(100% - 28px);
+            width: calc(100% - 32px);
             opacity: 0;
             animation: demoSlide 9s infinite;
             font-size: 13px;
+            color: var(--text);
         }
 
         .demo-step:nth-child(1) { animation-delay: 0s; }
@@ -443,109 +600,114 @@
 
         @keyframes demoSlide {
             0%, 33.33% { opacity: 0; }
-            33.34%, 66.66% { opacity: 1; }
-            66.67%, 100% { opacity: 0; }
+            5%, 28% { opacity: 1; }
+            33.34%, 100% { opacity: 0; }
         }
 
-        .demo-review {
+        .demo-card {
             background: var(--cream);
-            padding: 10px;
+            padding: 12px;
             border-radius: 8px;
-            margin: 8px 0;
-            font-size: 13px;
+            margin: 10px 0;
+            font-size: 12px;
         }
 
-        .demo-button {
-            background: var(--accent-light);
-            color: var(--text);
-            padding: 6px 12px;
+        .demo-btn {
+            background: var(--gold-pale);
+            color: var(--charcoal);
+            padding: 6px 14px;
             border-radius: 6px;
             display: inline-block;
-            margin-top: 6px;
-            font-size: 12px;
+            margin-top: 8px;
+            font-size: 11px;
             font-weight: 500;
         }
 
-        .and-divider {
+        .divider {
             text-align: center;
-            margin: 20px 0;
+            margin: 24px 0;
             color: var(--text-muted);
-            font-weight: 600;
-            font-size: 12px;
+            font-size: 11px;
             position: relative;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 12px;
+            gap: 16px;
             text-transform: uppercase;
-            letter-spacing: 0.05em;
+            letter-spacing: 0.1em;
         }
 
-        .and-divider::before,
-        .and-divider::after {
+        .divider::before,
+        .divider::after {
             content: '';
             flex: 1;
             height: 1px;
-            background: var(--border-strong);
+            background: linear-gradient(90deg, transparent, var(--border-gold), transparent);
         }
 
-        .file-upload {
+        .upload-zone {
             position: relative;
-            border: 1px dashed var(--border-strong);
-            border-radius: 12px;
-            padding: 28px 20px;
+            border: 2px dashed var(--border);
+            border-radius: 16px;
+            padding: 32px 24px;
             text-align: center;
             cursor: pointer;
-            transition: all 0.2s ease;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
             background: var(--cream);
-            min-height: 120px;
+            min-height: 130px;
             display: flex;
             align-items: center;
             justify-content: center;
         }
 
-        .file-upload:hover {
-            border-color: var(--primary);
-            background: var(--primary-soft);
+        .upload-zone:hover {
+            border-color: var(--gold);
+            background: linear-gradient(135deg, var(--cream) 0%, rgba(196, 149, 106, 0.08) 100%);
         }
 
-        .file-upload.is-dragover {
-            border-color: var(--primary);
-            background: var(--primary-soft);
+        .upload-zone.is-dragover {
+            border-color: var(--wine);
+            background: linear-gradient(135deg, rgba(114, 47, 55, 0.05) 0%, rgba(196, 149, 106, 0.1) 100%);
             border-style: solid;
+            transform: scale(1.01);
         }
 
-        .file-upload.has-file {
+        .upload-zone.has-file {
             border-color: var(--sage);
             border-style: solid;
-            background: var(--sage-light);
+            background: linear-gradient(135deg, rgba(122, 139, 110, 0.08) 0%, rgba(184, 196, 173, 0.1) 100%);
         }
 
-        .dz-content {
+        .upload-content {
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 8px;
+            gap: 10px;
         }
 
-        .dz-icon {
-            width: 40px;
-            height: 40px;
+        .upload-icon {
+            width: 44px;
+            height: 44px;
             color: var(--text-muted);
+            transition: all 0.3s ease;
         }
 
-        .file-upload:hover .dz-icon,
-        .file-upload.is-dragover .dz-icon {
-            color: var(--primary);
+        .upload-zone:hover .upload-icon {
+            color: var(--gold);
+            transform: translateY(-2px);
         }
 
-        .dz-title {
+        .upload-zone.has-file .upload-icon {
+            color: var(--sage);
+        }
+
+        .upload-title {
             font-size: 14px;
             font-weight: 500;
             color: var(--text);
         }
 
-        .dz-hint {
+        .upload-hint {
             font-size: 13px;
             color: var(--text-muted);
         }
@@ -557,33 +719,50 @@
             font-size: 13px;
         }
 
-        .submit-button {
+        .submit-btn {
             width: 100%;
-            padding: 14px 20px;
-            background: var(--primary);
+            padding: 16px 24px;
+            background: linear-gradient(135deg, var(--wine) 0%, var(--wine-dark) 100%);
             color: white;
             border: none;
-            border-radius: 12px;
+            border-radius: 14px;
             font-size: 15px;
             font-weight: 600;
-            font-family: 'Inter', sans-serif;
+            font-family: 'DM Sans', sans-serif;
             cursor: pointer;
-            transition: all 0.2s ease;
-            box-shadow: var(--shadow);
-            margin-top: 24px;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            box-shadow: 0 4px 16px rgba(114, 47, 55, 0.3);
+            margin-top: 28px;
+            position: relative;
+            overflow: hidden;
+            animation: sectionReveal 0.6s 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
         }
 
-        .submit-button:hover {
-            background: var(--secondary);
-            transform: translateY(-1px);
-            box-shadow: var(--shadow-lg);
+        .submit-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.15), transparent);
+            transition: left 0.5s ease;
         }
 
-        .submit-button:active {
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(114, 47, 55, 0.4);
+        }
+
+        .submit-btn:hover::before {
+            left: 100%;
+        }
+
+        .submit-btn:active {
             transform: translateY(0);
         }
 
-        .submit-button:disabled {
+        .submit-btn:disabled {
             opacity: 0.6;
             cursor: not-allowed;
             transform: none;
@@ -591,61 +770,73 @@
 
         .footer-note {
             text-align: center;
-            margin-top: 16px;
+            margin-top: 18px;
             font-size: 13px;
             color: var(--text-muted);
             font-weight: 400;
+            animation: sectionReveal 0.6s 0.8s cubic-bezier(0.16, 1, 0.3, 1) both;
         }
 
         .success-message {
             display: none;
-            padding: 48px 32px;
+            padding: 56px 40px;
             text-align: center;
             position: relative;
-            overflow: hidden;
         }
 
         .success-message.show {
             display: block;
-            animation: fadeIn 0.4s ease;
+            animation: successReveal 0.6s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
-        .success-icon {
-            width: 64px;
-            height: 64px;
-            background: var(--sage-light);
+        @keyframes successReveal {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        .success-badge {
+            width: 72px;
+            height: 72px;
+            background: linear-gradient(135deg, var(--sage-light) 0%, rgba(122, 139, 110, 0.2) 100%);
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            margin: 0 auto 20px;
+            margin: 0 auto 24px;
+            animation: successPulse 2s ease-in-out infinite;
         }
 
-        .success-icon svg {
-            width: 32px;
-            height: 32px;
+        @keyframes successPulse {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(122, 139, 110, 0.3); }
+            50% { box-shadow: 0 0 0 12px rgba(122, 139, 110, 0); }
+        }
+
+        .success-badge svg {
+            width: 36px;
+            height: 36px;
             color: var(--sage);
         }
 
         .success-message h2 {
-            font-size: 22px;
-            margin-bottom: 10px;
-            color: var(--text);
-            font-weight: 700;
+            font-family: 'Instrument Serif', Georgia, serif;
+            font-size: 28px;
+            margin-bottom: 12px;
+            color: var(--charcoal);
+            font-weight: 400;
         }
 
         .success-message p {
             color: var(--text-secondary);
             font-size: 15px;
-            margin-bottom: 6px;
+            margin-bottom: 8px;
         }
 
         .error-message {
-            background: #FEF2F2;
-            border: 1px solid #FECACA;
-            padding: 12px 16px;
-            border-radius: 10px;
-            margin-bottom: 20px;
+            background: linear-gradient(135deg, #FEF2F2 0%, #FEE2E2 100%);
+            border: 1px solid rgba(185, 28, 28, 0.2);
+            padding: 14px 18px;
+            border-radius: 12px;
+            margin-bottom: 24px;
             color: #B91C1C;
             font-size: 14px;
             font-weight: 500;
@@ -654,7 +845,13 @@
 
         .error-message.show {
             display: block;
-            animation: fadeIn 0.3s ease;
+            animation: shake 0.5s cubic-bezier(0.36, 0.07, 0.19, 0.97);
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            10%, 30%, 50%, 70%, 90% { transform: translateX(-4px); }
+            20%, 40%, 60%, 80% { transform: translateX(4px); }
         }
 
         #reviewScreenshot {
@@ -668,8 +865,8 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(61, 56, 51, 0.4);
-            backdrop-filter: blur(4px);
+            background: rgba(44, 40, 38, 0.6);
+            backdrop-filter: blur(8px);
             z-index: 1500;
             justify-content: center;
             align-items: center;
@@ -680,78 +877,86 @@
         }
 
         .auth-content {
-            background: var(--white);
+            background: white;
             color: var(--text);
-            padding: 32px;
-            border-radius: 16px;
+            padding: 40px;
+            border-radius: 24px;
             max-width: 400px;
             width: 90%;
             border: 1px solid var(--border);
-            box-shadow: var(--shadow-lg);
+            box-shadow: var(--shadow-strong);
             position: relative;
+            animation: modalReveal 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        @keyframes modalReveal {
+            from { opacity: 0; transform: scale(0.95) translateY(20px); }
+            to { opacity: 1; transform: scale(1) translateY(0); }
         }
 
         .auth-content h2 {
+            font-family: 'Instrument Serif', Georgia, serif;
             text-align: center;
-            margin-bottom: 24px;
-            color: var(--text);
-            font-weight: 700;
-            font-size: 20px;
+            margin-bottom: 28px;
+            color: var(--charcoal);
+            font-weight: 400;
+            font-size: 24px;
         }
 
         .modal-close-btn {
             position: absolute;
-            top: 16px;
-            right: 16px;
+            top: 20px;
+            right: 20px;
             background: var(--cream);
             border: 1px solid var(--border);
             font-size: 18px;
             cursor: pointer;
             color: var(--text-secondary);
-            border-radius: 8px;
-            width: 32px;
-            height: 32px;
+            border-radius: 10px;
+            width: 36px;
+            height: 36px;
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: all 0.2s ease;
+            transition: all 0.3s ease;
         }
 
         .modal-close-btn:hover {
             background: var(--cream-dark);
-            color: var(--text);
+            color: var(--wine);
         }
 
         .auth-actions-row {
             display: flex;
             justify-content: center;
-            gap: 16px;
-            margin-top: 16px;
+            gap: 20px;
+            margin-top: 20px;
         }
 
         .link-btn {
             background: none;
             border: none;
-            color: var(--primary);
+            color: var(--wine);
             cursor: pointer;
             font-size: 13px;
             font-weight: 500;
-            font-family: 'Inter', sans-serif;
+            font-family: 'DM Sans', sans-serif;
             padding: 4px;
             transition: color 0.2s ease;
         }
 
         .link-btn:hover {
-            color: var(--secondary);
+            color: var(--wine-dark);
+            text-decoration: underline;
         }
 
         .profile-popover {
             position: fixed;
-            top: 68px;
-            right: 20px;
-            background: var(--white);
-            border-radius: 12px;
-            box-shadow: var(--shadow-lg);
+            top: 80px;
+            right: 32px;
+            background: white;
+            border-radius: 16px;
+            box-shadow: var(--shadow-strong);
             border: 1px solid var(--border);
             width: 280px;
             z-index: 1300;
@@ -760,65 +965,66 @@
         }
 
         .profile-header {
-            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            background: linear-gradient(135deg, var(--wine) 0%, var(--wine-dark) 100%);
             color: white;
-            padding: 20px;
+            padding: 24px;
         }
 
         .profile-body {
-            padding: 16px 20px;
+            padding: 18px 24px;
         }
 
         .profile-row {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin: 8px 0;
+            margin: 10px 0;
             color: var(--text);
             font-weight: 500;
             font-size: 14px;
         }
 
         .profile-actions {
-            padding: 16px 20px;
+            padding: 18px 24px;
             border-top: 1px solid var(--border);
             display: flex;
-            gap: 10px;
+            gap: 12px;
         }
 
         .btn-secondary-small {
             background: var(--cream);
             color: var(--text);
-            border: 1px solid var(--border-strong);
-            border-radius: 8px;
-            padding: 10px 14px;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 10px 16px;
             font-size: 13px;
             font-weight: 500;
-            font-family: 'Inter', sans-serif;
+            font-family: 'DM Sans', sans-serif;
             cursor: pointer;
-            transition: all 0.2s ease;
+            transition: all 0.3s ease;
         }
 
         .btn-secondary-small:hover {
-            border-color: var(--primary-light);
-            background: var(--primary-soft);
+            border-color: var(--gold);
+            background: var(--cream-warm);
         }
 
         .btn-primary-small {
-            background: var(--primary);
+            background: linear-gradient(135deg, var(--wine) 0%, var(--wine-dark) 100%);
             color: white;
             border: none;
-            border-radius: 8px;
-            padding: 10px 14px;
+            border-radius: 10px;
+            padding: 10px 16px;
             font-size: 13px;
             font-weight: 500;
-            font-family: 'Inter', sans-serif;
+            font-family: 'DM Sans', sans-serif;
             cursor: pointer;
-            transition: all 0.2s ease;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(114, 47, 55, 0.2);
         }
 
         .btn-primary-small:hover {
-            background: var(--secondary);
+            box-shadow: 0 4px 12px rgba(114, 47, 55, 0.3);
         }
 
         .submissions-modal {
@@ -828,8 +1034,8 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(61, 56, 51, 0.4);
-            backdrop-filter: blur(4px);
+            background: rgba(44, 40, 38, 0.6);
+            backdrop-filter: blur(8px);
             z-index: 1400;
             justify-content: center;
             align-items: center;
@@ -840,31 +1046,33 @@
         }
 
         .submissions-content {
-            background: var(--white);
+            background: white;
             color: var(--text);
-            padding: 28px;
-            border-radius: 16px;
+            padding: 32px;
+            border-radius: 20px;
             max-width: 720px;
             width: 94%;
             max-height: 85vh;
             overflow-y: auto;
             border: 1px solid var(--border);
-            box-shadow: var(--shadow-lg);
+            box-shadow: var(--shadow-strong);
+            animation: modalReveal 0.4s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
         .submissions-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 20px;
-            padding-bottom: 16px;
+            margin-bottom: 24px;
+            padding-bottom: 18px;
             border-bottom: 1px solid var(--border);
         }
 
         .submissions-title {
-            font-size: 18px;
-            color: var(--text);
-            font-weight: 600;
+            font-family: 'Instrument Serif', Georgia, serif;
+            font-size: 22px;
+            color: var(--charcoal);
+            font-weight: 400;
         }
 
         .submissions-close {
@@ -873,20 +1081,20 @@
             font-size: 18px;
             cursor: pointer;
             color: var(--text-secondary);
-            border-radius: 8px;
-            padding: 8px 12px;
+            border-radius: 10px;
+            padding: 10px 14px;
             font-weight: 500;
-            transition: all 0.2s ease;
+            transition: all 0.3s ease;
         }
 
         .submissions-close:hover {
-            border-color: var(--primary-light);
-            background: var(--primary-soft);
+            border-color: var(--gold);
+            color: var(--wine);
         }
 
         .subs-table {
             border: 1px solid var(--border);
-            border-radius: 10px;
+            border-radius: 12px;
             overflow: hidden;
         }
 
@@ -897,17 +1105,19 @@
         }
 
         .subs-table thead th {
-            background: var(--cream);
-            padding: 12px 14px;
+            background: var(--cream-warm);
+            padding: 14px 16px;
             text-align: left;
             font-weight: 600;
-            font-size: 13px;
+            font-size: 12px;
             color: var(--text-secondary);
             border-bottom: 1px solid var(--border);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
         }
 
         .subs-table tbody td {
-            padding: 12px 14px;
+            padding: 14px 16px;
             border-top: 1px solid var(--border);
             color: var(--text);
             font-size: 14px;
@@ -918,14 +1128,14 @@
         }
 
         .subs-table tbody tr:hover td {
-            background: var(--primary-soft);
+            background: rgba(196, 149, 106, 0.08);
         }
 
         .handle {
-            font-family: 'Inter', monospace;
-            background: var(--accent-light);
-            color: var(--text);
-            padding: 4px 8px;
+            font-family: 'DM Sans', monospace;
+            background: var(--gold-pale);
+            color: var(--charcoal);
+            padding: 4px 10px;
             border-radius: 6px;
             font-weight: 500;
             font-size: 12px;
@@ -933,29 +1143,34 @@
 
         .pill {
             display: inline-block;
-            padding: 4px 10px;
+            padding: 5px 12px;
             border-radius: 999px;
             font-size: 11px;
             font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
         }
 
-        .pill.amazon { background: #FEF3C7; color: #B45309; }
+        .pill.amazon { background: #FEF3C7; color: #92400E; }
         .pill.starbucks { background: var(--sage-light); color: #3D6635; }
-        .pill.surprise { background: var(--accent-light); color: var(--secondary); }
+        .pill.surprise { background: var(--gold-pale); color: var(--wine); }
         .pill.link { background: var(--cream-dark); color: var(--text-secondary); }
         .pill.screenshot { background: var(--cream-dark); color: var(--text-secondary); }
 
         .status-chip {
             display: inline-block;
-            padding: 4px 10px;
+            padding: 5px 12px;
             border-radius: 999px;
             font-size: 11px;
             font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
         }
 
-        .status-chip.pending { background: #FEF3C7; color: #B45309; }
+        .status-chip.pending { background: #FEF3C7; color: #92400E; }
         .status-chip.awarded { background: var(--sage-light); color: #3D6635; }
-        .status-chip.rejected { background: #FEE2E2; color: #B91C1C; }
+        .status-chip.rejected { background: #FEE2E2; color: #991B1B; }
+        .status-chip.paid { background: #DBEAFE; color: #1E40AF; }
 
         .reset-modal {
             display: none;
@@ -964,8 +1179,8 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(61, 56, 51, 0.4);
-            backdrop-filter: blur(4px);
+            background: rgba(44, 40, 38, 0.6);
+            backdrop-filter: blur(8px);
             z-index: 1000;
             justify-content: center;
             align-items: center;
@@ -976,89 +1191,95 @@
         }
 
         .reset-content {
-            background: var(--white);
+            background: white;
             color: var(--text);
-            padding: 32px;
-            border-radius: 16px;
+            padding: 36px;
+            border-radius: 20px;
             max-width: 400px;
             width: 90%;
             border: 1px solid var(--border);
-            box-shadow: var(--shadow-lg);
+            box-shadow: var(--shadow-strong);
+            animation: modalReveal 0.4s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
         .reset-content h2 {
+            font-family: 'Instrument Serif', Georgia, serif;
             margin-bottom: 16px;
-            color: var(--text);
-            font-weight: 700;
-            font-size: 18px;
+            color: var(--charcoal);
+            font-weight: 400;
+            font-size: 22px;
         }
 
         .reset-content input {
             width: 100%;
-            padding: 12px 14px;
-            margin-bottom: 12px;
-            border: 1px solid var(--border-strong);
-            background: var(--white);
+            padding: 14px 16px;
+            margin-bottom: 14px;
+            border: 1px solid var(--border);
+            background: var(--cream);
             color: var(--text);
-            border-radius: 10px;
-            font-family: 'Inter', sans-serif;
+            border-radius: 12px;
+            font-family: 'DM Sans', sans-serif;
             font-weight: 400;
         }
 
         .reset-button {
             width: 100%;
-            padding: 12px;
-            background: var(--primary);
+            padding: 14px;
+            background: linear-gradient(135deg, var(--wine) 0%, var(--wine-dark) 100%);
             color: white;
             border: none;
-            border-radius: 10px;
+            border-radius: 12px;
             font-size: 15px;
             font-weight: 600;
-            font-family: 'Inter', sans-serif;
+            font-family: 'DM Sans', sans-serif;
             cursor: pointer;
-            transition: all 0.2s ease;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(114, 47, 55, 0.25);
         }
 
         .reset-button:hover {
-            background: var(--secondary);
+            box-shadow: 0 6px 16px rgba(114, 47, 55, 0.35);
         }
 
         @media (max-width: 768px) {
-            body {
-                display: block;
-                padding: 76px 16px 32px 16px;
+            .page-wrapper {
+                padding: 88px 16px 40px;
             }
 
-            .container {
-                border-radius: 16px;
+            .topbar-content {
+                padding: 0 20px;
+            }
+
+            .card {
+                border-radius: 20px;
             }
 
             .header {
-                padding: 32px 24px;
+                padding: 36px 28px;
             }
 
             .header h1 {
-                font-size: 22px;
+                font-size: 26px;
             }
 
             .form-container {
-                padding: 24px;
+                padding: 28px;
             }
 
-            .payment-methods {
+            .gift-options {
                 grid-template-columns: 1fr;
                 gap: 10px;
             }
 
-            .payment-method {
+            .gift-option {
                 display: flex;
                 align-items: center;
-                gap: 14px;
-                padding: 14px 16px;
+                gap: 16px;
+                padding: 16px 18px;
                 text-align: left;
             }
 
-            .payment-method-icon {
+            .gift-icon {
                 margin: 0;
             }
 
@@ -1067,89 +1288,81 @@
             }
 
             .profile-popover {
-                right: 12px;
+                right: 16px;
                 width: 260px;
             }
 
             .submissions-content {
-                padding: 20px;
+                padding: 24px;
             }
         }
 
         @media (max-width: 480px) {
-            body {
-                padding: 72px 12px 24px 12px;
-            }
-
-            .container {
-                border-radius: 14px;
+            .page-wrapper {
+                padding: 80px 12px 32px;
             }
 
             .topbar {
-                height: 56px;
+                height: 64px;
             }
 
             .topbar-content {
-                height: 56px;
+                height: 64px;
+                padding: 0 16px;
             }
 
-            .brand {
-                font-size: 14px;
+            .brand-text {
+                font-size: 17px;
             }
 
-            .brand-badge {
-                width: 28px;
-                height: 28px;
+            .brand-mark {
+                width: 36px;
+                height: 36px;
             }
 
             .header {
-                padding: 28px 20px;
+                padding: 32px 24px;
             }
 
             .header h1 {
-                font-size: 20px;
+                font-size: 24px;
             }
 
             .form-container {
-                padding: 20px;
+                padding: 24px;
             }
 
-            .section-title h2 {
-                font-size: 15px;
+            .section-title {
+                font-size: 18px;
             }
 
-            .step-number {
-                width: 26px;
-                height: 26px;
-                font-size: 12px;
+            .step-indicator {
+                width: 28px;
+                height: 28px;
+                font-size: 13px;
             }
 
-            .submit-button {
-                padding: 14px 18px;
+            .submit-btn {
+                padding: 14px 20px;
                 font-size: 14px;
             }
         }
     </style>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script>
-        console.log('Checking Supabase after load:', typeof window.supabase);
-    </script>
 </head>
 
 <body>
     <div class="topbar">
         <div class="topbar-content">
             <div class="brand">
-                <div class="brand-badge">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <div class="brand-mark">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M20 12v6a2 2 0 01-2 2H6a2 2 0 01-2-2v-6"></path>
-                        <path d="M12 3v12"></path>
-                        <path d="M12 3l4 4"></path>
-                        <path d="M12 3L8 7"></path>
+                        <path d="M12 3v12M12 3l4 4M12 3L8 7"></path>
                         <rect x="2" y="7" width="20" height="5" rx="2"></rect>
                     </svg>
                 </div>
-                <span>Guest Appreciation</span>
+                <span class="brand-text">Guest Appreciation</span>
             </div>
             <div class="topbar-actions">
                 <a href="#" id="userAuthLink">
@@ -1166,151 +1379,152 @@
         </div>
     </div>
 
-    <div class="container">
-        <div class="header">
-            <div class="header-icon">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M20 12v6a2 2 0 01-2 2H6a2 2 0 01-2-2v-6"></path>
-                    <path d="M12 3v12"></path>
-                    <path d="M12 3l4 4"></path>
-                    <path d="M12 3L8 7"></path>
-                    <rect x="2" y="7" width="20" height="5" rx="2"></rect>
-                </svg>
-            </div>
-            <h1>Your Thank-You Gift Awaits</h1>
-            <p>We appreciate your lovely review. Let us know where to send your special thank-you gift.</p>
-        </div>
-
-        <div class="form-container" id="formContainer">
-            <div class="error-message" id="errorMessage"></div>
-
-            <form id="rewardForm">
-                <div class="section">
-                    <div class="section-title">
-                        <div class="step-number">1</div>
-                        <h2>Choose Your Gift</h2>
-                    </div>
-                    <div class="payment-methods">
-                        <div class="payment-method" data-method="amazon">
-                            <div class="payment-method-icon">🛒</div>
-                            <div class="payment-method-label">Amazon Gift Card</div>
-                        </div>
-                        <div class="payment-method" data-method="starbucks">
-                            <div class="payment-method-icon">☕</div>
-                            <div class="payment-method-label">Starbucks Gift Card</div>
-                        </div>
-                        <div class="payment-method" data-method="surprise">
-                            <div class="payment-method-icon">✨</div>
-                            <div class="payment-method-label">Surprise Me</div>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label for="paymentHandle" id="paymentLabel">Delivery Email</label>
-                        <input type="text" id="paymentHandle" name="paymentHandle" required
-                            placeholder="your.email@example.com" disabled>
-                    </div>
-                </div>
-
-                <div class="section">
-                    <div class="section-title">
-                        <div class="step-number">2</div>
-                        <h2>Share Your Review</h2>
-                    </div>
-                    <p style="color: var(--text-secondary); font-size: 14px; margin-bottom: 16px;">
-                        Share your review link and a screenshot to help us verify and send your gift quickly.
-                    </p>
-
-                    <button type="button" class="tutorial-toggle" onclick="toggleTutorial()">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <circle cx="12" cy="12" r="10"></circle>
-                            <path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3"></path>
-                            <line x1="12" y1="17" x2="12.01" y2="17"></line>
+    <div class="page-wrapper">
+        <div class="container">
+            <div class="card">
+                <div class="header">
+                    <div class="header-badge">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M20 12v6a2 2 0 01-2 2H6a2 2 0 01-2-2v-6"></path>
+                            <path d="M12 3v12M12 3l4 4M12 3L8 7"></path>
+                            <rect x="2" y="7" width="20" height="5" rx="2"></rect>
                         </svg>
-                        Need help finding your review?
-                    </button>
-
-                    <div class="tutorial-box tutorial-content" id="tutorialContent">
-                        <div class="tutorial-title">How to Find Your Review Link</div>
-                        <div class="demo-browser">
-                            <div class="browser-bar">
-                                <div class="browser-dot"></div>
-                                <div class="browser-dot"></div>
-                                <div class="browser-dot"></div>
-                            </div>
-                            <div class="browser-content">
-                                <div class="demo-step">
-                                    <strong>Step 1:</strong> Find your review on Google
-                                    <div class="demo-review">
-                                        <div>★★★★★</div>
-                                        <div>"Great service! Highly recommend..."</div>
-                                        <div style="color: var(--text-muted); font-size: 11px;">Your Name</div>
-                                    </div>
-                                </div>
-                                <div class="demo-step">
-                                    <strong>Step 2:</strong> Click the three dots menu (⋮)
-                                    <div class="demo-review">
-                                        <div style="text-align: right;">⋮</div>
-                                    </div>
-                                    <div class="demo-button">Share</div>
-                                </div>
-                                <div class="demo-step">
-                                    <strong>Step 3:</strong> Click "Copy link"
-                                    <div class="demo-button">Copy link</div>
-                                    <div style="margin-top: 8px; color: var(--sage); font-weight: 500; font-size: 12px;">✓ Link copied</div>
-                                </div>
-                            </div>
-                        </div>
                     </div>
-
-                    <div class="form-group">
-                        <label for="reviewLink">Review Link <span style="color: var(--primary);">*</span></label>
-                        <input type="url" id="reviewLink" name="reviewLink" placeholder="https://g.page/r/..." required>
-                    </div>
-
-                    <div class="and-divider"><span>and</span></div>
-
-                    <div class="form-group">
-                        <label>Screenshot <span style="color: var(--primary);">*</span></label>
-                        <div class="file-upload" id="fileUploadArea" role="button" tabindex="0"
-                            aria-label="Upload screenshot of your review">
-                            <div class="dz-content">
-                                <svg class="dz-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <path d="M12 16V4m0 0l-4 4m4-4l4 4" stroke="currentColor" stroke-width="2"
-                                        stroke-linecap="round" stroke-linejoin="round" />
-                                    <path d="M4 14v3a3 3 0 003 3h10a3 3 0 003-3v-3" stroke="currentColor"
-                                        stroke-opacity="0.6" stroke-width="2" stroke-linecap="round" />
-                                </svg>
-                                <div class="dz-title">Drop your screenshot here</div>
-                                <div class="dz-hint">or click to browse</div>
-                                <div class="file-name" id="fileName"></div>
-                            </div>
-                        </div>
-                        <input type="file" id="reviewScreenshot" name="reviewScreenshot" accept="image/*" required>
-                    </div>
+                    <h1>Your Thank-You Gift Awaits</h1>
+                    <p>We appreciate your lovely review. Let us know where to send your special gift.</p>
                 </div>
 
-                <button type="submit" class="submit-button" id="submitButton">
-                    Submit & Get My Gift
-                </button>
+                <div class="form-container" id="formContainer">
+                    <div class="error-message" id="errorMessage"></div>
 
-                <p class="footer-note">
-                    Thank you for being a valued guest.
-                </p>
-            </form>
-        </div>
+                    <form id="rewardForm">
+                        <div class="section">
+                            <div class="section-header">
+                                <div class="step-indicator">1</div>
+                                <h2 class="section-title">Choose Your Gift</h2>
+                            </div>
+                            <div class="gift-options">
+                                <div class="gift-option payment-method" data-method="amazon">
+                                    <div class="gift-icon"><span>🛒</span></div>
+                                    <div class="gift-label">Amazon Gift Card</div>
+                                </div>
+                                <div class="gift-option payment-method" data-method="starbucks">
+                                    <div class="gift-icon"><span>☕</span></div>
+                                    <div class="gift-label">Starbucks Gift Card</div>
+                                </div>
+                                <div class="gift-option payment-method" data-method="surprise">
+                                    <div class="gift-icon"><span>✨</span></div>
+                                    <div class="gift-label">Surprise Me</div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="paymentHandle" id="paymentLabel">Delivery Email</label>
+                                <input type="text" id="paymentHandle" name="paymentHandle" required
+                                    placeholder="your.email@example.com" disabled>
+                            </div>
+                        </div>
 
-        <div class="success-message" id="successMessage">
-            <div class="success-icon">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <polyline points="20 6 9 17 4 12"></polyline>
-                </svg>
-            </div>
-            <h2>Thank You!</h2>
-            <p>Your gift request has been submitted.</p>
-            <p style="margin-top: 6px;">We'll email your gift within 24-48 hours.</p>
-            <div style="margin-top: 24px; display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
-                <button class="btn-primary-small" id="viewMySubsBtn">View My Submissions</button>
-                <button class="btn-secondary-small" id="backHomeBtn">Back to Home</button>
+                        <div class="section">
+                            <div class="section-header">
+                                <div class="step-indicator">2</div>
+                                <h2 class="section-title">Share Your Review</h2>
+                            </div>
+                            <p style="color: var(--text-secondary); font-size: 14px; margin-bottom: 18px; line-height: 1.6;">
+                                Share your review link and a screenshot to help us verify and send your gift quickly.
+                            </p>
+
+                            <button type="button" class="help-toggle tutorial-toggle" onclick="toggleTutorial()">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <circle cx="12" cy="12" r="10"></circle>
+                                    <path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3"></path>
+                                    <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                                </svg>
+                                Need help finding your review?
+                            </button>
+
+                            <div class="help-content tutorial-content" id="tutorialContent">
+                                <div class="help-title">How to Find Your Review Link</div>
+                                <div class="demo-window">
+                                    <div class="demo-bar">
+                                        <div class="demo-dot"></div>
+                                        <div class="demo-dot"></div>
+                                        <div class="demo-dot"></div>
+                                    </div>
+                                    <div class="demo-body">
+                                        <div class="demo-step">
+                                            <strong>Step 1:</strong> Find your review on Google
+                                            <div class="demo-card">
+                                                <div>★★★★★</div>
+                                                <div>"Great service! Highly recommend..."</div>
+                                            </div>
+                                        </div>
+                                        <div class="demo-step">
+                                            <strong>Step 2:</strong> Click the three dots menu (⋮)
+                                            <div class="demo-card">
+                                                <div style="text-align: right;">⋮</div>
+                                            </div>
+                                            <div class="demo-btn">Share</div>
+                                        </div>
+                                        <div class="demo-step">
+                                            <strong>Step 3:</strong> Click "Copy link"
+                                            <div class="demo-btn">Copy link</div>
+                                            <div style="margin-top: 10px; color: var(--sage); font-weight: 500; font-size: 12px;">✓ Link copied</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="reviewLink">Review Link <span style="color: var(--wine);">*</span></label>
+                                <input type="url" id="reviewLink" name="reviewLink" placeholder="https://g.page/r/..." required>
+                            </div>
+
+                            <div class="divider"><span>and</span></div>
+
+                            <div class="form-group">
+                                <label>Screenshot <span style="color: var(--wine);">*</span></label>
+                                <div class="upload-zone file-upload" id="fileUploadArea" role="button" tabindex="0"
+                                    aria-label="Upload screenshot of your review">
+                                    <div class="upload-content dz-content">
+                                        <svg class="upload-icon dz-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                            <path d="M12 16V4m0 0l-4 4m4-4l4 4" stroke="currentColor" stroke-width="1.5"
+                                                stroke-linecap="round" stroke-linejoin="round" />
+                                            <path d="M4 14v3a3 3 0 003 3h10a3 3 0 003-3v-3" stroke="currentColor"
+                                                stroke-opacity="0.6" stroke-width="1.5" stroke-linecap="round" />
+                                        </svg>
+                                        <div class="upload-title dz-title">Drop your screenshot here</div>
+                                        <div class="upload-hint dz-hint">or click to browse</div>
+                                        <div class="file-name" id="fileName"></div>
+                                    </div>
+                                </div>
+                                <input type="file" id="reviewScreenshot" name="reviewScreenshot" accept="image/*" required>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="submit-btn submit-button" id="submitButton">
+                            Submit & Get My Gift
+                        </button>
+
+                        <p class="footer-note">
+                            Thank you for being a valued guest.
+                        </p>
+                    </form>
+                </div>
+
+                <div class="success-message" id="successMessage">
+                    <div class="success-badge">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="20 6 9 17 4 12"></polyline>
+                        </svg>
+                    </div>
+                    <h2>Thank You!</h2>
+                    <p>Your gift request has been submitted.</p>
+                    <p style="margin-top: 8px;">We'll email your gift within 24-48 hours.</p>
+                    <div style="margin-top: 28px; display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;">
+                        <button class="btn-primary-small" id="viewMySubsBtn">View My Submissions</button>
+                        <button class="btn-secondary-small" id="backHomeBtn">Back to Home</button>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -1318,14 +1532,14 @@
     <div class="reset-modal" id="resetModal">
         <div class="reset-content">
             <h2>Reset Password</h2>
-            <p style="margin-bottom: 16px; color: var(--text-secondary); font-size: 14px;">Enter your new password below:</p>
+            <p style="margin-bottom: 18px; color: var(--text-secondary); font-size: 14px;">Enter your new password below:</p>
             <form id="resetPasswordForm" onsubmit="event.preventDefault(); resetPassword();">
                 <input type="password" id="newPassword" placeholder="New Password" minlength="6" required>
                 <input type="password" id="confirmPassword" placeholder="Confirm Password" minlength="6" required>
                 <button type="submit" class="reset-button">Update Password</button>
             </form>
-            <p style="margin-top: 16px; text-align: center;">
-                <a href="#" onclick="closeResetModal()" style="color: var(--primary); font-weight: 500; font-size: 14px;">Cancel</a>
+            <p style="margin-top: 18px; text-align: center;">
+                <a href="#" onclick="closeResetModal()" style="color: var(--wine); font-weight: 500; font-size: 14px;">Cancel</a>
             </p>
         </div>
     </div>
@@ -1345,7 +1559,7 @@
                     <input type="password" id="authPassword" placeholder="Your password" autocomplete="current-password"
                         required>
                 </div>
-                <button type="submit" class="submit-button" id="authSubmitBtn" style="width: 100%; margin-top: 20px;">
+                <button type="submit" class="submit-btn submit-button" id="authSubmitBtn" style="width: 100%; margin-top: 24px;">
                     Continue
                 </button>
             </form>
@@ -1353,7 +1567,7 @@
                 <button class="link-btn" id="toggleAuthMode">Create an account</button>
                 <button class="link-btn" id="forgotPasswordBtn">Forgot password?</button>
             </div>
-            <p style="margin-top: 16px; color: var(--text-muted); font-size: 12px; text-align: center;">
+            <p style="margin-top: 18px; color: var(--text-muted); font-size: 12px; text-align: center;">
                 By continuing you agree to receive emails for account access.
             </p>
         </div>
@@ -1372,15 +1586,6 @@
     </div>
 
     <script src="js/index.js"></script>
-
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            const mobileAuthButton = document.getElementById('userAuthLinkMobile');
-            if (mobileAuthButton) {
-                console.log('Mobile auth button found and ready');
-            }
-        });
-    </script>
 </body>
 
 </html>
