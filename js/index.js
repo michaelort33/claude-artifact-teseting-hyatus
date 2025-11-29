@@ -468,37 +468,39 @@ if (toggleAuthModeBtn) {
     });
 }
 
-if (authSubmitBtn) {
-    authSubmitBtn.addEventListener('click', async () => {
-        if (!authError || !authEmail || !authPassword || !authSubmitBtn) return;
-        authError.style.display = 'none';
-        const email = authEmail.value.trim();
-        const password = authPassword.value.trim();
-        if (!email || !password) {
-            authError.textContent = 'Please enter email and password';
-            authError.style.display = 'block';
-            return;
-        }
+async function handleAuthSubmit() {
+    if (!authError || !authEmail || !authPassword || !authSubmitBtn) return;
+    authError.style.display = 'none';
+    const email = authEmail.value.trim();
+    const password = authPassword.value.trim();
+    if (!email || !password) {
+        authError.textContent = 'Please enter email and password';
+        authError.style.display = 'block';
+        return;
+    }
 
-        authSubmitBtn.disabled = true;
-        authSubmitBtn.textContent = authMode === 'signin' ? 'Signing In...' : 'Creating Account...';
-        try {
-            if (authMode === 'signin') {
-                const { error } = await supabase.auth.signInWithPassword({ email, password });
-                if (error) throw error;
-            } else {
-                const { error } = await supabase.auth.signUp({ email, password });
-                if (error) throw error;
-            }
-            closeAuthModal();
-        } catch (err) {
-            authError.textContent = err.message || 'Authentication error';
-            authError.style.display = 'block';
-        } finally {
-            authSubmitBtn.disabled = false;
-            authSubmitBtn.textContent = authMode === 'signin' ? 'Sign In' : 'Create Account';
+    authSubmitBtn.disabled = true;
+    authSubmitBtn.textContent = authMode === 'signin' ? 'Signing In...' : 'Creating Account...';
+    try {
+        if (authMode === 'signin') {
+            const { error } = await supabase.auth.signInWithPassword({ email, password });
+            if (error) throw error;
+        } else {
+            const { error } = await supabase.auth.signUp({ email, password });
+            if (error) throw error;
         }
-    });
+        closeAuthModal();
+    } catch (err) {
+        authError.textContent = err.message || 'Authentication error';
+        authError.style.display = 'block';
+    } finally {
+        authSubmitBtn.disabled = false;
+        authSubmitBtn.textContent = authMode === 'signin' ? 'Sign In' : 'Create Account';
+    }
+}
+
+if (authSubmitBtn) {
+    authSubmitBtn.addEventListener('click', handleAuthSubmit);
 }
 
 if (forgotPasswordBtn) {
