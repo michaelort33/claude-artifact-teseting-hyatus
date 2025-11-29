@@ -387,19 +387,29 @@
         function switchTab(which) {
             const rewardsTab = document.getElementById('dashboard');
             const summaryTab = document.getElementById('summaryDashboard');
+            const analyticsTab = document.getElementById('analyticsDashboard');
             const btnRewards = document.getElementById('tabRewards');
             const btnSummary = document.getElementById('tabSummary');
+            const btnAnalytics = document.getElementById('tabAnalytics');
 
             // Hide all tabs
             rewardsTab.classList.remove('active'); rewardsTab.style.display = 'none';
             summaryTab.classList.remove('active'); summaryTab.style.display = 'none';
+            if (analyticsTab) { analyticsTab.classList.remove('active'); analyticsTab.style.display = 'none'; }
             btnRewards.classList.remove('active');
             btnSummary.classList.remove('active');
+            if (btnAnalytics) btnAnalytics.classList.remove('active');
 
             if (which === 'summary') {
                 summaryTab.style.display = 'block'; summaryTab.classList.add('active');
                 btnSummary.classList.add('active');
                 loadSummary();
+            } else if (which === 'analytics') {
+                if (analyticsTab) {
+                    analyticsTab.style.display = 'block'; analyticsTab.classList.add('active');
+                }
+                if (btnAnalytics) btnAnalytics.classList.add('active');
+                refreshAnalytics();
             } else {
                 rewardsTab.style.display = 'block'; rewardsTab.classList.add('active');
                 btnRewards.classList.add('active');
@@ -1306,6 +1316,376 @@
         // Tabs events
         document.getElementById('tabRewards').addEventListener('click', () => switchTab('rewards'));
         document.getElementById('tabSummary').addEventListener('click', () => switchTab('summary'));
+        const analyticsTabBtn = document.getElementById('tabAnalytics');
+        if (analyticsTabBtn) {
+            analyticsTabBtn.addEventListener('click', () => switchTab('analytics'));
+        }
+
+        // Analytics functionality
+        let analyticsData = [];
+
+        async function refreshAnalytics() {
+            const tbody = document.getElementById('analyticsBody');
+            if (tbody) {
+                tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; color: var(--text-secondary); padding: 24px;">Loading analytics...</td></tr>';
+            }
+
+            try {
+                // Fetch all submissions for analytics
+                const { data, error } = await supabase
+                    .from('review_rewards')
+                    .select('id, created_at, payment_method, payment_handle, status, award_amount, previous_guest')
+                    .order('created_at', { ascending: false });
+
+                if (error) throw error;
+
+                analyticsData = data || [];
+                renderAnalytics();
+                renderQuickInsights();
+            } catch (err) {
+                console.error('Error loading analytics:', err);
+                if (tbody) {
+                    tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; color: #991B1B; padding: 24px;">Error loading analytics data</td></tr>';
+                }
+            }
+        }
+
+        function getFilteredAnalyticsData() {
+            let filtered = [...analyticsData];
+
+            // Apply status filter
+            const statusFilter = document.getElementById('analyticsStatusFilter')?.value;
+            if (statusFilter && statusFilter !== 'all') {
+                filtered = filtered.filter(s => s.status === statusFilter);
+            }
+
+            // Apply date range filter
+            const dateFrom = document.getElementById('analyticsDateFrom')?.value;
+            const dateTo = document.getElementById('analyticsDateTo')?.value;
+
+            if (dateFrom) {
+                const fromDate = new Date(dateFrom);
+                filtered = filtered.filter(s => new Date(s.created_at) >= fromDate);
+            }
+
+            if (dateTo) {
+                const toDate = new Date(dateTo);
+                toDate.setHours(23, 59, 59, 999);
+                filtered = filtered.filter(s => new Date(s.created_at) <= toDate);
+            }
+
+            return filtered;
+        }
+
+        function renderAnalytics() {
+            const tbody = document.getElementById('analyticsBody');
+            const thead = document.getElementById('analyticsTableHead');
+            if (!tbody) return;
+
+            const filtered = getFilteredAnalyticsData();
+            const groupBy = document.getElementById('analyticsGroupBy')?.value || 'email';
+
+            // Group data
+            const groups = {};
+            filtered.forEach(item => {
+                let key;
+                switch (groupBy) {
+                    case 'email':
+                        key = item.payment_handle || 'Unknown';
+                        break;
+                    case 'payment_method':
+                        key = (item.payment_method || 'Unknown').toUpperCase();
+                        break;
+                    case 'status':
+                        key = (item.status || 'pending').charAt(0).toUpperCase() + (item.status || 'pending').slice(1);
+                        break;
+                    case 'award_amount':
+                        key = `$${(item.award_amount || 0).toFixed(2)}`;
+                        break;
+                    case 'date':
+                        key = new Date(item.created_at).toLocaleDateString();
+                        break;
+                    case 'month':
+                        const date = new Date(item.created_at);
+                        key = date.toLocaleDateString('en-US', { year: 'numeric', month: 'long' });
+                        break;
+                    default:
+                        key = 'Unknown';
+                }
+
+                if (!groups[key]) {
+                    groups[key] = {
+                        count: 0,
+                        pending: 0,
+                        awarded: 0,
+                        paid: 0,
+                        rejected: 0,
+                        totalAmount: 0
+                    };
+                }
+
+                groups[key].count++;
+                const status = item.status || 'pending';
+                if (groups[key][status] !== undefined) {
+                    groups[key][status]++;
+                }
+                groups[key].totalAmount += item.award_amount || 0;
+            });
+
+            // Update header based on group by
+            const groupLabels = {
+                'email': 'User (Email)',
+                'payment_method': 'Reward Choice',
+                'status': 'Status',
+                'award_amount': 'Award Amount',
+                'date': 'Date',
+                'month': 'Month'
+            };
+
+            if (thead) {
+                thead.innerHTML = `
+                    <tr>
+                        <th>${groupLabels[groupBy] || 'Group'}</th>
+                        <th>Count</th>
+                        <th>Pending</th>
+                        <th>Awarded</th>
+                        <th>Paid</th>
+                        <th>Rejected</th>
+                        <th>Total Amount</th>
+                    </tr>
+                `;
+            }
+
+            // Sort by count descending
+            const sortedGroups = Object.entries(groups).sort((a, b) => b[1].count - a[1].count);
+
+            if (sortedGroups.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; color: var(--text-muted); padding: 24px;">No data matching filters</td></tr>';
+                updateAnalyticsStats([], filtered);
+                return;
+            }
+
+            tbody.innerHTML = '';
+            let totalCount = 0, totalPending = 0, totalAwarded = 0, totalPaid = 0, totalRejected = 0, totalAmount = 0;
+
+            sortedGroups.forEach(([key, stats]) => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td style="font-weight: 500;">${key}</td>
+                    <td>${stats.count}</td>
+                    <td>${stats.pending > 0 ? `<span class="status-badge status-pending">${stats.pending}</span>` : '-'}</td>
+                    <td>${stats.awarded > 0 ? `<span class="status-badge status-awarded">${stats.awarded}</span>` : '-'}</td>
+                    <td>${stats.paid > 0 ? `<span class="status-badge status-paid">${stats.paid}</span>` : '-'}</td>
+                    <td>${stats.rejected > 0 ? `<span class="status-badge status-rejected">${stats.rejected}</span>` : '-'}</td>
+                    <td>$${stats.totalAmount.toFixed(2)}</td>
+                `;
+                tbody.appendChild(tr);
+
+                totalCount += stats.count;
+                totalPending += stats.pending;
+                totalAwarded += stats.awarded;
+                totalPaid += stats.paid;
+                totalRejected += stats.rejected;
+                totalAmount += stats.totalAmount;
+            });
+
+            // Add totals row
+            const totalRow = document.createElement('tr');
+            totalRow.style.fontWeight = 'bold';
+            totalRow.style.background = 'var(--cream-warm)';
+            totalRow.innerHTML = `
+                <td>TOTAL (${sortedGroups.length} groups)</td>
+                <td>${totalCount}</td>
+                <td>${totalPending}</td>
+                <td>${totalAwarded}</td>
+                <td>${totalPaid}</td>
+                <td>${totalRejected}</td>
+                <td>$${totalAmount.toFixed(2)}</td>
+            `;
+            tbody.appendChild(totalRow);
+
+            updateAnalyticsStats(sortedGroups, filtered);
+        }
+
+        function updateAnalyticsStats(groups, filtered) {
+            // Unique users
+            const uniqueEmails = new Set(filtered.map(s => s.payment_handle).filter(Boolean));
+            document.getElementById('uniqueUsersCount').textContent = uniqueEmails.size;
+
+            // Average per user
+            const avgPerUser = uniqueEmails.size > 0 ? (filtered.length / uniqueEmails.size).toFixed(1) : '0';
+            document.getElementById('avgPerUser').textContent = avgPerUser;
+
+            // Repeat users (users with more than 1 submission)
+            const emailCounts = {};
+            filtered.forEach(s => {
+                if (s.payment_handle) {
+                    emailCounts[s.payment_handle] = (emailCounts[s.payment_handle] || 0) + 1;
+                }
+            });
+            const repeatUsers = Object.values(emailCounts).filter(c => c > 1).length;
+            document.getElementById('repeatUsersCount').textContent = repeatUsers;
+
+            // Conversion rate (awarded + paid / total)
+            const converted = filtered.filter(s => s.status === 'awarded' || s.status === 'paid').length;
+            const conversionRate = filtered.length > 0 ? ((converted / filtered.length) * 100).toFixed(1) : '0';
+            document.getElementById('conversionRate').textContent = conversionRate + '%';
+        }
+
+        function renderQuickInsights() {
+            // Top users by submissions
+            const emailCounts = {};
+            analyticsData.forEach(s => {
+                if (s.payment_handle) {
+                    emailCounts[s.payment_handle] = (emailCounts[s.payment_handle] || 0) + 1;
+                }
+            });
+            const topUsers = Object.entries(emailCounts)
+                .sort((a, b) => b[1] - a[1])
+                .slice(0, 5);
+
+            const topUsersDiv = document.getElementById('topUsersInsight');
+            if (topUsersDiv) {
+                topUsersDiv.innerHTML = topUsers.length > 0
+                    ? topUsers.map(([email, count]) => 
+                        `<div style="display: flex; justify-content: space-between; padding: 4px 0; border-bottom: 1px solid var(--border);">
+                            <span style="overflow: hidden; text-overflow: ellipsis; max-width: 180px;">${email}</span>
+                            <span style="font-weight: 600; color: var(--wine);">${count}</span>
+                        </div>`
+                    ).join('')
+                    : '<span style="color: var(--text-muted);">No data available</span>';
+            }
+
+            // Status breakdown
+            const statusCounts = { pending: 0, awarded: 0, paid: 0, rejected: 0 };
+            analyticsData.forEach(s => {
+                const status = s.status || 'pending';
+                if (statusCounts[status] !== undefined) {
+                    statusCounts[status]++;
+                }
+            });
+
+            const statusDiv = document.getElementById('statusBreakdownInsight');
+            if (statusDiv) {
+                const total = analyticsData.length || 1;
+                statusDiv.innerHTML = `
+                    <div style="display: flex; justify-content: space-between; padding: 4px 0;"><span>Pending</span><span style="font-weight: 600;">${statusCounts.pending} (${((statusCounts.pending/total)*100).toFixed(1)}%)</span></div>
+                    <div style="display: flex; justify-content: space-between; padding: 4px 0;"><span>Awarded</span><span style="font-weight: 600;">${statusCounts.awarded} (${((statusCounts.awarded/total)*100).toFixed(1)}%)</span></div>
+                    <div style="display: flex; justify-content: space-between; padding: 4px 0;"><span>Paid</span><span style="font-weight: 600;">${statusCounts.paid} (${((statusCounts.paid/total)*100).toFixed(1)}%)</span></div>
+                    <div style="display: flex; justify-content: space-between; padding: 4px 0;"><span>Rejected</span><span style="font-weight: 600;">${statusCounts.rejected} (${((statusCounts.rejected/total)*100).toFixed(1)}%)</span></div>
+                `;
+            }
+
+            // Reward preferences
+            const rewardCounts = {};
+            analyticsData.forEach(s => {
+                const method = (s.payment_method || 'unknown').toUpperCase();
+                rewardCounts[method] = (rewardCounts[method] || 0) + 1;
+            });
+
+            const rewardDiv = document.getElementById('rewardPreferenceInsight');
+            if (rewardDiv) {
+                const total = analyticsData.length || 1;
+                rewardDiv.innerHTML = Object.entries(rewardCounts)
+                    .sort((a, b) => b[1] - a[1])
+                    .map(([method, count]) => 
+                        `<div style="display: flex; justify-content: space-between; padding: 4px 0; border-bottom: 1px solid var(--border);">
+                            <span>${method}</span>
+                            <span style="font-weight: 600;">${count} (${((count/total)*100).toFixed(1)}%)</span>
+                        </div>`
+                    ).join('') || '<span style="color: var(--text-muted);">No data available</span>';
+            }
+        }
+
+        function clearAnalyticsFilters() {
+            const groupBy = document.getElementById('analyticsGroupBy');
+            const statusFilter = document.getElementById('analyticsStatusFilter');
+            const dateFrom = document.getElementById('analyticsDateFrom');
+            const dateTo = document.getElementById('analyticsDateTo');
+
+            if (groupBy) groupBy.value = 'email';
+            if (statusFilter) statusFilter.value = 'all';
+            if (dateFrom) dateFrom.value = '';
+            if (dateTo) dateTo.value = '';
+
+            renderAnalytics();
+        }
+
+        function exportAnalyticsCSV() {
+            const filtered = getFilteredAnalyticsData();
+            const groupBy = document.getElementById('analyticsGroupBy')?.value || 'email';
+
+            // Group data
+            const groups = {};
+            filtered.forEach(item => {
+                let key;
+                switch (groupBy) {
+                    case 'email': key = item.payment_handle || 'Unknown'; break;
+                    case 'payment_method': key = (item.payment_method || 'Unknown').toUpperCase(); break;
+                    case 'status': key = item.status || 'pending'; break;
+                    case 'award_amount': key = `$${(item.award_amount || 0).toFixed(2)}`; break;
+                    case 'date': key = new Date(item.created_at).toLocaleDateString(); break;
+                    case 'month':
+                        const date = new Date(item.created_at);
+                        key = date.toLocaleDateString('en-US', { year: 'numeric', month: 'long' });
+                        break;
+                    default: key = 'Unknown';
+                }
+
+                if (!groups[key]) {
+                    groups[key] = { count: 0, pending: 0, awarded: 0, paid: 0, rejected: 0, totalAmount: 0 };
+                }
+                groups[key].count++;
+                const status = item.status || 'pending';
+                if (groups[key][status] !== undefined) groups[key][status]++;
+                groups[key].totalAmount += item.award_amount || 0;
+            });
+
+            const groupLabels = {
+                'email': 'User Email',
+                'payment_method': 'Reward Choice',
+                'status': 'Status',
+                'award_amount': 'Award Amount',
+                'date': 'Date',
+                'month': 'Month'
+            };
+
+            // Build CSV
+            const rows = [[groupLabels[groupBy] || 'Group', 'Count', 'Pending', 'Awarded', 'Paid', 'Rejected', 'Total Amount']];
+            Object.entries(groups).sort((a, b) => b[1].count - a[1].count).forEach(([key, stats]) => {
+                rows.push([key, stats.count, stats.pending, stats.awarded, stats.paid, stats.rejected, stats.totalAmount.toFixed(2)]);
+            });
+
+            const csvContent = rows.map(r => r.map(c => `"${c}"`).join(',')).join('\n');
+            const blob = new Blob([csvContent], { type: 'text/csv' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `analytics_${groupBy}_${new Date().toISOString().split('T')[0]}.csv`;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        // Set up analytics filter listeners
+        const analyticsGroupByEl = document.getElementById('analyticsGroupBy');
+        if (analyticsGroupByEl) {
+            analyticsGroupByEl.addEventListener('change', renderAnalytics);
+        }
+
+        const analyticsStatusFilterEl = document.getElementById('analyticsStatusFilter');
+        if (analyticsStatusFilterEl) {
+            analyticsStatusFilterEl.addEventListener('change', renderAnalytics);
+        }
+
+        const analyticsDateFromEl = document.getElementById('analyticsDateFrom');
+        if (analyticsDateFromEl) {
+            analyticsDateFromEl.addEventListener('change', renderAnalytics);
+        }
+
+        const analyticsDateToEl = document.getElementById('analyticsDateTo');
+        if (analyticsDateToEl) {
+            analyticsDateToEl.addEventListener('change', renderAnalytics);
+        }
 
         // Set up filters
         const statusFilterEl = document.getElementById('statusFilter');

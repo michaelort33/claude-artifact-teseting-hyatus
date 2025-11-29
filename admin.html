@@ -984,6 +984,7 @@
     <div class="nav-tabs" id="navTabs">
         <button class="nav-tab active" id="tabRewards">Rewards</button>
         <button class="nav-tab" id="tabSummary">Summary</button>
+        <button class="nav-tab" id="tabAnalytics">Analytics</button>
     </div>
 
     <div class="login-wrapper">
@@ -1198,6 +1199,111 @@
                 <tbody id="summaryBody">
                 </tbody>
             </table>
+        </div>
+    </div>
+
+    <!-- Analytics Dashboard -->
+    <div class="dashboard" id="analyticsDashboard" style="display:none;">
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-label">Unique Users</div>
+                <div class="stat-value" id="uniqueUsersCount">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Avg per User</div>
+                <div class="stat-value" id="avgPerUser">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Repeat Users</div>
+                <div class="stat-value" id="repeatUsersCount">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Conversion Rate</div>
+                <div class="stat-value" id="conversionRate">0%</div>
+            </div>
+        </div>
+
+        <div class="filter-bar" style="flex-wrap: wrap; gap: 16px;">
+            <div style="display: flex; align-items: center; gap: 12px;">
+                <label style="font-weight: 500; color: var(--text-secondary); font-size: 13px; text-transform: uppercase; letter-spacing: 0.05em;">Group By:</label>
+                <select id="analyticsGroupBy" style="min-width: 160px;">
+                    <option value="email">User (Email)</option>
+                    <option value="payment_method">Reward Choice</option>
+                    <option value="status">Status</option>
+                    <option value="award_amount">Award Amount</option>
+                    <option value="date">Date (Day)</option>
+                    <option value="month">Date (Month)</option>
+                </select>
+            </div>
+            <div style="display: flex; align-items: center; gap: 12px;">
+                <label style="font-weight: 500; color: var(--text-secondary); font-size: 13px; text-transform: uppercase; letter-spacing: 0.05em;">Status:</label>
+                <select id="analyticsStatusFilter" style="min-width: 140px;">
+                    <option value="all">All Statuses</option>
+                    <option value="pending">Pending</option>
+                    <option value="awarded">Awarded</option>
+                    <option value="paid">Paid</option>
+                    <option value="rejected">Rejected</option>
+                </select>
+            </div>
+            <div style="display: flex; align-items: center; gap: 12px;">
+                <label style="font-weight: 500; color: var(--text-secondary); font-size: 13px; text-transform: uppercase; letter-spacing: 0.05em;">From:</label>
+                <input type="date" id="analyticsDateFrom" style="min-width: 140px;">
+            </div>
+            <div style="display: flex; align-items: center; gap: 12px;">
+                <label style="font-weight: 500; color: var(--text-secondary); font-size: 13px; text-transform: uppercase; letter-spacing: 0.05em;">To:</label>
+                <input type="date" id="analyticsDateTo" style="min-width: 140px;">
+            </div>
+            <div style="margin-left: auto; display: flex; gap: 12px; align-items: center;">
+                <button class="btn btn-secondary" onclick="clearAnalyticsFilters()" style="padding: 10px 16px; font-size: 13px;">
+                    Clear Filters
+                </button>
+                <button class="btn" onclick="exportAnalyticsCSV()" style="padding: 10px 20px; font-size: 13px;">
+                    Export CSV
+                </button>
+                <div class="refresh-icon" onclick="refreshAnalytics()" title="Refresh analytics">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                    </svg>
+                </div>
+            </div>
+        </div>
+
+        <div class="submissions-table" id="analyticsTableContainer">
+            <table id="analyticsTable">
+                <thead id="analyticsTableHead">
+                    <tr>
+                        <th>Group</th>
+                        <th>Count</th>
+                        <th>Pending</th>
+                        <th>Awarded</th>
+                        <th>Paid</th>
+                        <th>Rejected</th>
+                        <th>Total Amount</th>
+                    </tr>
+                </thead>
+                <tbody id="analyticsBody">
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Detailed breakdown section -->
+        <div class="filter-bar" style="margin-top: 24px;">
+            <h3 style="font-family: 'Instrument Serif', Georgia, serif; font-weight: 400; font-size: 18px;">Quick Insights</h3>
+        </div>
+        <div class="stats-grid" style="grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));">
+            <div class="stat-card" style="padding: 20px;">
+                <div class="stat-label">Top Users (by submissions)</div>
+                <div id="topUsersInsight" style="margin-top: 12px; font-size: 13px; line-height: 1.8; color: var(--text-secondary);"></div>
+            </div>
+            <div class="stat-card" style="padding: 20px;">
+                <div class="stat-label">Status Breakdown</div>
+                <div id="statusBreakdownInsight" style="margin-top: 12px; font-size: 13px; line-height: 1.8; color: var(--text-secondary);"></div>
+            </div>
+            <div class="stat-card" style="padding: 20px;">
+                <div class="stat-label">Reward Preferences</div>
+                <div id="rewardPreferenceInsight" style="margin-top: 12px; font-size: 13px; line-height: 1.8; color: var(--text-secondary);"></div>
+            </div>
         </div>
     </div>
 
