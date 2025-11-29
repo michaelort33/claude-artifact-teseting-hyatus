@@ -197,7 +197,7 @@
             // Show loading message immediately
             const tbody = document.getElementById('submissionsBody');
             if (tbody) {
-                tbody.innerHTML = '<tr><td colspan="10" style="text-align: center; color: #666;">Loading dashboard...</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="10" style="text-align: center; color: #6B635B;">Loading dashboard...</td></tr>';
             }
 
             // Properly initialize the rewards tab as active
@@ -236,9 +236,9 @@
             const tbody = document.getElementById('submissionsBody');
             if (tbody && retryCount === 0) {
                 if (shouldResetPagination) {
-                    tbody.innerHTML = '<tr><td colspan="10" style="text-align: center; color: #666;">Loading submissions...</td></tr>';
+                    tbody.innerHTML = '<tr><td colspan="10" style="text-align: center; color: #6B635B;">Loading submissions...</td></tr>';
                 } else {
-                    tbody.innerHTML += '<tr><td colspan="10" style="text-align: center; color: #666;">Loading more...</td></tr>';
+                    tbody.innerHTML += '<tr><td colspan="10" style="text-align: center; color: #6B635B;">Loading more...</td></tr>';
                 }
             }
 
@@ -304,14 +304,14 @@
                             console.log(`Retrying in ${retryDelay}ms... (attempt ${retryCount + 1}/${maxRetries})`);
                             // Show retry message to user
                             if (tbody) {
-                                tbody.innerHTML = `<tr><td colspan="10" style="text-align: center; color: #666;">Connection timeout, retrying... (${retryCount + 1}/${maxRetries})</td></tr>`;
+                                tbody.innerHTML = `<tr><td colspan="10" style="text-align: center; color: #6B635B;">Connection timeout, retrying... (${retryCount + 1}/${maxRetries})</td></tr>`;
                             }
                             setTimeout(() => loadSubmissions(retryCount + 1, retryShouldReset), retryDelay);
                             return;
                         } else {
                             alert('Network error: Unable to connect to the database after multiple attempts. This may be due to slow connection or database performance issues.\n\nTip: Try refreshing the page or try again in a few moments.');
                             if (tbody) {
-                                tbody.innerHTML = '<tr><td colspan="10" style="text-align: center; color: #f88;">Unable to load submissions. Please try refreshing.</td></tr>';
+                                tbody.innerHTML = '<tr><td colspan="10" style="text-align: center; color: #991B1B;">Unable to load submissions. Please try refreshing.</td></tr>';
                             }
                         }
                     } else if (error.code === 'PGRST301') {
@@ -324,7 +324,7 @@
                     } else {
                         alert('Error loading submissions: ' + error.message + '\n\nError code: ' + (error.code || 'Unknown') + '\nStatus: ' + (error.status || 'Unknown'));
                         if (tbody) {
-                            tbody.innerHTML = '<tr><td colspan="10" style="text-align: center; color: #f88;">Failed to load submissions. Please refresh the page.</td></tr>';
+                            tbody.innerHTML = '<tr><td colspan="10" style="text-align: center; color: #991B1B;">Failed to load submissions. Please refresh the page.</td></tr>';
                         }
                     }
                     return;
@@ -434,7 +434,7 @@
                 tbody.innerHTML = '';
 
                 if (!data || data.length === 0) {
-                    tbody.innerHTML = '<tr><td colspan="10" style="text-align: center; color: #999;">No submissions found</td></tr>';
+                    tbody.innerHTML = '<tr><td colspan="10" style="text-align: center; color: #8B8278;">No submissions found</td></tr>';
                     return;
                 }
 
@@ -485,7 +485,7 @@
                 console.error('Error in renderSubmissions:', err);
                 const tbody = document.getElementById('submissionsBody');
                 if (tbody) {
-                    tbody.innerHTML = '<tr><td colspan="10" style="text-align: center; color: #f00;">Error loading submissions</td></tr>';
+                    tbody.innerHTML = '<tr><td colspan="10" style="text-align: center; color: #991B1B;">Error loading submissions</td></tr>';
                 }
             }
         }
@@ -639,7 +639,7 @@
                             (newStatus === 'paid' ? 'Paid' :
                                 (newStatus === 'pending' ? 'Reverted' : 'Rejected'));
                         button.textContent = '✓ ' + statusText;
-                        button.style.background = '#4caf50';
+                        button.style.background = 'linear-gradient(135deg, #7A8B6E 0%, #6B7D60 100%)';
                         button.style.color = 'white';
 
                         setTimeout(() => {
@@ -709,7 +709,7 @@
 
                         // Show success feedback
                         button.textContent = '✓ Saved';
-                        button.style.background = '#4caf50';
+                        button.style.background = 'linear-gradient(135deg, #7A8B6E 0%, #6B7D60 100%)';
                         button.style.color = 'white';
 
                         setTimeout(() => {

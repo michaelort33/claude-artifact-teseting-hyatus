@@ -71,8 +71,9 @@ document.addEventListener('DOMContentLoaded', () => {
         const submitButton = document.getElementById('submitButton');
         if (submitButton) {
             submitButton.textContent = 'Campaign Paused';
-            submitButton.style.background = '#ccc';
+            submitButton.style.background = 'linear-gradient(135deg, #9A928A 0%, #6B635B 100%)';
             submitButton.style.cursor = 'not-allowed';
+            submitButton.style.boxShadow = 'none';
         }
 
         // Show campaign pause alert
@@ -80,14 +81,15 @@ document.addEventListener('DOMContentLoaded', () => {
         if (formContainer) {
             const pauseAlert = document.createElement('div');
             pauseAlert.style.cssText = `
-                background: #fff3cd;
-                border: 1px solid #ffeaa7;
-                color: #856404;
-                padding: 15px;
-                border-radius: 8px;
-                margin-bottom: 20px;
+                background: linear-gradient(135deg, #E8DBC8 0%, #D4B896 100%);
+                border: 1px solid rgba(196, 149, 106, 0.4);
+                color: #722F37;
+                padding: 18px 24px;
+                border-radius: 14px;
+                margin-bottom: 24px;
                 text-align: center;
                 font-weight: 500;
+                box-shadow: 0 4px 12px rgba(114, 47, 55, 0.08);
             `;
             pauseAlert.innerHTML = `
                 <strong>⏸️ Campaign Paused</strong><br>
@@ -239,7 +241,7 @@ function createFloatingDollars() {
     if (!successContainer) return;
     const dollarCount = 12;
     const confettiCount = 20;
-    const colors = ['#ffdd00', '#ff6b6b', '#4ecdc4', '#45b7d1', '#f9ca24', '#6c5ce7'];
+    const colors = ['#C4956A', '#722F37', '#D4B896', '#8B4049', '#E8DBC8', '#7A8B6E'];
 
     // Remove any existing animations
     const existingElements = successContainer.querySelectorAll('.dollar-sign, .confetti');
@@ -517,13 +519,13 @@ if (forgotPasswordBtn) {
             if (error) throw error;
             authError.textContent = 'Password reset email sent. Check your inbox.';
             authError.style.display = 'block';
-            authError.style.background = '#d4edda';
-            authError.style.color = '#155724';
+            authError.style.background = 'linear-gradient(135deg, #B8C4AD 0%, #C5D5C3 100%)';
+            authError.style.color = '#3D6635';
         } catch (err) {
             authError.textContent = err.message || 'Failed to send reset email';
             authError.style.display = 'block';
-            authError.style.background = '#f8d7da';
-            authError.style.color = '#721c24';
+            authError.style.background = 'linear-gradient(135deg, #FEE2E2 0%, #FECACA 100%)';
+            authError.style.color = '#991B1B';
         }
     });
 }
@@ -614,7 +616,7 @@ function renderMySubmissions(rows) {
     const wrapper = document.getElementById('mySubmissionsContent');
     if (!wrapper) return;
     if (!rows.length) {
-        wrapper.innerHTML = `<div style="padding:16px; color:#666;">No submissions yet. Submit your first reward claim above.</div>`;
+        wrapper.innerHTML = `<div style="padding:18px; color:#6B635B; font-size:14px;">No submissions yet. Submit your first reward claim above.</div>`;
         return;
     }
     const header = `
@@ -699,7 +701,7 @@ async function openSubmissionsModal() {
     const wrapper = document.getElementById('mySubmissionsContent');
     if (!currentUser) {
         if (wrapper) {
-            wrapper.innerHTML = '<div style="padding:16px; color:#666;">Please sign in to view your submissions.<br /><button class="btn-primary-small" id="modalSignInBtn" style="margin-top:10px;">Sign In</button></div>';
+            wrapper.innerHTML = '<div style="padding:18px; color:#6B635B; font-size:14px;">Please sign in to view your submissions.<br /><button class="btn-primary-small" id="modalSignInBtn" style="margin-top:12px;">Sign In</button></div>';
             const btn = document.getElementById('modalSignInBtn');
             if (btn)
                 btn.onclick = () => {
@@ -710,7 +712,7 @@ async function openSubmissionsModal() {
         }
         return;
     }
-    if (wrapper) wrapper.innerHTML = '<div style="padding:16px; color:#666;">Loading...</div>';
+    if (wrapper) wrapper.innerHTML = '<div style="padding:18px; color:#6B635B; font-size:14px;">Loading...</div>';
     if (!mySubmissions.length) await loadMySubmissions();
     renderMySubmissions(mySubmissions);
 }
