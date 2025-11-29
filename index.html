@@ -6,14 +6,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Claim Your Review Reward</title>
 
-    <!-- Prevent search engine indexing -->
     <meta name="robots" content="noindex, nofollow, noarchive, nosnippet, noimageindex, notranslate">
     <meta name="googlebot" content="noindex, nofollow, noarchive, nosnippet, noimageindex, notranslate">
     <meta name="bingbot" content="noindex, nofollow, noarchive, nosnippet, noimageindex, notranslate">
     <meta name="slurp" content="noindex, nofollow, noarchive, nosnippet, noimageindex, notranslate">
     <meta name="duckduckbot" content="noindex, nofollow, noarchive, nosnippet, noimageindex, notranslate">
 
-    <!-- Prevent AI training -->
     <meta name="ai-content-declaration" content="ai-generated">
     <meta name="ChatGPT" content="noindex">
     <meta name="CCBot" content="nofollow">
@@ -23,11 +21,14 @@
     <meta name="CCBot" content="noindex">
     <meta name="anthropic-ai" content="noindex">
     <meta name="Claude-Web" content="nofollow">
+    
     <link rel="icon" type="image/svg+xml"
-        href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect width='16' height='16' rx='3' fill='%2310a37f'/%3E%3Cpath d='M4 7h8v5a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V7z' fill='%23ffffff'/%3E%3Cpath d='M3.5 7h9M8 7v7' stroke='%23ffffff' stroke-width='1' stroke-linecap='round'/%3E%3Cpath d='M6.5 5.25c-.8 0-1.45-.6-1.45-1.35S5.7 2.6 6.5 2.6c.82 0 1.35.58 1.5 1.15.15-.57.68-1.15 1.5-1.15.8 0 1.45.6 1.45 1.3s-.65 1.35-1.45 1.35H6.5z' fill='%23ffffff'/%3E%3C/svg%3E">
-    <link rel="icon" href="/favicon.ico" sizes="any">
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
-    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+        href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Ccircle cx='8' cy='8' r='8' fill='%23FF6B9D'/%3E%3Ctext x='8' y='12' text-anchor='middle' font-size='10'%3E🎁%3C/text%3E%3C/svg%3E">
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+    
     <style>
         * {
             margin: 0;
@@ -39,69 +40,116 @@
             scroll-behavior: smooth;
         }
 
+        :root {
+            --pink: #FF6B9D;
+            --pink-light: #FFB8D0;
+            --pink-soft: rgba(255, 107, 157, 0.15);
+            --purple: #A855F7;
+            --purple-light: #DDD6FE;
+            --blue: #60A5FA;
+            --blue-light: #BFDBFE;
+            --mint: #6EE7B7;
+            --mint-light: #A7F3D0;
+            --yellow: #FCD34D;
+            --yellow-light: #FEF3C7;
+            --orange: #FB923C;
+            --cream: #FFF8F0;
+            --white: #FFFFFF;
+            --text: #4A3728;
+            --text-light: #8B7355;
+            --border: rgba(255, 107, 157, 0.2);
+            --shadow: 0 10px 40px rgba(255, 107, 157, 0.2);
+            --shadow-lg: 0 20px 60px rgba(255, 107, 157, 0.25);
+        }
+
         ::selection {
-            background: var(--accent);
+            background: var(--pink);
             color: white;
         }
 
-        :root {
-            /* Clean, professional light theme */
-            --bg: #ffffff;
-            --surface: #ffffff;
-            --surface-2: #f9fafb;
-            --surface-3: #f3f4f6;
-            --border: #e5e7eb;
-            --text: #111827;
-            --subtext: #6b7280;
-            --accent: #10a37f;
-            --accent-hover: #0d8968;
-            --accent-soft: rgba(16, 163, 127, 0.1);
-            --success: #10a37f;
-            --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
-            --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.07);
-            --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
-        }
-
-        /* Fix legacy inline light colors */
-        *[style*="color: #333"],
-        *[style*="color:#333"] {
-            color: #1e293b !important;
-        }
-
-        *[style*="color: #666"],
-        *[style*="color:#666"] {
-            color: #64748b !important;
-        }
-
-        *[style*="color: #999"],
-        *[style*="color:#999"] {
-            color: #94a3b8 !important;
-        }
-
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Inter', Roboto, 'Helvetica Neue', sans-serif;
-            background: var(--bg);
+            font-family: 'Nunito', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #FFF0F5 0%, #F0F4FF 50%, #F0FFF4 100%);
             color: var(--text);
             min-height: 100vh;
             min-height: 100dvh;
-            padding: 84px 20px 20px 20px;
+            padding: 90px 20px 40px 20px;
             display: flex;
             align-items: center;
             justify-content: center;
             line-height: 1.6;
             -webkit-font-smoothing: antialiased;
-            -moz-osx-font-smoothing: grayscale;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(255, 182, 193, 0.3) 0%, transparent 50%),
+                radial-gradient(circle at 90% 80%, rgba(167, 139, 250, 0.2) 0%, transparent 50%),
+                radial-gradient(circle at 50% 50%, rgba(110, 231, 183, 0.15) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .floating-shapes {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            pointer-events: none;
+            z-index: -1;
+            overflow: hidden;
+        }
+
+        .shape {
+            position: absolute;
+            animation: float 6s ease-in-out infinite;
+            opacity: 0.6;
+            font-size: 24px;
+        }
+
+        .shape:nth-child(1) { top: 10%; left: 5%; animation-delay: 0s; }
+        .shape:nth-child(2) { top: 20%; right: 10%; animation-delay: 1s; }
+        .shape:nth-child(3) { top: 60%; left: 8%; animation-delay: 2s; }
+        .shape:nth-child(4) { top: 70%; right: 5%; animation-delay: 3s; }
+        .shape:nth-child(5) { top: 40%; left: 3%; animation-delay: 4s; }
+        .shape:nth-child(6) { top: 85%; left: 15%; animation-delay: 5s; }
+        .shape:nth-child(7) { top: 15%; left: 50%; animation-delay: 2.5s; }
+        .shape:nth-child(8) { top: 90%; right: 20%; animation-delay: 1.5s; }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(10deg); }
         }
 
         .container {
-            max-width: 640px;
+            max-width: 580px;
             width: 100%;
-            background: var(--surface);
-            color: var(--text);
-            border-radius: 12px;
+            background: var(--white);
+            border-radius: 32px;
             box-shadow: var(--shadow-lg);
-            border: 1px solid var(--border);
+            border: 3px solid var(--pink-light);
             overflow: hidden;
+            position: relative;
+        }
+
+        .container::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255, 107, 157, 0.05) 0%, transparent 70%);
+            pointer-events: none;
         }
 
         .topbar {
@@ -109,140 +157,197 @@
             top: 0;
             left: 0;
             right: 0;
-            height: 56px;
-            background: var(--surface);
-            border-bottom: 1px solid var(--border);
+            height: 64px;
+            background: linear-gradient(135deg, var(--pink) 0%, var(--purple) 100%);
             z-index: 1200;
+            box-shadow: 0 4px 20px rgba(255, 107, 157, 0.3);
         }
 
         .topbar-content {
             max-width: 1080px;
             margin: 0 auto;
-            height: 56px;
+            height: 64px;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 0 16px;
+            padding: 0 20px;
         }
 
         .brand {
             display: flex;
             align-items: center;
-            gap: 10px;
-            font-weight: 700;
+            gap: 12px;
+            font-weight: 800;
+            font-size: 18px;
+            color: white;
             letter-spacing: -0.02em;
-            flex-shrink: 0;
         }
 
         .brand-badge {
-            width: 28px;
-            height: 28px;
-            border-radius: 6px;
-            background: var(--accent);
+            width: 36px;
+            height: 36px;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.25);
+            backdrop-filter: blur(10px);
             display: flex;
             align-items: center;
             justify-content: center;
-            color: #fff;
-            font-size: 16px;
+            font-size: 20px;
+            animation: wiggle 2s ease-in-out infinite;
+        }
+
+        @keyframes wiggle {
+            0%, 100% { transform: rotate(-5deg); }
+            50% { transform: rotate(5deg); }
         }
 
         .topbar-actions {
             display: flex;
-            gap: 10px;
-            min-width: 0;
-            flex-shrink: 1;
+            gap: 12px;
         }
 
         .topbar-actions a {
             text-decoration: none;
-            font-weight: 500;
-            color: var(--text);
-            padding: 6px 12px;
-            border-radius: 6px;
-            border: 1px solid var(--border);
-            background: transparent;
-            transition: all 0.15s ease;
-            min-width: 0;
-            flex-shrink: 1;
-            overflow: hidden;
-            white-space: nowrap;
-            text-overflow: ellipsis;
+            font-weight: 700;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 14px;
         }
 
         .topbar-actions a:hover {
-            background: var(--surface-2);
-            border-color: var(--border);
+            background: rgba(255, 255, 255, 0.35);
+            transform: translateY(-2px) scale(1.02);
         }
 
         .header {
-            background: var(--accent);
+            background: linear-gradient(135deg, var(--pink) 0%, var(--purple) 50%, var(--blue) 100%);
             color: white;
-            padding: 32px 24px;
+            padding: 40px 28px;
             text-align: center;
             position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '✨';
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            font-size: 24px;
+            animation: sparkle 2s ease-in-out infinite;
+        }
+
+        .header::after {
+            content: '💫';
+            position: absolute;
+            top: 30px;
+            right: 25px;
+            font-size: 20px;
+            animation: sparkle 2s ease-in-out infinite 0.5s;
+        }
+
+        @keyframes sparkle {
+            0%, 100% { opacity: 0.6; transform: scale(1) rotate(0deg); }
+            50% { opacity: 1; transform: scale(1.2) rotate(15deg); }
+        }
+
+        .header-icon {
+            font-size: 64px;
+            margin-bottom: 16px;
+            display: block;
+            animation: bounce-in 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        @keyframes bounce-in {
+            0% { transform: scale(0) rotate(-20deg); opacity: 0; }
+            50% { transform: scale(1.2) rotate(10deg); }
+            100% { transform: scale(1) rotate(0deg); opacity: 1; }
         }
 
         .header h1 {
-            font-size: 28px;
-            margin-bottom: 8px;
-            font-weight: 600;
+            font-size: 32px;
+            margin-bottom: 12px;
+            font-weight: 800;
             color: white;
             line-height: 1.2;
             letter-spacing: -0.02em;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
         }
 
         .header p {
-            opacity: 0.9;
-            font-size: 15px;
-            font-weight: 400;
+            opacity: 0.95;
+            font-size: 16px;
+            font-weight: 600;
             line-height: 1.5;
         }
 
+        .header-wave {
+            position: absolute;
+            bottom: -1px;
+            left: 0;
+            right: 0;
+            height: 30px;
+            background: var(--white);
+            border-radius: 100% 100% 0 0;
+        }
+
         .form-container {
-            padding: 24px;
+            padding: 32px 28px;
+            position: relative;
         }
 
         .section {
-            margin-bottom: 18px;
+            margin-bottom: 28px;
         }
 
         .section-title {
             display: flex;
             align-items: center;
             margin-bottom: 20px;
-            color: #1e293b;
+            gap: 14px;
         }
 
         .step-number {
-            background: var(--accent);
+            background: linear-gradient(135deg, var(--pink) 0%, var(--purple) 100%);
             color: white;
-            width: 28px;
-            height: 28px;
+            width: 36px;
+            height: 36px;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            margin-right: 12px;
-            font-weight: 600;
-            font-size: 13px;
+            font-weight: 800;
+            font-size: 16px;
+            box-shadow: 0 4px 15px rgba(255, 107, 157, 0.4);
+            flex-shrink: 0;
         }
 
+        .section-title h2 {
+            font-size: 20px;
+            font-weight: 800;
+            color: var(--text);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
 
         .form-group {
             margin-bottom: 20px;
         }
 
-        .auth-content .form-group {
-            margin-bottom: 16px;
-        }
-
         label {
             display: block;
-            margin-bottom: 6px;
-            color: #475569;
-            font-weight: 600;
-            font-size: 13px;
-            letter-spacing: 0.02em;
+            margin-bottom: 8px;
+            color: var(--text);
+            font-weight: 700;
+            font-size: 14px;
         }
 
         input[type="text"],
@@ -251,84 +356,125 @@
         input[type="password"],
         select {
             width: 100%;
-            padding: 10px 12px;
-            border: 1px solid var(--border);
-            background: var(--surface);
+            padding: 14px 18px;
+            border: 2px solid var(--border);
+            background: var(--cream);
             color: var(--text);
-            border-radius: 8px;
-            font-size: 15px;
-            transition: all 0.15s ease;
+            border-radius: 16px;
+            font-size: 16px;
+            font-family: 'Nunito', sans-serif;
+            font-weight: 600;
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
         }
 
         input:focus,
         select:focus {
             outline: none;
-            border-color: var(--accent);
-            box-shadow: 0 0 0 3px var(--accent-soft);
+            border-color: var(--pink);
+            box-shadow: 0 0 0 4px var(--pink-soft);
+            transform: translateY(-2px);
+        }
+
+        input::placeholder {
+            color: var(--text-light);
+            opacity: 0.7;
         }
 
         .payment-methods {
             display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 10px;
-            margin-bottom: 16px;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin-bottom: 20px;
         }
 
         .payment-method {
-            padding: 14px 12px;
-            border: 1px solid var(--border);
-            border-radius: 8px;
+            padding: 20px 16px;
+            border: 3px solid var(--border);
+            border-radius: 20px;
             text-align: center;
             cursor: pointer;
-            transition: all 0.15s ease;
-            background: var(--surface);
-            color: var(--subtext);
-            font-size: 14px;
-            font-weight: 500;
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            background: var(--white);
+            color: var(--text);
+            font-weight: 700;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .payment-method::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, var(--pink-soft) 0%, var(--purple-light) 100%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
         }
 
         .payment-method:hover {
-            border-color: var(--accent);
-            background: var(--surface-2);
+            border-color: var(--pink);
+            transform: translateY(-4px) scale(1.02);
+            box-shadow: 0 8px 25px rgba(255, 107, 157, 0.25);
+        }
+
+        .payment-method:hover::before {
+            opacity: 0.5;
         }
 
         .payment-method.selected {
-            border-color: var(--accent);
-            background: var(--accent-soft);
-            color: var(--accent);
+            border-color: var(--pink);
+            background: linear-gradient(135deg, var(--pink-soft) 0%, var(--purple-light) 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(255, 107, 157, 0.3);
+        }
+
+        .payment-method > div {
+            position: relative;
+            z-index: 1;
+        }
+
+        .payment-method > div:first-child {
+            font-size: 32px;
+            margin-bottom: 8px;
+            filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+        }
+
+        .payment-method > div:last-child {
+            font-size: 13px;
+            line-height: 1.3;
         }
 
         .tutorial-box {
-            background: var(--surface-2);
-            border-radius: 8px;
+            background: linear-gradient(135deg, var(--yellow-light) 0%, var(--orange) 100%);
+            border-radius: 20px;
             padding: 20px;
             margin-bottom: 20px;
-            border: 1px solid var(--border);
+            border: 2px solid rgba(251, 146, 60, 0.3);
         }
 
         .tutorial-toggle {
-            background: transparent;
-            border: 1px solid var(--border);
-            color: var(--subtext);
-            padding: 8px 14px;
-            border-radius: 6px;
+            background: var(--white);
+            border: 2px solid var(--orange);
+            color: var(--text);
+            padding: 12px 20px;
+            border-radius: 14px;
             cursor: pointer;
-            font-size: 14px;
-            margin-bottom: 15px;
-            transition: all 0.15s ease;
-            font-weight: 500;
+            font-size: 15px;
+            font-weight: 700;
+            font-family: 'Nunito', sans-serif;
+            margin-bottom: 16px;
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
 
         .tutorial-toggle:hover {
-            background: var(--surface-2);
-            border-color: var(--accent);
-            color: var(--text);
-        }
-
-        .tutorial-toggle:focus-visible {
-            outline: none;
-            box-shadow: 0 0 0 3px var(--accent-soft);
-            border-color: var(--accent);
+            background: var(--yellow-light);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(251, 146, 60, 0.3);
         }
 
         .tutorial-content {
@@ -337,333 +483,308 @@
 
         .tutorial-content.show {
             display: block;
-            animation: slideDown 0.3s ease-out;
+            animation: slideDown 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
         }
 
         @keyframes slideDown {
-            from {
-                opacity: 0;
-                transform: translateY(-10px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+            from { opacity: 0; transform: translateY(-15px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         .tutorial-title {
-            font-weight: 600;
-            margin-bottom: 15px;
+            font-weight: 800;
+            margin-bottom: 16px;
             color: var(--text);
+            font-size: 16px;
         }
 
         .demo-browser {
-            background: var(--surface);
-            border-radius: 10px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06);
-            border: 1px solid var(--border);
+            background: var(--white);
+            border-radius: 16px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+            border: 2px solid rgba(0, 0, 0, 0.05);
             overflow: hidden;
         }
 
         .browser-bar {
-            background: var(--surface-2);
-            padding: 10px;
+            background: linear-gradient(135deg, #f8f8f8 0%, #ececec 100%);
+            padding: 12px;
             display: flex;
             align-items: center;
-            gap: 6px;
-            border-bottom: 1px solid var(--border);
+            gap: 8px;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
         }
 
         .browser-dot {
-            width: 10px;
-            height: 10px;
+            width: 12px;
+            height: 12px;
             border-radius: 50%;
-            background: #cbd5e1;
         }
 
+        .browser-dot:nth-child(1) { background: #FF6B6B; }
+        .browser-dot:nth-child(2) { background: #FFE66D; }
+        .browser-dot:nth-child(3) { background: #6EE7B7; }
+
         .browser-content {
-            padding: 15px;
-            height: 180px;
+            padding: 16px;
+            height: 160px;
             position: relative;
             overflow: hidden;
         }
 
         .demo-step {
             position: absolute;
-            width: 100%;
+            width: calc(100% - 32px);
             opacity: 0;
             animation: demoSlide 9s infinite;
         }
 
-        .demo-step:nth-child(1) {
-            animation-delay: 0s;
-        }
-
-        .demo-step:nth-child(2) {
-            animation-delay: 3s;
-        }
-
-        .demo-step:nth-child(3) {
-            animation-delay: 6s;
-        }
+        .demo-step:nth-child(1) { animation-delay: 0s; }
+        .demo-step:nth-child(2) { animation-delay: 3s; }
+        .demo-step:nth-child(3) { animation-delay: 6s; }
 
         @keyframes demoSlide {
-
-            0%,
-            33.33% {
-                opacity: 0;
-            }
-
-            33.34%,
-            66.66% {
-                opacity: 1;
-            }
-
-            66.67%,
-            100% {
-                opacity: 0;
-            }
+            0%, 33.33% { opacity: 0; }
+            33.34%, 66.66% { opacity: 1; }
+            66.67%, 100% { opacity: 0; }
         }
 
         .demo-review {
-            background: var(--surface-2);
-            padding: 8px;
-            border-radius: 5px;
-            margin-bottom: 8px;
-            font-size: 13px;
-        }
-
-        .demo-button {
-            background: var(--surface-2);
-            color: var(--text);
-            padding: 6px 12px;
-            border: 1px solid var(--border);
-            border-radius: 5px;
-            display: inline-block;
-            margin-top: 8px;
-            font-size: 13px;
-        }
-
-        .or-divider,
-        .and-divider {
-            text-align: center;
-            margin: 15px 0;
-            color: var(--subtext);
-            position: relative;
+            background: var(--cream);
+            padding: 12px;
+            border-radius: 12px;
+            margin-bottom: 10px;
             font-size: 14px;
         }
 
-        .and-divider {
-            color: #3fb950;
-            font-weight: 600;
+        .demo-button {
+            background: var(--blue-light);
+            color: var(--text);
+            padding: 8px 16px;
+            border-radius: 10px;
+            display: inline-block;
+            margin-top: 8px;
+            font-size: 14px;
+            font-weight: 700;
         }
 
-        .or-divider::before,
-        .or-divider::after,
+        .and-divider {
+            text-align: center;
+            margin: 24px 0;
+            color: var(--mint);
+            font-weight: 800;
+            font-size: 16px;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+        }
+
         .and-divider::before,
         .and-divider::after {
             content: '';
-            position: absolute;
-            top: 50%;
-            width: 45%;
-            height: 1px;
-            background: linear-gradient(90deg, transparent, var(--border));
+            flex: 1;
+            height: 3px;
+            background: linear-gradient(90deg, transparent, var(--mint-light), transparent);
+            border-radius: 2px;
         }
 
-        .or-divider::before,
-        .and-divider::before {
-            left: 0;
-        }
-
-        .or-divider::after,
-        .and-divider::after {
-            right: 0;
+        .and-divider span {
+            background: linear-gradient(135deg, var(--mint) 0%, var(--blue) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
 
         .file-upload {
             position: relative;
-            border: 2px dashed var(--border);
-            border-radius: 8px;
-            padding: 24px;
+            border: 3px dashed var(--pink-light);
+            border-radius: 20px;
+            padding: 32px 24px;
             text-align: center;
             cursor: pointer;
-            transition: all 0.15s ease;
-            background: var(--surface-2);
-            min-height: 120px;
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            background: linear-gradient(135deg, var(--cream) 0%, var(--white) 100%);
+            min-height: 140px;
             display: flex;
             align-items: center;
             justify-content: center;
         }
 
         .file-upload:hover {
-            border-color: var(--accent);
-            background: var(--accent-soft);
-        }
-
-        .file-upload:focus-visible {
-            outline: 2px solid var(--accent);
-            outline-offset: 2px;
+            border-color: var(--pink);
+            background: var(--pink-soft);
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(255, 107, 157, 0.2);
         }
 
         .file-upload.is-dragover {
-            border-color: var(--accent);
-            background: var(--accent-soft);
+            border-color: var(--purple);
+            background: var(--purple-light);
+            transform: scale(1.02);
         }
 
         .file-upload.has-file {
-            border-color: var(--accent);
+            border-color: var(--mint);
             border-style: solid;
-            background: var(--accent-soft);
+            background: linear-gradient(135deg, var(--mint-light) 0%, var(--white) 100%);
         }
 
         .dz-content {
             display: flex;
+            flex-direction: column;
             align-items: center;
-            gap: 14px;
+            gap: 12px;
         }
 
         .dz-icon {
-            width: 28px;
-            height: 28px;
-            color: var(--accent);
-            opacity: 0.9;
+            width: 48px;
+            height: 48px;
+            color: var(--pink);
         }
 
         .dz-title {
-            font-size: 14px;
-            font-weight: 600;
-        }
-
-        .dz-hint {
-            font-size: 12px;
-            color: #64748b;
-        }
-
-        .dz-title {
+            font-size: 16px;
+            font-weight: 700;
             color: var(--text);
-            font-weight: 600;
         }
 
         .dz-hint {
-            color: var(--subtext);
-            font-size: 13px;
-            margin-top: 2px;
+            font-size: 14px;
+            color: var(--text-light);
+        }
+
+        .file-name {
+            margin-top: 8px;
+            color: var(--mint);
+            font-weight: 800;
+            font-size: 15px;
         }
 
         .submit-button {
             width: 100%;
-            padding: 12px;
-            background: var(--accent);
+            padding: 18px 24px;
+            background: linear-gradient(135deg, var(--pink) 0%, var(--purple) 50%, var(--blue) 100%);
             color: white;
             border: none;
-            border-radius: 8px;
-            font-size: 15px;
-            font-weight: 600;
+            border-radius: 20px;
+            font-size: 18px;
+            font-weight: 800;
+            font-family: 'Nunito', sans-serif;
             cursor: pointer;
-            transition: all 0.15s ease;
-            -webkit-tap-highlight-color: transparent;
-            touch-action: manipulation;
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            box-shadow: 0 8px 30px rgba(255, 107, 157, 0.4);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .submit-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transition: left 0.5s ease;
         }
 
         .submit-button:hover {
-            background: var(--accent-hover);
-            transform: translateY(-1px);
-            box-shadow: var(--shadow-md);
+            transform: translateY(-4px) scale(1.02);
+            box-shadow: 0 12px 40px rgba(255, 107, 157, 0.5);
+        }
+
+        .submit-button:hover::before {
+            left: 100%;
         }
 
         .submit-button:active {
-            transform: translateY(0);
-        }
-
-        .submit-button:focus-visible {
-            outline: none;
-            box-shadow: 0 0 0 3px var(--accent-soft);
+            transform: translateY(-2px) scale(1.01);
         }
 
         .submit-button:disabled {
-            opacity: 0.5;
+            opacity: 0.6;
             cursor: not-allowed;
+            transform: none;
+        }
+
+        .footer-note {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 14px;
+            color: var(--text-light);
+            font-weight: 600;
+        }
+
+        .footer-note span {
+            display: inline-block;
+            animation: heart-beat 1.5s ease-in-out infinite;
+        }
+
+        @keyframes heart-beat {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.2); }
         }
 
         .success-message {
             display: none;
             text-align: center;
-            padding: 40px;
+            padding: 50px 30px;
             position: relative;
             overflow: hidden;
         }
 
         .success-icon {
-            font-size: 72px;
-            margin-bottom: 20px;
-            animation: bounce 0.6s ease-out;
+            font-size: 100px;
+            margin-bottom: 24px;
+            animation: celebration 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
         }
 
-        @keyframes bounce {
-            0% {
-                transform: scale(0.3) translateY(20px);
-                opacity: 0;
-            }
-
-            50% {
-                transform: scale(1.05) translateY(-10px);
-            }
-
-            70% {
-                transform: scale(0.9) translateY(5px);
-            }
-
-            100% {
-                transform: scale(1) translateY(0);
-                opacity: 1;
-            }
+        @keyframes celebration {
+            0% { transform: scale(0) rotate(-30deg); opacity: 0; }
+            50% { transform: scale(1.3) rotate(15deg); }
+            75% { transform: scale(0.9) rotate(-5deg); }
+            100% { transform: scale(1) rotate(0deg); opacity: 1; }
         }
 
         .success-message h2 {
-            color: #1e293b;
-            margin-bottom: 10px;
+            color: var(--text);
+            margin-bottom: 12px;
             font-size: 32px;
-            animation: celebrateText 0.8s ease-out 0.3s both;
+            font-weight: 800;
+            animation: fadeInUp 0.6s ease-out 0.3s both;
         }
 
-        @keyframes celebrateText {
-            0% {
-                transform: scale(0.8) rotateZ(-5deg);
-                opacity: 0;
-            }
+        .success-best {
+            background: linear-gradient(135deg, var(--pink) 0%, var(--purple) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            display: inline-block;
+            animation: shimmer 2s ease-in-out infinite;
+        }
 
-            50% {
-                transform: scale(1.1) rotateZ(3deg);
-            }
-
-            100% {
-                transform: scale(1) rotateZ(0);
-                opacity: 1;
-            }
+        @keyframes shimmer {
+            0%, 100% { opacity: 0.8; transform: scale(1); }
+            50% { opacity: 1; transform: scale(1.05); }
         }
 
         .success-message p {
-            color: #64748b;
+            color: var(--text-light);
+            font-size: 16px;
+            font-weight: 600;
             animation: fadeInUp 0.6s ease-out 0.5s both;
         }
 
         @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         .dollar-sign {
             position: absolute;
-            font-size: 28px;
-            color: #10b981;
+            font-size: 32px;
             animation: floatUp 3s ease-out infinite;
             z-index: 1;
             user-select: none;
@@ -671,524 +792,78 @@
         }
 
         @keyframes floatUp {
-            0% {
-                transform: translateY(0) rotateZ(0deg);
-                opacity: 0;
-            }
-
-            10% {
-                opacity: 1;
-            }
-
-            90% {
-                opacity: 1;
-            }
-
-            100% {
-                transform: translateY(-400px) rotateZ(360deg);
-                opacity: 0;
-            }
-        }
-
-        .success-best {
-            color: #3b82f6;
-            font-weight: 600;
-            display: inline-block;
-            animation: shimmer 2s ease-in-out infinite;
-        }
-
-        @keyframes shimmer {
-
-            0%,
-            100% {
-                opacity: 0.8;
-                transform: scale(1);
-            }
-
-            50% {
-                opacity: 1;
-                transform: scale(1.05);
-            }
+            0% { transform: translateY(0) rotateZ(0deg); opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { transform: translateY(-400px) rotateZ(360deg); opacity: 0; }
         }
 
         .confetti {
             position: absolute;
-            width: 10px;
-            height: 10px;
+            width: 12px;
+            height: 12px;
+            border-radius: 3px;
             animation: confetti-fall 3s ease-out infinite;
             z-index: 1;
         }
 
         @keyframes confetti-fall {
-            0% {
-                transform: translateY(0) rotateZ(0deg);
-                opacity: 1;
-            }
-
-            100% {
-                transform: translateY(400px) rotateZ(720deg);
-                opacity: 0;
-            }
+            0% { transform: translateY(0) rotateZ(0deg); opacity: 1; }
+            100% { transform: translateY(400px) rotateZ(720deg); opacity: 0; }
         }
 
         .error-message {
-            background: rgba(239, 68, 68, 0.1);
-            color: #dc2626;
-            padding: 12px 16px;
-            border-radius: 8px;
-            margin-bottom: 16px;
+            background: linear-gradient(135deg, #FEE2E2 0%, #FECACA 100%);
+            color: #DC2626;
+            padding: 16px 20px;
+            border-radius: 16px;
+            margin-bottom: 20px;
             display: none;
-            border: 1px solid rgba(239, 68, 68, 0.2);
-            font-size: 14px;
+            border: 2px solid rgba(220, 38, 38, 0.2);
+            font-size: 15px;
             text-align: center;
-            font-weight: 500;
+            font-weight: 700;
         }
 
         .error-message.show {
             display: block !important;
+            animation: shake 0.5s ease-in-out;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
         }
 
         input[type="file"] {
             display: none;
         }
 
-        .file-name {
-            margin-top: 10px;
-            color: var(--accent);
-            font-weight: 600;
-        }
-
-        /* Remove old admin-link styling as it's now part of auth-buttons */
-
-        .reset-modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.5);
-            z-index: 1000;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .reset-modal.active {
-            display: flex;
-        }
-
-        .reset-content {
-            background: var(--surface);
-            color: var(--text);
-            padding: 30px;
-            border-radius: 10px;
-            max-width: 400px;
-            width: 90%;
-            border: 1px solid var(--border);
-        }
-
-        .reset-content h2 {
-            margin-bottom: 20px;
-            color: var(--text);
-        }
-
-        .reset-content input {
-            width: 100%;
-            padding: 10px;
-            margin-bottom: 15px;
-            border: 1px solid var(--border);
-            background: var(--surface-2);
-            color: var(--text);
-            border-radius: 5px;
-        }
-
-        .reset-button {
-            width: 100%;
-            padding: 12px;
-            background: var(--surface-2);
-            color: var(--text);
-            border: 1px solid var(--border);
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 16px;
-            font-weight: 500;
-        }
-
-        .reset-button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
-        }
-
-        /* User auth + dashboard additions */
-        /* Auth buttons container */
-        .auth-buttons {
-            position: fixed;
-            top: 15px;
-            right: 15px;
-            display: flex;
-            gap: 10px;
-            z-index: 1100;
-        }
-
-        .user-link,
-        .admin-link-top {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            color: #475569;
-            padding: 10px 16px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
+        .pause-alert {
+            background: linear-gradient(135deg, var(--yellow-light) 0%, #FDE68A 100%);
+            border: 2px solid var(--yellow);
             border-radius: 20px;
-            text-decoration: none;
-            font-size: 14px;
-            font-weight: 500;
-            transition: all 0.2s ease;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            padding: 20px 24px;
+            margin-bottom: 24px;
+            text-align: center;
         }
 
-        .user-link:hover,
-        .admin-link-top:hover {
-            border-color: #3b82f6;
-            color: #1e293b;
-            transform: translateY(-1px);
-            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.2);
-        }
-
-        /* Legacy bars hidden in favor of new topbar */
-        .auth-buttons {
-            display: none !important;
-        }
-
-        .auth-buttons-mobile {
-            display: none !important;
-        }
-
-        .mobile-nav-content {
-            max-width: 100%;
-            padding: 14px 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .mobile-nav-logo {
+        .pause-alert-title {
             font-size: 18px;
-            font-weight: 700;
-            color: #1e293b;
+            font-weight: 800;
+            color: #92400E;
+            margin-bottom: 8px;
             display: flex;
             align-items: center;
-            gap: 10px;
-            letter-spacing: -0.5px;
-        }
-
-        .mobile-nav-logo span:first-child {
-            font-size: 24px;
-            animation: pulse 2s ease-in-out infinite;
-        }
-
-        .mobile-nav-buttons {
-            display: flex;
+            justify-content: center;
             gap: 8px;
         }
 
-        .auth-buttons-mobile .user-link,
-        .auth-buttons-mobile .admin-link-top {
-            background: rgba(47, 129, 247, 0.1);
-            color: var(--text);
-            padding: 8px 14px;
-            border: 1px solid rgba(47, 129, 247, 0.2);
-            border-radius: 20px;
-            text-decoration: none;
-            font-size: 13px;
-            font-weight: 500;
-            transition: all 0.2s;
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .auth-buttons-mobile .user-link::before,
-        .auth-buttons-mobile .admin-link-top::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
-            transition: left 0.5s;
-        }
-
-        .auth-buttons-mobile .user-link:hover::before,
-        .auth-buttons-mobile .admin-link-top:hover::before {
-            left: 100%;
-        }
-
-        .auth-buttons-mobile .user-link:hover,
-        .auth-buttons-mobile .admin-link-top:hover {
-            background: rgba(47, 129, 247, 0.2);
-            border-color: var(--accent);
-            transform: translateY(-1px);
-        }
-
-        .auth-buttons-mobile .user-link svg,
-        .auth-buttons-mobile .admin-link-top svg {
-            width: 14px;
-            height: 14px;
-        }
-
-        .auth-button-text-mobile {
-            font-weight: 600;
-            white-space: nowrap;
-            min-width: 20px;
-            text-align: center;
+        .pause-alert-text {
             font-size: 14px;
-        }
-
-        /* Truncate long emails on mobile */
-        .auth-button-text {
-            white-space: nowrap;
-        }
-
-        @media (max-width: 768px) {
-            .auth-button-text {
-                max-width: 100px;
-                overflow: hidden;
-                text-overflow: ellipsis;
-            }
-
-            /* Ensure topbar actions don't overflow on small screens */
-            .topbar-actions {
-                max-width: 60%;
-            }
-
-            .topbar-actions a {
-                max-width: 120px;
-                padding: 6px 8px;
-                font-size: 13px;
-            }
-        }
-
-        @media (max-width: 768px) {
-
-            /* Fix mobile layout - prevent flex centering issues */
-            body {
-                display: block !important;
-                align-items: unset !important;
-                justify-content: unset !important;
-                padding: 84px 10px 10px 10px !important;
-                min-height: 100vh;
-                overflow-x: hidden;
-            }
-
-            .container {
-                max-width: none !important;
-                width: 100% !important;
-                margin: 0 auto !important;
-                border-radius: 16px !important;
-                min-height: auto !important;
-            }
-
-            /* Ensure form elements are properly sized on mobile */
-            .form-group input,
-            .form-group select,
-            .submit-button {
-                width: 100% !important;
-                max-width: 100% !important;
-            }
-
-            /* Fix payment methods grid on mobile */
-            .payment-methods {
-                grid-template-columns: 1fr !important;
-                gap: 12px !important;
-            }
-
-            .payment-method {
-                width: 100% !important;
-                padding: 16px !important;
-            }
-
-            /* Hide fixed auth buttons on mobile */
-            .auth-buttons {
-                display: none !important;
-            }
-
-            /* Show mobile auth buttons */
-            .auth-buttons-mobile {
-                display: block;
-            }
-
-            /* Adjust header for sticky nav */
-            .header {
-                padding-top: 30px;
-                margin-top: 56px;
-            }
-
-            /* Show optional sign-in message on mobile */
-            .mobile-optional-signin {
-                display: block !important;
-            }
-
-            /* Adjust container to account for sticky nav */
-            .container {
-                padding-top: 0;
-            }
-
-            /* Adjust profile popover position on mobile */
-            .profile-popover {
-                top: 60px;
-                right: 10px;
-                width: 260px;
-            }
-
-            /* Optimize submissions modal for mobile */
-            .submissions-modal .modal-content {
-                width: 95% !important;
-                max-width: none !important;
-                margin: 10px !important;
-                max-height: 90vh !important;
-            }
-
-            .submissions-modal .modal-header h2 {
-                font-size: 20px !important;
-            }
-        }
-
-        /* Mobile submissions table optimization */
-        @media (max-width: 768px) {
-
-            /* Hide table headers and make table responsive */
-            .subs-table table,
-            .subs-table thead,
-            .subs-table tbody,
-            .subs-table th,
-            .subs-table td,
-            .subs-table tr {
-                display: block;
-            }
-
-            .subs-table thead tr {
-                position: absolute;
-                top: -9999px;
-                left: -9999px;
-            }
-
-            .subs-table tbody tr {
-                background: var(--surface);
-                border: 1px solid var(--border);
-                border-radius: 8px;
-                margin-bottom: 12px;
-                padding: 16px;
-                position: relative;
-            }
-
-            .subs-table tbody tr:nth-child(even) {
-                background: var(--surface);
-            }
-
-            .subs-table tbody td {
-                border: none;
-                border-bottom: 1px solid var(--border);
-                position: relative;
-                padding: 8px 0 8px 120px !important;
-                text-align: left;
-                white-space: nowrap;
-                overflow: hidden;
-                text-overflow: ellipsis;
-            }
-
-            .subs-table tbody td:last-child {
-                border-bottom: none;
-            }
-
-            .subs-table tbody td:before {
-                content: attr(data-label);
-                position: absolute;
-                left: 0;
-                width: 110px;
-                padding-right: 10px;
-                white-space: nowrap;
-                font-weight: 600;
-                color: var(--subtext);
-                font-size: 12px;
-                text-transform: uppercase;
-                letter-spacing: 0.5px;
-            }
-
-            /* Add labels for mobile table */
-            .subs-table tbody td:nth-child(1):before {
-                content: "Date";
-            }
-
-            .subs-table tbody td:nth-child(2):before {
-                content: "Reward";
-            }
-
-            .subs-table tbody td:nth-child(3):before {
-                content: "Delivery";
-            }
-
-            .subs-table tbody td:nth-child(4):before {
-                content: "Type";
-            }
-
-            .subs-table tbody td:nth-child(5):before {
-                content: "Status";
-            }
-        }
-
-        /* Extra small mobile devices */
-        @media (max-width: 480px) {
-            body {
-                padding: 8px !important;
-            }
-
-            .container {
-                border-radius: 12px !important;
-            }
-
-            .header h1 {
-                font-size: 24px !important;
-            }
-
-            .form-content {
-                padding: 20px !important;
-            }
-
-            .payment-method {
-                padding: 12px !important;
-                font-size: 14px !important;
-            }
-
-            /* Further optimize table for very small screens */
-            .subs-table tbody td {
-                padding: 6px 0 6px 100px !important;
-                font-size: 14px;
-            }
-
-            .subs-table tbody td:before {
-                width: 90px;
-                font-size: 11px;
-            }
-
-            .handle {
-                font-size: 12px;
-                padding: 2px 6px;
-            }
-
-            .pill {
-                font-size: 11px;
-                padding: 3px 8px;
-            }
-
-            .status-chip {
-                font-size: 11px;
-                padding: 3px 8px;
-            }
+            color: #A16207;
+            font-weight: 600;
         }
 
         .auth-modal {
@@ -1198,7 +873,8 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.6);
+            background: rgba(74, 55, 40, 0.5);
+            backdrop-filter: blur(8px);
             z-index: 1200;
             justify-content: center;
             align-items: center;
@@ -1209,16 +885,16 @@
         }
 
         .auth-content {
-            background: var(--surface);
+            background: var(--white);
             color: var(--text);
-            padding: 24px;
-            border-radius: 16px;
+            padding: 32px;
+            border-radius: 28px;
             max-width: 420px;
             width: 92%;
             max-height: 90vh;
             overflow-y: auto;
-            border: 1px solid var(--border);
-            box-shadow: 0 30px 80px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.05) inset;
+            border: 3px solid var(--pink-light);
+            box-shadow: var(--shadow-lg);
             position: relative;
         }
 
@@ -1226,274 +902,140 @@
             position: absolute;
             top: 16px;
             right: 16px;
-            background: none;
-            border: none;
-            font-size: 24px;
-            color: var(--subtext);
+            background: var(--cream);
+            border: 2px solid var(--border);
+            font-size: 20px;
+            color: var(--text-light);
             cursor: pointer;
-            width: 32px;
-            height: 32px;
+            width: 36px;
+            height: 36px;
             display: flex;
             align-items: center;
             justify-content: center;
-            border-radius: 8px;
-            transition: all 0.2s ease;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+            font-weight: 700;
         }
 
         .modal-close-btn:hover {
-            background: var(--surface-2);
-            color: var(--text);
-        }
-
-        @media (min-width: 768px) {
-            .auth-content {
-                padding: 32px;
-            }
-        }
-
-        .auth-content::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 180px;
-            background: radial-gradient(50% 50% at 50% 0%, rgba(47, 129, 247, 0.15) 0%, rgba(47, 129, 247, 0) 100%);
-            pointer-events: none;
+            background: var(--pink-soft);
+            border-color: var(--pink);
+            color: var(--pink);
+            transform: rotate(90deg);
         }
 
         .auth-content h2 {
             margin-bottom: 24px;
             color: var(--text);
-            font-size: 24px;
-            font-weight: 700;
+            font-size: 28px;
+            font-weight: 800;
             text-align: center;
-            position: relative;
-            z-index: 1;
-        }
-
-        /* Auth modal specific overrides */
-        .auth-content .form-group input,
-        .auth-content .form-group input[type="email"],
-        .auth-content .form-group input[type="password"],
-        .reset-content input {
-            border-radius: 8px;
-            height: 44px !important;
-            min-height: 44px !important;
-            padding: 10px 12px !important;
-            font-size: 15px !important;
-            line-height: 1.5 !important;
-            background: var(--surface-2) !important;
-            border: 1px solid var(--border) !important;
-            color: var(--text) !important;
-        }
-
-        /* Ensure password inputs specifically get the dark theme */
-        input[type="password"] {
-            background-color: var(--surface-2) !important;
-            -webkit-appearance: none;
-            -moz-appearance: none;
-            appearance: none;
-        }
-
-        /* Prevent autofill white background flash - aggressive approach */
-        input:-webkit-autofill,
-        input:-webkit-autofill:hover,
-        input:-webkit-autofill:focus,
-        input:-webkit-autofill:active,
-        input:-webkit-autofill:first-line {
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: var(--text) !important;
-            transition: background-color 5000s ease-in-out 0s, color 5000s ease-in-out 0s;
-            box-shadow: inset 0 0 20px 20px var(--surface-2) !important;
-            background-color: var(--surface-2) !important;
-            color: var(--text) !important;
-        }
-
-        /* Ensure auth inputs have immediate dark background */
-        .auth-content input[type="email"],
-        .auth-content input[type="password"] {
-            background-color: var(--surface-2) !important;
-            transition: none !important;
-        }
-
-        /* Preload dark backgrounds */
-        .auth-modal::before {
-            content: '';
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 1px;
-            height: 1px;
-            background: var(--surface-2);
-            opacity: 0;
-            pointer-events: none;
-        }
-
-        input::placeholder,
-        textarea::placeholder {
-            color: var(--subtext);
-            opacity: 0.9;
-        }
-
-        /* Ensure focus states work for all auth inputs */
-        .auth-content input:focus,
-        .auth-content input[type="email"]:focus,
-        .auth-content input[type="password"]:focus {
-            outline: none !important;
-            border-color: var(--accent) !important;
-            box-shadow: 0 0 0 3px var(--accent-soft) !important;
-            background: var(--surface-2) !important;
         }
 
         .auth-actions-row {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-top: 20px;
+            margin-top: 24px;
             padding-top: 20px;
-            border-top: 1px solid var(--border);
+            border-top: 2px solid var(--border);
         }
 
         .link-btn {
             background: none;
             border: none;
-            color: var(--accent);
+            color: var(--pink);
             cursor: pointer;
             font-size: 14px;
+            font-weight: 700;
+            font-family: 'Nunito', sans-serif;
             padding: 0;
             transition: all 0.2s ease;
-            opacity: 0.9;
         }
 
         .link-btn:hover {
-            opacity: 1;
+            color: var(--purple);
             text-decoration: underline;
         }
 
-        .my-submissions {
-            margin-top: 20px;
-            background: var(--surface);
-            color: var(--text);
-            border: 1px solid var(--border);
-            border-radius: 10px;
-            overflow: hidden;
-            display: none;
-        }
-
-        .my-submissions h3 {
-            padding: 16px 20px;
-            border-bottom: 1px solid var(--border);
-            color: var(--text);
-        }
-
-        .my-submissions table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
-        .my-submissions th,
-        .my-submissions td {
-            padding: 12px 15px;
-            border-bottom: 1px solid #f5f5f5;
-            font-size: 14px;
-        }
-
-        .status-chip {
-            display: inline-block;
-            padding: 4px 10px;
-            border-radius: 999px;
-            font-size: 12px;
-            font-weight: 600;
-        }
-
-        .status-chip.pending {
-            background: #fff3cd;
-            color: #856404;
-        }
-
-        .status-chip.awarded {
-            background: #d4edda;
-            color: #155724;
-        }
-
-        .status-chip.rejected {
-            background: #f8d7da;
-            color: #721c24;
-        }
-
-        /* Compact upload area */
-        .file-upload {
-            padding: 14px;
-        }
-
-        .upload-icon {
-            font-size: 28px;
-            margin-bottom: 6px;
-        }
-
-        /* Profile popover */
         .profile-popover {
             position: fixed;
-            top: 56px;
+            top: 72px;
             right: 20px;
-            background: var(--surface);
+            background: var(--white);
             color: var(--text);
-            border: 1px solid var(--border);
-            border-radius: 10px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
-            width: 280px;
+            border: 3px solid var(--pink-light);
+            border-radius: 20px;
+            box-shadow: var(--shadow-lg);
+            width: 300px;
             z-index: 1300;
             display: none;
             overflow: hidden;
         }
 
         .profile-header {
-            background: var(--surface-2);
-            color: var(--text);
-            padding: 16px;
+            background: linear-gradient(135deg, var(--pink) 0%, var(--purple) 100%);
+            color: white;
+            padding: 20px;
         }
 
         .profile-body {
-            padding: 14px 16px;
+            padding: 16px 20px;
         }
 
         .profile-row {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin: 6px 0;
+            margin: 8px 0;
             color: var(--text);
+            font-weight: 600;
         }
 
         .profile-actions {
-            padding: 12px 16px 16px 16px;
-            border-top: 1px solid #f0f0f0;
+            padding: 16px 20px;
+            border-top: 2px solid var(--border);
             display: flex;
-            gap: 10px;
+            gap: 12px;
         }
 
         .btn-secondary-small {
-            background: #6c757d;
-            color: white;
-            border: none;
-            border-radius: 8px;
-            padding: 8px 10px;
+            background: var(--cream);
+            color: var(--text);
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            padding: 10px 16px;
             font-size: 14px;
+            font-weight: 700;
+            font-family: 'Nunito', sans-serif;
             cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-secondary-small:hover {
+            border-color: var(--pink);
+            background: var(--pink-soft);
         }
 
         .btn-primary-small {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, var(--pink) 0%, var(--purple) 100%);
             color: white;
             border: none;
-            border-radius: 8px;
-            padding: 8px 10px;
+            border-radius: 12px;
+            padding: 10px 16px;
             font-size: 14px;
+            font-weight: 700;
+            font-family: 'Nunito', sans-serif;
             cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(255, 107, 157, 0.3);
         }
 
-        /* Submissions modal */
+        .btn-primary-small:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 107, 157, 0.4);
+        }
+
         .submissions-modal {
             display: none;
             position: fixed;
@@ -1501,7 +1043,8 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.55);
+            background: rgba(74, 55, 40, 0.5);
+            backdrop-filter: blur(8px);
             z-index: 1400;
             justify-content: center;
             align-items: center;
@@ -1512,52 +1055,53 @@
         }
 
         .submissions-content {
-            background: var(--surface);
+            background: var(--white);
             color: var(--text);
-            padding: 22px;
-            border-radius: 12px;
+            padding: 28px;
+            border-radius: 24px;
             max-width: 720px;
-            width: 92%;
-            max-height: 82vh;
+            width: 94%;
+            max-height: 85vh;
             overflow-y: auto;
-            border: 1px solid var(--border);
-            box-shadow: 0 30px 80px rgba(0, 0, 0, 0.45), 0 0 0 3px var(--accent-soft);
+            border: 3px solid var(--pink-light);
+            box-shadow: var(--shadow-lg);
         }
 
         .submissions-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 14px;
-            padding-bottom: 8px;
-            border-bottom: 1px solid var(--border);
+            margin-bottom: 20px;
+            padding-bottom: 16px;
+            border-bottom: 2px solid var(--border);
         }
 
         .submissions-title {
-            font-size: 18px;
+            font-size: 22px;
             color: var(--text);
-            font-weight: 700;
+            font-weight: 800;
         }
 
         .submissions-close {
-            background: none;
-            border: 1px solid var(--border);
-            font-size: 16px;
+            background: var(--cream);
+            border: 2px solid var(--border);
+            font-size: 18px;
             cursor: pointer;
             color: var(--text);
-            border-radius: 8px;
-            padding: 6px 10px;
+            border-radius: 12px;
+            padding: 8px 14px;
+            font-weight: 700;
+            transition: all 0.3s ease;
         }
 
         .submissions-close:hover {
-            border-color: var(--accent);
-            box-shadow: 0 0 0 3px var(--accent-soft);
+            border-color: var(--pink);
+            background: var(--pink-soft);
         }
 
-        /* Submissions table styles */
         .subs-table {
-            border: 1px solid var(--border);
-            border-radius: 10px;
+            border: 2px solid var(--border);
+            border-radius: 16px;
             overflow: hidden;
         }
 
@@ -1568,92 +1112,243 @@
         }
 
         .subs-table thead th {
-            background: var(--surface-2);
-            padding: 12px 14px;
+            background: linear-gradient(135deg, var(--pink-soft) 0%, var(--purple-light) 100%);
+            padding: 14px 16px;
             text-align: left;
-            font-weight: 600;
-            color: var(--subtext);
-            position: sticky;
-            top: 0;
-            z-index: 1;
-            border-bottom: 1px solid var(--border);
+            font-weight: 800;
+            color: var(--text);
+            border-bottom: 2px solid var(--border);
         }
 
         .subs-table tbody td {
-            padding: 12px 14px;
+            padding: 14px 16px;
             border-top: 1px solid var(--border);
             color: var(--text);
         }
 
         .subs-table tbody tr:nth-child(even) td {
-            background: var(--surface-3);
+            background: var(--cream);
+        }
+
+        .subs-table tbody tr:hover td {
+            background: var(--pink-soft);
         }
 
         .handle {
-            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-            background: rgba(47, 129, 247, 0.12);
+            font-family: 'Nunito', monospace;
+            background: var(--blue-light);
             color: var(--text);
-            padding: 3px 8px;
-            border-radius: 6px;
+            padding: 4px 10px;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 13px;
         }
 
         .pill {
             display: inline-block;
-            padding: 4px 10px;
+            padding: 6px 12px;
             border-radius: 999px;
             font-size: 12px;
+            font-weight: 800;
+        }
+
+        .pill.amazon { background: #FEF3C7; color: #D97706; }
+        .pill.starbucks { background: #D1FAE5; color: #059669; }
+        .pill.surprise { background: var(--purple-light); color: #7C3AED; }
+
+        .status-chip {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 999px;
+            font-size: 12px;
+            font-weight: 800;
+        }
+
+        .status-chip.pending { background: #FEF3C7; color: #D97706; }
+        .status-chip.awarded { background: #D1FAE5; color: #059669; }
+        .status-chip.rejected { background: #FEE2E2; color: #DC2626; }
+
+        .reset-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(74, 55, 40, 0.5);
+            backdrop-filter: blur(8px);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .reset-modal.active {
+            display: flex;
+        }
+
+        .reset-content {
+            background: var(--white);
+            color: var(--text);
+            padding: 32px;
+            border-radius: 24px;
+            max-width: 400px;
+            width: 90%;
+            border: 3px solid var(--pink-light);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .reset-content h2 {
+            margin-bottom: 20px;
+            color: var(--text);
+            font-weight: 800;
+        }
+
+        .reset-content input {
+            width: 100%;
+            padding: 14px;
+            margin-bottom: 16px;
+            border: 2px solid var(--border);
+            background: var(--cream);
+            color: var(--text);
+            border-radius: 12px;
+            font-family: 'Nunito', sans-serif;
             font-weight: 600;
         }
 
-        .pill.venmo {
-            background: #e8f0fe;
-            color: #1967d2;
+        .reset-button {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, var(--pink) 0%, var(--purple) 100%);
+            color: white;
+            border: none;
+            border-radius: 14px;
+            font-size: 16px;
+            font-weight: 800;
+            font-family: 'Nunito', sans-serif;
+            cursor: pointer;
+            transition: all 0.3s ease;
         }
 
-        .pill.paypal {
-            background: #e6f4ea;
-            color: #0b8043;
+        .reset-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 107, 157, 0.4);
         }
 
-        .pill.cashapp {
-            background: #e8f5e9;
-            color: #0f9d58;
+        @media (max-width: 768px) {
+            body {
+                display: block;
+                padding: 80px 12px 30px 12px;
+            }
+
+            .container {
+                border-radius: 24px;
+            }
+
+            .header {
+                padding: 32px 20px;
+            }
+
+            .header h1 {
+                font-size: 26px;
+            }
+
+            .header-icon {
+                font-size: 52px;
+            }
+
+            .form-container {
+                padding: 24px 20px;
+            }
+
+            .payment-methods {
+                grid-template-columns: 1fr;
+                gap: 12px;
+            }
+
+            .payment-method {
+                display: flex;
+                align-items: center;
+                gap: 16px;
+                padding: 16px 20px;
+                text-align: left;
+            }
+
+            .payment-method > div:first-child {
+                font-size: 28px;
+                margin-bottom: 0;
+            }
+
+            .topbar-actions a span {
+                display: none;
+            }
+
+            .profile-popover {
+                right: 12px;
+                width: 280px;
+            }
+
+            .submissions-content {
+                padding: 20px;
+            }
+
+            .floating-shapes .shape:nth-child(n+5) {
+                display: none;
+            }
         }
 
-        .pill.booking {
-            background: #fff3e0;
-            color: #e65100;
-        }
+        @media (max-width: 480px) {
+            body {
+                padding: 76px 10px 24px 10px;
+            }
 
-        .pill.other {
-            background: #f3e5f5;
-            color: #7b1fa2;
-        }
+            .container {
+                border-radius: 20px;
+                border-width: 2px;
+            }
 
-        .pill.link {
-            background: #eaf2ff;
-            color: #1a73e8;
-        }
+            .topbar {
+                height: 56px;
+            }
 
-        .pill.screenshot {
-            background: #fff4e5;
-            color: #b06f00;
-        }
+            .topbar-content {
+                height: 56px;
+            }
 
-        /* New gift reward pill styles */
-        .pill.amazon {
-            background: #fff7e6;
-            color: #ff9900;
-        }
+            .brand {
+                font-size: 16px;
+            }
 
-        .pill.starbucks {
-            background: #e6f4ea;
-            color: #00754a;
-        }
+            .brand-badge {
+                width: 32px;
+                height: 32px;
+            }
 
-        .pill.surprise {
-            background: #f3e5f5;
-            color: #7b1fa2;
+            .header {
+                padding: 28px 16px;
+            }
+
+            .header h1 {
+                font-size: 22px;
+            }
+
+            .form-container {
+                padding: 20px 16px;
+            }
+
+            .section-title h2 {
+                font-size: 18px;
+            }
+
+            .step-number {
+                width: 32px;
+                height: 32px;
+                font-size: 14px;
+            }
+
+            .submit-button {
+                padding: 16px 20px;
+                font-size: 16px;
+            }
         }
     </style>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -1663,59 +1358,54 @@
 </head>
 
 <body>
-    <!-- Topbar (Stripe-like) -->
+    <div class="floating-shapes">
+        <div class="shape">🌟</div>
+        <div class="shape">💝</div>
+        <div class="shape">✨</div>
+        <div class="shape">🎀</div>
+        <div class="shape">💫</div>
+        <div class="shape">🌸</div>
+        <div class="shape">⭐</div>
+        <div class="shape">🦋</div>
+    </div>
+
     <div class="topbar">
         <div class="topbar-content">
             <div class="brand">
-                <div class="brand-badge">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path
-                            d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"
-                            fill="white" />
-                    </svg>
-                </div>
+                <div class="brand-badge">🎁</div>
                 <span>Guest Appreciation</span>
             </div>
             <div class="topbar-actions">
-                <a href="#" id="userAuthLink">Sign in</a>
-                <a href="admin.html">Admin</a>
+                <a href="#" id="userAuthLink">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                        <circle cx="12" cy="7" r="4"></circle>
+                    </svg>
+                    <span>Sign In</span>
+                </a>
+                <a href="admin.html">
+                    <span>Admin</span>
+                </a>
             </div>
         </div>
     </div>
 
-
     <div class="container">
-
         <div class="header">
-            <h1>Your Thank‑You Gift</h1>
-            <p>We’re grateful for your review. Let us know where to send your gift.</p>
-
-
-            <p id="accountRequirementsWarning"
-                style="margin-top: 12px; background: rgba(231, 76, 60, 0.1); padding: 10px; border-radius: 8px; border: 1px solid rgba(231, 76, 60, 0.3); color: #e74c3c; display: none;">
-                <strong>Thank you!</strong> We appreciate your time and thoughtful feedback.
-            </p>
-            <p class="mobile-optional-signin" style="margin-top: 10px; font-size: 13px; opacity: 0.8; display: none;">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                    stroke-linecap="round" stroke-linejoin="round"
-                    style="display: inline-block; vertical-align: middle; margin-right: 4px;">
-                    <circle cx="12" cy="12" r="10"></circle>
-                    <line x1="12" y1="16" x2="12" y2="12"></line>
-                    <line x1="12" y1="8" x2="12.01" y2="8"></line>
-                </svg>
-                Signing in is optional - you can submit your reward without an account
-            </p>
+            <span class="header-icon">🎁</span>
+            <h1>Yay! Your Thank-You Gift Awaits!</h1>
+            <p>We're so grateful for your lovely review! Tell us where to send your special surprise.</p>
+            <div class="header-wave"></div>
         </div>
 
         <div class="form-container" id="formContainer">
             <div class="error-message" id="errorMessage"></div>
 
             <form id="rewardForm">
-                <!-- Step 1: Payment Method -->
                 <div class="section">
                     <div class="section-title">
                         <div class="step-number">1</div>
-                        <h2>Choose Your Gift</h2>
+                        <h2>Pick Your Gift! 🎉</h2>
                     </div>
                     <div class="payment-methods">
                         <div class="payment-method" data-method="amazon">
@@ -1723,36 +1413,36 @@
                             <div>Amazon Gift Card</div>
                         </div>
                         <div class="payment-method" data-method="starbucks">
-                            <div>☕️</div>
+                            <div>☕</div>
                             <div>Starbucks Gift Card</div>
                         </div>
                         <div class="payment-method" data-method="surprise">
                             <div>🎁</div>
-                            <div>Surprise Gift</div>
+                            <div>Surprise Me!</div>
                         </div>
                     </div>
                     <div class="form-group">
-                        <label for="paymentHandle" id="paymentLabel">Delivery Email</label>
+                        <label for="paymentHandle" id="paymentLabel">Where should we send it? ✉️</label>
                         <input type="text" id="paymentHandle" name="paymentHandle" required
-                            placeholder="name@example.com" disabled>
+                            placeholder="your.email@example.com" disabled>
                     </div>
                 </div>
 
-                <!-- Step 2: Review Details -->
                 <div class="section">
                     <div class="section-title">
                         <div class="step-number">2</div>
-                        <h2>Help Us Find Your Review</h2>
+                        <h2>Show Us Your Review! 📝</h2>
                     </div>
-                    <p style="color: #666; font-size: 14px; margin-bottom: 15px;">Including your review link and a
-                        screenshot helps us share a small token of appreciation.</p>
+                    <p style="color: var(--text-light); font-size: 15px; margin-bottom: 18px; font-weight: 600;">
+                        Just share your review link and a quick screenshot - it helps us send your gift faster! 💨
+                    </p>
 
-                    <!-- Tutorial -->
-                    <button type="button" class="tutorial-toggle" onclick="toggleTutorial()">📱 Need a hand finding your
-                        review link? Tap here</button>
+                    <button type="button" class="tutorial-toggle" onclick="toggleTutorial()">
+                        <span>📱</span> Need help finding your review? Tap here!
+                    </button>
 
                     <div class="tutorial-box tutorial-content" id="tutorialContent">
-                        <div class="tutorial-title">How to Get Your Review Link:</div>
+                        <div class="tutorial-title">✨ How to Find Your Review Link:</div>
                         <div class="demo-browser">
                             <div class="browser-bar">
                                 <div class="browser-dot"></div>
@@ -1765,7 +1455,7 @@
                                     <div class="demo-review">
                                         <div>⭐⭐⭐⭐⭐</div>
                                         <div>"Great service! Highly recommend..."</div>
-                                        <div style="color: #666; font-size: 12px;">Your Name</div>
+                                        <div style="color: var(--text-light); font-size: 12px;">Your Name</div>
                                     </div>
                                 </div>
                                 <div class="demo-step">
@@ -1778,89 +1468,80 @@
                                 <div class="demo-step">
                                     <strong>Step 3:</strong> Click "Copy link"
                                     <div class="demo-button">📋 Copy link</div>
-                                    <div style="margin-top: 10px; color: #4caf50;">✓ Link copied!</div>
+                                    <div style="margin-top: 10px; color: var(--mint); font-weight: 700;">✓ Link copied!</div>
                                 </div>
                             </div>
                         </div>
                     </div>
 
                     <div class="form-group">
-                        <label for="reviewLink">Step 1: Paste Your Review Link <span
-                                style="color: #e74c3c;">*</span></label>
+                        <label for="reviewLink">Paste Your Review Link <span style="color: var(--pink);">*</span></label>
                         <input type="url" id="reviewLink" name="reviewLink" placeholder="https://g.page/r/..." required>
                     </div>
 
-                    <div class="and-divider">AND</div>
+                    <div class="and-divider"><span>AND</span></div>
 
                     <div class="form-group">
-                        <label>Step 2: Upload a Screenshot <span style="color: #e74c3c;">*</span></label>
+                        <label>Upload a Screenshot <span style="color: var(--pink);">*</span></label>
                         <div class="file-upload" id="fileUploadArea" role="button" tabindex="0"
                             aria-label="Upload screenshot of your review">
                             <div class="dz-content">
-                                <svg class="dz-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"
-                                    aria-hidden="true">
-                                    <path d="M12 16V4m0 0l-4 4m4-4l4 4" stroke="currentColor" stroke-width="1.8"
+                                <svg class="dz-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M12 16V4m0 0l-4 4m4-4l4 4" stroke="currentColor" stroke-width="2.5"
                                         stroke-linecap="round" stroke-linejoin="round" />
                                     <path d="M4 14v3a3 3 0 003 3h10a3 3 0 003-3v-3" stroke="currentColor"
-                                        stroke-opacity="0.7" stroke-width="1.5" stroke-linecap="round" />
+                                        stroke-opacity="0.7" stroke-width="2" stroke-linecap="round" />
                                 </svg>
-                                <div class="dz-text">
-                                    <div class="dz-title">Click to upload screenshot of your review</div>
-                                    <div class="dz-hint">or drag and drop</div>
-                                    <div class="file-name" id="fileName"></div>
-                                </div>
+                                <div class="dz-title">Drop your screenshot here!</div>
+                                <div class="dz-hint">or click to browse 📸</div>
+                                <div class="file-name" id="fileName"></div>
                             </div>
                         </div>
                         <input type="file" id="reviewScreenshot" name="reviewScreenshot" accept="image/*" required>
                     </div>
                 </div>
 
-                <button type="submit" class="submit-button" id="submitButton">Send Details & Receive Your Gift</button>
+                <button type="submit" class="submit-button" id="submitButton">
+                    🎉 Send & Get My Gift!
+                </button>
 
-                <p style="text-align: center; margin-top: 15px; font-size: 12px; color: #666;">We appreciate your
-                    feedback—thank you for helping us improve.</p>
+                <p class="footer-note">
+                    Thanks for being awesome! <span>💖</span>
+                </p>
             </form>
-
-
-
-
         </div>
 
         <div class="success-message" id="successMessage">
-            <div class="success-icon">🎁</div>
-            <h2>Thank You! <span class="success-best">You're the Best!</span></h2>
-            <p>Your gift request has been received.</p>
-            <p>We'll email your gift within 24-48 hours.</p>
-            <div style="margin-top: 18px; display: flex; gap: 10px; justify-content: center;">
+            <div class="success-icon">🎊</div>
+            <h2>Woohoo! <span class="success-best">You're Amazing!</span></h2>
+            <p>Your gift request is on its way!</p>
+            <p style="margin-top: 8px;">We'll email your surprise within 24-48 hours. 💌</p>
+            <div style="margin-top: 24px; display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;">
                 <button class="btn-primary-small" id="viewMySubsBtn">View My Submissions</button>
                 <button class="btn-secondary-small" id="backHomeBtn">Back to Home</button>
             </div>
         </div>
     </div>
 
-
-
-    <!-- Password Reset Modal -->
     <div class="reset-modal" id="resetModal">
         <div class="reset-content">
-            <h2>Reset Your Password</h2>
-            <p style="margin-bottom: 20px; color: #666;">Enter your new password below:</p>
+            <h2>🔐 Reset Password</h2>
+            <p style="margin-bottom: 20px; color: var(--text-light); font-weight: 600;">Enter your new password below:</p>
             <form id="resetPasswordForm" onsubmit="event.preventDefault(); resetPassword();">
                 <input type="password" id="newPassword" placeholder="New Password" minlength="6" required>
                 <input type="password" id="confirmPassword" placeholder="Confirm Password" minlength="6" required>
-                <button type="submit" class="reset-button">Update Password</button>
+                <button type="submit" class="reset-button">Update Password ✨</button>
             </form>
-            <p style="margin-top: 15px; text-align: center;">
-                <a href="#" onclick="closeResetModal()" style="color: #667eea;">Cancel</a>
+            <p style="margin-top: 16px; text-align: center;">
+                <a href="#" onclick="closeResetModal()" style="color: var(--pink); font-weight: 700;">Cancel</a>
             </p>
         </div>
     </div>
 
-    <!-- Auth Modal -->
     <div class="auth-modal" id="authModal">
         <div class="auth-content">
             <button class="modal-close-btn" id="closeAuthModal">&times;</button>
-            <h2 id="authTitle">Sign In</h2>
+            <h2 id="authTitle">Welcome Back! 👋</h2>
             <div id="authError" class="error-message" style="display:none; margin-bottom: 20px;"></div>
             <form id="authForm" onsubmit="event.preventDefault(); handleAuthSubmit();">
                 <div class="form-group">
@@ -1872,553 +1553,42 @@
                     <input type="password" id="authPassword" placeholder="Your password" autocomplete="current-password"
                         required>
                 </div>
-                <button type="submit" class="submit-button" id="authSubmitBtn"
-                    style="width: 100%; margin-top: 24px;">Sign In</button>
+                <button type="submit" class="submit-button" id="authSubmitBtn" style="width: 100%; margin-top: 20px;">
+                    Let's Go! 🚀
+                </button>
             </form>
             <div class="auth-actions-row">
                 <button class="link-btn" id="toggleAuthMode">Create an account</button>
                 <button class="link-btn" id="forgotPasswordBtn">Forgot password?</button>
             </div>
-            <p style="margin-top: 16px; color: var(--subtext); font-size: 12px; text-align: center; opacity: 0.8;">By
-                continuing you agree to receive emails for account access. You can sign out anytime.</p>
+            <p style="margin-top: 16px; color: var(--text-light); font-size: 12px; text-align: center;">
+                By continuing you agree to receive emails for account access. You can sign out anytime! 💝
+            </p>
         </div>
     </div>
 
-    <!-- Profile Popover -->
     <div class="profile-popover" id="profilePopover"></div>
 
-    <!-- My Submissions Modal -->
     <div class="submissions-modal" id="submissionsModal">
         <div class="submissions-content">
             <div class="submissions-header">
-                <div class="submissions-title">My Submissions</div>
+                <div class="submissions-title">📋 My Submissions</div>
                 <button class="submissions-close" id="closeSubmissionsModal">&times;</button>
             </div>
             <div id="mySubmissionsContent" class="subs-table"></div>
         </div>
     </div>
 
-    <script type="text/plain">
-        // Supabase configuration
-        const SUPABASE_URL = 'https://dugjgmwlzyjillkemzhz.supabase.co';
-        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR1Z2pnbXdsenlqaWxsa2Vtemh6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTU3MjE3MTIsImV4cCI6MjA3MTI5NzcxMn0.s9uM3exfI3hBvbiT3nZrC_whJ03IAy18202qmgJ4GOg';
-
-        // Initialize Supabase client
-        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
-        let currentUser = null;
-
-        // Toggle tutorial visibility
-        function toggleTutorial() {
-            const tutorial = document.getElementById('tutorialContent');
-            tutorial.classList.toggle('show');
-        }
-
-        // Payment method selection
-        const paymentMethods = document.querySelectorAll('.payment-method');
-        const paymentHandle = document.getElementById('paymentHandle');
-        const paymentLabel = document.getElementById('paymentLabel');
-        let selectedMethod = '';
-
-        paymentMethods.forEach(method => {
-            method.addEventListener('click', () => {
-                paymentMethods.forEach(m => m.classList.remove('selected'));
-                method.classList.add('selected');
-                selectedMethod = method.dataset.method;
-
-                paymentHandle.disabled = false;
-                paymentHandle.value = '';
-
-                if (selectedMethod === 'venmo') {
-                    paymentLabel.textContent = 'Venmo Username';
-                    paymentHandle.placeholder = '@username';
-                } else if (selectedMethod === 'paypal') {
-                    paymentLabel.textContent = 'PayPal Email';
-                    paymentHandle.placeholder = 'email@example.com';
-                } else if (selectedMethod === 'cashapp') {
-                    paymentLabel.textContent = 'Cash App $Cashtag';
-                    paymentHandle.placeholder = '$cashtag';
-                } else if (selectedMethod === 'booking') {
-                    paymentLabel.textContent = 'Booking Platform Details';
-                    paymentHandle.placeholder = 'Platform + reservation email or code';
-                } else if (selectedMethod === 'other') {
-                    paymentLabel.textContent = 'Preferred Payment Method';
-                    paymentHandle.placeholder = 'Provide payment details';
-                }
-            });
-        });
-
-        // File upload
-        const fileUploadArea = document.getElementById('fileUploadArea');
-        const fileInput = document.getElementById('reviewScreenshot');
-        const fileName = document.getElementById('fileName');
-        let uploadedFile = null;
-
-        fileUploadArea.addEventListener('click', () => { fileInput.click(); });
-        fileUploadArea.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); fileInput.click(); }
-        });
-
-        fileUploadArea.addEventListener('dragover', (e) => {
-            e.preventDefault();
-            fileUploadArea.classList.add('is-dragover');
-        });
-
-        fileUploadArea.addEventListener('dragleave', () => {
-            fileUploadArea.classList.remove('is-dragover');
-        });
-
-        fileUploadArea.addEventListener('drop', (e) => {
-            e.preventDefault();
-            const files = e.dataTransfer.files;
-            if (files.length > 0) {
-                fileInput.files = files;
-                handleFileSelect();
-            }
-            fileUploadArea.classList.remove('is-dragover');
-        });
-
-        fileInput.addEventListener('change', handleFileSelect);
-
-        function handleFileSelect() {
-            if (fileInput.files.length > 0) {
-                uploadedFile = fileInput.files[0];
-                fileName.textContent = `✓ ${uploadedFile.name}`;
-                fileUploadArea.classList.add('has-file');
-            }
-        }
-
-        // Function to convert file to base64
-        function fileToBase64(file) {
-            return new Promise((resolve, reject) => {
-                const reader = new FileReader();
-                reader.readAsDataURL(file);
-                reader.onload = () => resolve(reader.result);
-                reader.onerror = error => reject(error);
-            });
-        }
-
-        // Show error message
-        function showError(message) {
-            const errorDiv = document.getElementById('errorMessage');
-            errorDiv.textContent = message;
-            errorDiv.classList.add('show');
-            setTimeout(() => {
-                errorDiv.classList.remove('show');
-            }, 5000);
-        }
-    </script>
-
-    <!-- All JavaScript has been moved to js/index.js -->
-    <!--
-        // Send admin notification email
-        async function sendAdminNotification(submission) {
-        // Option 1: Use EmailJS (free tier available)
-        // 1. Sign up at https://www.emailjs.com
-        // 2. Add this script tag to your HTML: <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
-    // 3. Initialize with your public key: emailjs.init("YOUR_PUBLIC_KEY");
-    // 4. Uncomment and configure:
-    /*
-    return emailjs.send("YOUR_SERVICE_ID", "YOUR_TEMPLATE_ID", {
-    to_email: "michaelort@hyatus.com",
-    payment_method: submission.payment_method,
-    payment_handle: submission.payment_handle,
-    submission_date: new Date(submission.created_at).toLocaleString(),
-    admin_link: window.location.origin + "/admin.html"
-    });
-
-    // Option 2: Use Netlify Functions (if deploying to Netlify)
-    // Create netlify/functions/notify-admin.js
-
-    // Option 3: Use Supabase Edge Functions (recommended)
-    // See supabase/functions/send-admin-notification/index.ts
-
-    // For now, just log it
-    console.log('Admin notification would be sent:', submission);
-    }
-
-    // Create floating dollar signs and confetti animation
-    function createFloatingDollars() {
-    const successContainer = document.getElementById('successMessage');
-    const dollarCount = 12;
-    const confettiCount = 20;
-    const colors = ['#ffdd00', '#ff6b6b', '#4ecdc4', '#45b7d1', '#f9ca24', '#6c5ce7'];
-
-    // Remove any existing animations
-    const existingElements = successContainer.querySelectorAll('.dollar-sign, .confetti');
-    existingElements.forEach(el => el.remove());
-
-    // Create dollar signs
-    for (let i = 0; i < dollarCount; i++) { const dollar=document.createElement('div'); dollar.className='dollar-sign' ;
-        dollar.textContent='$' ; dollar.style.left=Math.random() * 100 + '%' ; dollar.style.animationDelay=Math.random()
-        * 2 + 's' ; dollar.style.animationDuration=(3 + Math.random() * 2) + 's' ; dollar.style.bottom='-50px' ;
-        successContainer.appendChild(dollar); } // Create confetti for (let i=0; i < confettiCount; i++) { const
-        confetti=document.createElement('div'); confetti.className='confetti' ;
-        confetti.style.backgroundColor=colors[Math.floor(Math.random() * colors.length)];
-        confetti.style.left=Math.random() * 100 + '%' ; confetti.style.top=-10 + 'px' ;
-        confetti.style.animationDelay=Math.random() * 3 + 's' ; confetti.style.animationDuration=(2 + Math.random() * 2)
-        + 's' ; successContainer.appendChild(confetti); } // Clean up after animation setTimeout(()=> {
-        const elements = successContainer.querySelectorAll('.dollar-sign, .confetti');
-        elements.forEach(el => el.remove());
-        }, 6000);
-        }
-        -->
-
-
-
-
     <script src="js/index.js"></script>
 
-
-
-
-
     <script>
-        // Minimal script for mobile navigation to fix layout issues
         document.addEventListener('DOMContentLoaded', function () {
-            // This ensures critical mobile UI elements work even if main JS has issues
             const mobileAuthButton = document.getElementById('userAuthLinkMobile');
             if (mobileAuthButton) {
                 console.log('Mobile auth button found and ready');
             }
         });
     </script>
-
-
-
-
-    <script type="text/plain">
-    /* All inline JavaScript has been commented out
-        // ---------- Auth + User Dashboard ----------
-        function openAuthModal() {
-            authModal.classList.add('active');
-            authError.style.display = 'none';
-            authEmail.value = '';
-            authPassword.value = '';
-            }
-    
-            function closeAuthModal() {
-            authModal.classList.remove('active');
-            }
-    
-            function setAuthMode(mode) {
-            authMode = mode;
-            if (mode === 'signin') {
-            authTitle.textContent = 'Sign In';
-            authSubmitBtn.textContent = 'Sign In';
-            toggleAuthModeBtn.textContent = 'Create an account';
-            } else {
-            authTitle.textContent = 'Create Account';
-            authSubmitBtn.textContent = 'Create Account';
-            toggleAuthModeBtn.textContent = 'Have an account? Sign in';
-            }
-            }
-    
-            userAuthLink.addEventListener('click', async (e) => {
-            e.preventDefault();
-            if (currentUser) {
-            toggleProfilePopover();
-            } else {
-            setAuthMode('signin');
-            openAuthModal();
-            }
-            });
-    
-            // Mobile auth link
-            const userAuthLinkMobile = document.getElementById('userAuthLinkMobile');
-            if (userAuthLinkMobile) {
-            userAuthLinkMobile.addEventListener('click', async (e) => {
-            e.preventDefault();
-            if (currentUser) {
-            toggleProfilePopover();
-            } else {
-            setAuthMode('signin');
-            openAuthModal();
-            }
-            });
-            }
-    
-            toggleAuthModeBtn.addEventListener('click', (e) => {
-            e.preventDefault();
-            setAuthMode(authMode === 'signin' ? 'signup' : 'signin');
-            });
-    
-            // Handle auth form submission
-            async function handleAuthSubmit() {
-            authError.style.display = 'none';
-            const email = authEmail.value.trim();
-            const password = authPassword.value.trim();
-            if (!email || !password) {
-            authError.textContent = 'Please enter email and password';
-            authError.style.display = 'block';
-            return;
-            }
-    
-            authSubmitBtn.disabled = true;
-            authSubmitBtn.textContent = authMode === 'signin' ? 'Signing In...' : 'Creating Account...';
-            try {
-            if (authMode === 'signin') {
-            const { error } = await supabase.auth.signInWithPassword({ email, password });
-            if (error) throw error;
-            } else {
-            const { error } = await supabase.auth.signUp({ email, password });
-            if (error) throw error;
-            // Depending on Supabase settings, user may need to confirm email
-            }
-            closeAuthModal();
-            } catch (err) {
-            authError.textContent = err.message || 'Authentication error';
-            authError.style.display = 'block';
-            } finally {
-            authSubmitBtn.disabled = false;
-            authSubmitBtn.textContent = authMode === 'signin' ? 'Sign In' : 'Create Account';
-            }
-            }
-    
-            forgotPasswordBtn.addEventListener('click', async (e) => {
-            e.preventDefault();
-            const email = authEmail.value.trim();
-            if (!email) {
-            authError.textContent = 'Enter your email above first to receive a reset link';
-            authError.style.display = 'block';
-            return;
-            }
-            authError.style.display = 'none';
-            try {
-            const { error } = await supabase.auth.resetPasswordForEmail(email, {
-            redirectTo: (window.MAIN_BASE_URL || (window.location.origin + '/'))
-            });
-            if (error) throw error;
-            authError.textContent = 'Password reset email sent. Check your inbox.';
-            authError.style.display = 'block';
-            authError.style.background = '#d4edda';
-            authError.style.color = '#155724';
-            } catch (err) {
-            authError.textContent = err.message || 'Failed to send reset email';
-            authError.style.display = 'block';
-            authError.style.background = '#f8d7da';
-            authError.style.color = '#721c24';
-            }
-            });
-    
-            <script type="text/plain">
-            /* Disabled inline JavaScript
-            // Close auth modal on outside click
-            authModal.addEventListener('click', (e) => {
-            if (e.target === authModal) closeAuthModal();
-            });
-    
-            function updateAuthUI() {
-            const userAuthLinkMobile = document.getElementById('userAuthLinkMobile');
-    
-            if (currentUser) {
-            // Update button to show user icon and email
-            const userHTML = `
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                stroke-linecap="round" stroke-linejoin="round">
-                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-                <circle cx="12" cy="7" r="4"></circle>
-            </svg>
-            <span class="auth-button-text" title="${currentUser.email}">${currentUser.email}</span>
-            `;
-            userAuthLink.innerHTML = userHTML;
-    
-            // Update mobile button with first letter only
-            if (userAuthLinkMobile) {
-            const mobileUserHTML = `
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                stroke-linecap="round" stroke-linejoin="round">
-                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-                <circle cx="12" cy="7" r="4"></circle>
-            </svg>
-            <span class="auth-button-text-mobile" title="${currentUser.email}">${currentUser.email.charAt(0).toUpperCase()}</span>
-            `;
-            userAuthLinkMobile.innerHTML = mobileUserHTML;
-            }
-    
-            closeAuthModal();
-            closeProfilePopover();
-            loadMySubmissions();
-            } else {
-            // Show sign in button
-            const signInHTML = `
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                stroke-linecap="round" stroke-linejoin="round">
-                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-                <circle cx="12" cy="7" r="4"></circle>
-            </svg>
-            <span class="auth-button-text">Sign In</span>
-            `;
-            userAuthLink.innerHTML = signInHTML;
-    
-            // Update mobile button too
-            if (userAuthLinkMobile) {
-            userAuthLinkMobile.innerHTML = signInHTML.replace('auth-button-text', 'auth-button-text-mobile');
-            }
-    
-            closeProfilePopover();
-            }
-            }
-            */
-            </script>
-
-    <script type="text/plain">
-            /* This code block is disabled to prevent conflicts with external JS
-            async function loadMySubmissions() {
-            if (!currentUser) return;
-            const { data, error } = await supabase
-            .from('review_rewards')
-            .select('*')
-            .eq('user_id', currentUser.id)
-            .order('created_at', { ascending: false });
-            if (error) {
-            // silently ignore if column/policy not ready
-            return;
-            }
-            mySubmissions = data || [];
-            if (profilePopover.style.display === 'block') renderProfilePopover();
-            if (submissionsModal.classList.contains('active')) renderMySubmissions(mySubmissions);
-            }
-    
-            function renderMySubmissions(rows) {
-            const wrapper = document.getElementById('mySubmissionsContent');
-            if (!wrapper) return;
-            if (!rows.length) {
-            wrapper.innerHTML = `<div style="padding:16px; color:#666;">No submissions yet. Submit your first reward claim
-                above.</div>`;
-            return;
-            }
-            const header = `
-            <table>
-                <thead>
-                    <tr>
-                        <th>Date</th>
-                        <th>Payment</th>
-                        <th>Handle</th>
-                        <th>Type</th>
-                        <th>Status</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    `;
-                    const rowsHtml = rows.map(r => {
-                    const date = new Date(r.created_at).toLocaleString();
-                    const pm = (r.payment_method || '').toLowerCase();
-                    const type = r.review_link ? 'link' : 'screenshot';
-                    return `
-                    <tr>
-                        <td>${date}</td>
-                        <td><span class="pill ${pm}">${(r.payment_method || '').toUpperCase()}</span></td>
-                        <td><span class="handle">${r.payment_handle || ''}</span></td>
-                        <td><span class="pill ${type}">${type.toUpperCase()}</span></td>
-                        <td><span class="status-chip ${r.status}">${(r.status || '').toUpperCase()}</span></td>
-                    </tr>
-                    `;
-                    }).join('');
-                    const footer = `
-                </tbody>
-            </table>
-            `;
-            wrapper.innerHTML = header + rowsHtml + footer;
-            }
-    
-            function renderProfilePopover() {
-            if (!currentUser) return;
-            const count = mySubmissions.length;
-            profilePopover.innerHTML = `
-            <div class="profile-header">
-                <div style="font-weight:600;">Profile</div>
-                <div style="font-size:13px; opacity:0.9;">${currentUser.email}</div>
-            </div>
-            <div class="profile-body">
-                <div class="profile-row">
-                    <div>Submissions</div>
-                    <div style="font-weight:600;">${count}</div>
-                </div>
-            </div>
-            <div class="profile-actions">
-                <button class="btn-primary-small" id="openMySubsBtn">My Submissions</button>
-                <button class="btn-secondary-small" id="signOutBtn">Sign Out</button>
-            </div>
-            `;
-            document.getElementById('openMySubsBtn').onclick = () => {
-            openSubmissionsModal();
-            };
-            document.getElementById('signOutBtn').onclick = async () => {
-            await supabase.auth.signOut();
-            };
-            }
-    
-            function toggleProfilePopover() {
-            if (profilePopover.style.display === 'block') {
-            closeProfilePopover();
-            } else {
-            renderProfilePopover();
-            profilePopover.style.display = 'block';
-            }
-            }
-    
-            function closeProfilePopover() {
-            profilePopover.style.display = 'none';
-            }
-    
-            async function openSubmissionsModal() {
-            submissionsModal.classList.add('active');
-            closeProfilePopover();
-            const wrapper = document.getElementById('mySubmissionsContent');
-            if (!currentUser) {
-            if (wrapper) {
-            wrapper.innerHTML = '<div style="padding:16px; color:#666;">Please sign in to view your
-                submissions.<br /><button class="btn-primary-small" id="modalSignInBtn" style="margin-top:10px;">Sign
-                    In</button></div>';
-            const btn = document.getElementById('modalSignInBtn');
-            if (btn) btn.onclick = () => {
-            closeSubmissionsModal();
-            setAuthMode('signin');
-            openAuthModal();
-            };
-            }
-            return;
-            }
-            if (wrapper) wrapper.innerHTML = '<div style="padding:16px; color:#666;">Loading...</div>';
-            if (!mySubmissions.length) {
-            await loadMySubmissions();
-            }
-            renderMySubmissions(mySubmissions);
-            }
-    
-            function closeSubmissionsModal() {
-            submissionsModal.classList.remove('active');
-            }
-    
-            closeSubmissionsModalBtn.addEventListener('click', closeSubmissionsModal);
-            submissionsModal.addEventListener('click', (e) => {
-            if (e.target === submissionsModal) closeSubmissionsModal();
-            });
-    
-            // Success actions
-            const viewBtn = document.getElementById('viewMySubsBtn');
-            if (viewBtn) viewBtn.addEventListener('click', () => {
-            openSubmissionsModal();
-            });
-            const homeBtn = document.getElementById('backHomeBtn');
-            if (homeBtn) homeBtn.addEventListener('click', () => {
-            // Reset to form view
-            successMessage.style.display = 'none';
-            formContainer.style.display = 'block';
-            submitButton.textContent = 'Submit & Claim Reward';
-            submitButton.disabled = false;
-            form.reset();
-            paymentMethods.forEach(m => m.classList.remove('selected'));
-            selectedMethod = '';
-            paymentHandle.disabled = true;
-            paymentHandle.value = '';
-            paymentLabel.textContent = 'Select a payment method above';
-            fileUploadArea.classList.remove('has-file');
-            fileName.textContent = '';
-            });
-            </script>
-
 </body>
 
 </html>
