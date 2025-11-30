@@ -684,6 +684,26 @@
             display: block;
         }
 
+        .account-warning {
+            background: #FEF3C7;
+            border: 1px solid #F59E0B;
+            border-left-width: 3px;
+            color: #92400E;
+            padding: 16px 20px;
+            margin-bottom: 24px;
+            font-size: 14px;
+        }
+
+        .account-warning strong {
+            display: block;
+            margin-bottom: 4px;
+        }
+
+        .account-warning p {
+            margin: 0;
+            line-height: 1.5;
+        }
+
         .success-message {
             display: none;
             text-align: center;
@@ -1117,8 +1137,8 @@
             <div class="card">
                 <div class="card-header">
                     <div class="header-eyebrow">Claim Your Reward</div>
-                    <h1>Complete your submission</h1>
-                    <p>Fill out the form below to receive your gift card</p>
+                    <h1>Claim your <span id="rewardAmount">$10</span> gift card</h1>
+                    <p>Fill out the form below to receive your reward</p>
                 </div>
 
                 <div id="campaignPausedMessage" class="campaign-paused">
@@ -1127,6 +1147,11 @@
                 </div>
 
                 <div id="formContainer" class="form-container">
+                    <div id="accountRequirementsWarning" class="account-warning" style="display: none;">
+                        <strong>Friendly Reminder</strong>
+                        <p>Gifts are for reviews from established Google accounts. Reviews from new or inactive accounts may not qualify.</p>
+                    </div>
+
                     <div id="errorMessage" class="error-message"></div>
 
                     <div class="section">
@@ -1230,7 +1255,7 @@
                         </svg>
                     </div>
                     <h2>Submission Received</h2>
-                    <p>Thank you for your review. We will process your reward within 48 hours.</p>
+                    <p>Thank you for your review. Your <span id="successRewardAmount">$10</span> gift card will be processed within 48 hours.</p>
                     <button class="another-button" onclick="location.reload()">Submit Another</button>
                 </div>
             </div>
@@ -1269,6 +1294,15 @@
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="js/index.js"></script>
+    <script>
+        // Help toggle functionality
+        document.querySelectorAll('.help-toggle').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const helpContent = document.getElementById('helpContent');
+                if (helpContent) helpContent.classList.toggle('show');
+            });
+        });
+    </script>
 </body>
 
 </html>

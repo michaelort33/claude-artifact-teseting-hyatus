@@ -59,40 +59,41 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Campaign pause logic for non-previous guests
     if (!isPreviousGuest) {
-        // Disable all form elements
-        const formElements = document.querySelectorAll('#rewardForm input, #rewardForm button, #rewardForm .payment-method, #rewardForm .file-upload-area');
+        // Disable all form elements - supports both old and new class names
+        const formElements = document.querySelectorAll('#formContainer input, #formContainer button, #formContainer .payment-method, #formContainer .gift-option, #formContainer .upload-zone');
         formElements.forEach(element => {
             element.disabled = true;
             element.style.opacity = '0.5';
             element.style.cursor = 'not-allowed';
+            element.style.pointerEvents = 'none';
         });
 
         // Replace submit button with disabled message
         const submitButton = document.getElementById('submitButton');
         if (submitButton) {
             submitButton.textContent = 'Campaign Paused';
-            submitButton.style.background = 'linear-gradient(135deg, #9A928A 0%, #6B635B 100%)';
+            submitButton.style.background = 'var(--warm-gray, #C4C0B8)';
             submitButton.style.cursor = 'not-allowed';
-            submitButton.style.boxShadow = 'none';
         }
 
-        // Show campaign pause alert
+        // Show campaign pause alert - editorial style
         const formContainer = document.getElementById('formContainer');
         if (formContainer) {
             const pauseAlert = document.createElement('div');
+            pauseAlert.id = 'campaignPauseAlert';
             pauseAlert.style.cssText = `
-                background: linear-gradient(135deg, #E8DBC8 0%, #D4B896 100%);
-                border: 1px solid rgba(196, 149, 106, 0.4);
-                color: #722F37;
-                padding: 18px 24px;
-                border-radius: 14px;
+                background: #F7F3EA;
+                border: 1px solid #E5E2DB;
+                border-left: 3px solid #D96F52;
+                color: #2A2A2A;
+                padding: 20px 24px;
                 margin-bottom: 24px;
                 text-align: center;
-                font-weight: 500;
-                box-shadow: 0 4px 12px rgba(114, 47, 55, 0.08);
+                font-size: 14px;
+                line-height: 1.6;
             `;
             pauseAlert.innerHTML = `
-                <strong>⏸️ Campaign Paused</strong><br>
+                <strong style="color: #D96F52; display: block; margin-bottom: 4px;">Campaign Paused</strong>
                 Our current review campaign is paused due to high demand. We will be back soon!
             `;
             formContainer.insertBefore(pauseAlert, formContainer.firstChild);
@@ -100,14 +101,14 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
-// Toggle tutorial visibility
+// Toggle tutorial/help visibility
 function toggleTutorial() {
-    const tutorial = document.getElementById('tutorialContent');
+    const tutorial = document.getElementById('tutorialContent') || document.getElementById('helpContent');
     if (tutorial) tutorial.classList.toggle('show');
 }
 
-// Payment method selection
-const paymentMethods = document.querySelectorAll('.payment-method');
+// Payment method selection - supports both .payment-method and .gift-option classes
+const paymentMethods = document.querySelectorAll('.payment-method, .gift-option');
 const paymentHandle = document.getElementById('paymentHandle');
 const paymentLabel = document.getElementById('paymentLabel');
 
@@ -132,9 +133,9 @@ paymentMethods.forEach((method) => {
     });
 });
 
-// File upload
-const fileUploadArea = document.getElementById('fileUploadArea');
-const fileInput = document.getElementById('reviewScreenshot');
+// File upload - supports both old and new element IDs
+const fileUploadArea = document.getElementById('fileUploadArea') || document.getElementById('uploadZone');
+const fileInput = document.getElementById('reviewScreenshot') || document.getElementById('fileInput');
 const fileName = document.getElementById('fileName');
 
 if (fileUploadArea && fileInput) {
@@ -272,117 +273,109 @@ function createFloatingDollars() {
     }, 6000);
 }
 
-// Form submission
+// Form submission - supports both form element and direct button click
 const form = document.getElementById('rewardForm');
 const formContainer = document.getElementById('formContainer');
 const successMessage = document.getElementById('successMessage');
 const submitButton = document.getElementById('submitButton');
 
-// Form elements
+// Form submission handler function
+async function handleFormSubmit(e) {
+    if (e) e.preventDefault();
 
-// Submit button click handler
-if (submitButton) {
-    submitButton.addEventListener('click', (e) => {
-        // If the button type is not "submit", manually trigger form submission
-        if (e.target.type !== 'submit') {
-            if (form) {
-                form.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
-            }
-        }
+    const reviewLinkInput = document.getElementById('reviewLink');
+    const reviewLink = reviewLinkInput ? reviewLinkInput.value : '';
+    const hasScreenshot = fileInput && fileInput.files && fileInput.files.length > 0;
+
+    console.log('Validation check:', {
+        selectedMethod,
+        paymentHandleValue: paymentHandle ? paymentHandle.value : 'no handle',
+        reviewLink,
+        hasScreenshot,
+        fileInputExists: !!fileInput,
+        fileInputFiles: fileInput ? fileInput.files : 'no files'
     });
-}
 
-if (form) {
-    form.addEventListener('submit', async (e) => {
-        e.preventDefault();
+    if (!selectedMethod) return showError('Please select a reward choice');
+    if (!paymentHandle || !paymentHandle.value) return showError('Please enter your delivery email');
+    if (!reviewLink) return showError('Please paste your Google review link');
+    if (!hasScreenshot) return showError('Please upload a screenshot of your review');
 
-        const reviewLinkInput = document.getElementById('reviewLink');
-        const reviewLink = reviewLinkInput ? reviewLinkInput.value : '';
-        const hasScreenshot = fileInput && fileInput.files && fileInput.files.length > 0;
+    if (submitButton) {
+        submitButton.textContent = 'Submitting...';
+        submitButton.disabled = true;
+    }
 
-        console.log('Validation check:', {
-            selectedMethod,
-            paymentHandleValue: paymentHandle ? paymentHandle.value : 'no handle',
-            reviewLink,
-            hasScreenshot,
-            fileInputExists: !!fileInput,
-            fileInputFiles: fileInput ? fileInput.files : 'no files'
-        });
-
-        if (!selectedMethod) return showError('Please select a reward choice');
-        if (!paymentHandle || !paymentHandle.value) return showError('Please enter your delivery email');
-        if (!reviewLink) return showError('Please paste your Google review link');
-        if (!hasScreenshot) return showError('Please upload a screenshot of your review');
-
-        if (submitButton) {
-            submitButton.textContent = 'Submitting...';
-            submitButton.disabled = true;
+    try {
+        let screenshotData = null;
+        if (hasScreenshot && uploadedFile) {
+            screenshotData = await fileToBase64(uploadedFile);
         }
+
+        const { data: userResp, error: userError } = await supabase.auth.getUser();
+        if (userError) {
+            console.error('User error:', userError);
+        }
+        const userId = userResp?.user?.id || null;
+
+        const { data, error } = await supabase
+            .from('review_rewards')
+            .insert([
+                {
+                    payment_method: selectedMethod,
+                    payment_handle: paymentHandle.value,
+                    review_link: reviewLink || null,
+                    screenshot_url: screenshotData,
+                    status: 'pending',
+                    user_id: userId,
+                    award_amount: rewardAmount,
+                    previous_guest: isPreviousGuest,
+                },
+            ]);
+
+        if (error) {
+            console.error('Database error:', error);
+            throw error;
+        }
+
+        // Send admin notification
+        const submissionData = {
+            payment_method: selectedMethod,
+            payment_handle: paymentHandle.value,
+            created_at: new Date().toISOString(),
+        };
 
         try {
-            let screenshotData = null;
-            if (hasScreenshot && uploadedFile) {
-                screenshotData = await fileToBase64(uploadedFile);
-            }
-
-            const { data: userResp, error: userError } = await supabase.auth.getUser();
-            if (userError) {
-                console.error('User error:', userError);
-            }
-            const userId = userResp?.user?.id || null;
-
-            const { data, error } = await supabase
-                .from('review_rewards')
-                .insert([
-                    {
-                        payment_method: selectedMethod,
-                        payment_handle: paymentHandle.value,
-                        review_link: reviewLink || null,
-                        screenshot_url: screenshotData,
-                        status: 'pending',
-                        user_id: userId,
-                        award_amount: rewardAmount,
-                        previous_guest: isPreviousGuest,
-                    },
-                ]);
-
-            if (error) {
-                console.error('Database error:', error);
-                throw error;
-            }
-
-            // Send admin notification
-            const submissionData = {
-                payment_method: selectedMethod,
-                payment_handle: paymentHandle.value,
-                created_at: new Date().toISOString(),
-            };
-
-            try {
-                await sendAdminNotification(submissionData);
-            } catch (emailError) {
-                console.error('Failed to send admin notification:', emailError);
-                // Don't fail the whole submission for email issues
-            }
-
-            if (formContainer) formContainer.style.display = 'none';
-            if (successMessage) successMessage.style.display = 'block';
-            createFloatingDollars();
-        } catch (err) {
-            console.error('Error submitting:', err);
-            console.error('Error details:', {
-                message: err.message,
-                code: err.code,
-                details: err.details,
-                hint: err.hint
-            });
-            showError('There was an error submitting your claim. Please try again.');
-            if (submitButton) {
-                submitButton.textContent = 'Submit & Claim Reward';
-                submitButton.disabled = false;
-            }
+            await sendAdminNotification(submissionData);
+        } catch (emailError) {
+            console.error('Failed to send admin notification:', emailError);
         }
-    });
+
+        if (formContainer) formContainer.style.display = 'none';
+        if (successMessage) successMessage.style.display = 'block';
+        createFloatingDollars();
+    } catch (err) {
+        console.error('Error submitting:', err);
+        console.error('Error details:', {
+            message: err.message,
+            code: err.code,
+            details: err.details,
+            hint: err.hint
+        });
+        showError('There was an error submitting your claim. Please try again.');
+        if (submitButton) {
+            submitButton.textContent = 'Submit for Review';
+            submitButton.disabled = false;
+        }
+    }
+}
+
+// Attach event listeners for form submission
+if (submitButton) {
+    submitButton.addEventListener('click', handleFormSubmit);
+}
+if (form) {
+    form.addEventListener('submit', handleFormSubmit);
 }
 
 // ---------- Auth + User Dashboard ----------
