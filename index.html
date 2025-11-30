@@ -143,27 +143,29 @@
 
         .topbar-actions {
             display: flex;
-            gap: 24px;
+            align-items: center;
+            gap: 20px;
         }
 
         .topbar-actions a {
             text-decoration: none;
-            font-weight: 400;
+            font-weight: 500;
             color: var(--charcoal);
-            font-size: 14px;
+            font-size: 13px;
             position: relative;
-            transition: color 0.4s ease-out;
+            transition: color 0.3s ease-out;
+            padding: 8px 0;
         }
 
         .topbar-actions a::after {
             content: '';
             position: absolute;
-            bottom: -2px;
+            bottom: 6px;
             left: 0;
             width: 0;
             height: 1px;
             background: var(--terracotta);
-            transition: width 0.4s ease-out;
+            transition: width 0.3s ease-out;
         }
 
         .topbar-actions a:hover {
