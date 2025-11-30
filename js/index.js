@@ -1,42 +1,29 @@
 // Main application JavaScript
 
-// Add global error handler
 window.addEventListener('error', (e) => {
     console.error('Global JavaScript error:', e.message, e.filename, e.lineno);
 });
-
-// Supabase configuration
-const SUPABASE_URL = 'https://dugjgmwlzyjillkemzhz.supabase.co';
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR1Z2pnbXdsenlqaWxsa2Vtemh6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTU3MjE3MTIsImV4cCI6MjA3MTI5NzcxMn0.s9uM3exfI3hBvbiT3nZrC_whJ03IAy18202qmgJ4GOg';
-
-// Initialize Supabase client
-const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 let currentUser = null;
 let selectedMethod = '';
 let uploadedFile = null;
 let mySubmissions = [];
 
-// Check URL parameters
 const urlParams = new URLSearchParams(window.location.search);
-const rewardParam = urlParams.get('r') || urlParams.get('reward'); // Support both for backwards compatibility
-const warningParam = urlParams.get('v') || urlParams.get('warning'); // 'v' for validation
-const guestParam = urlParams.get('g') || urlParams.get('guest'); // 'g' for guest
-let rewardAmount = 10; // Default reward
-let isPreviousGuest = false; // Default not a previous guest
+const rewardParam = urlParams.get('r') || urlParams.get('reward');
+const warningParam = urlParams.get('v') || urlParams.get('warning');
+const guestParam = urlParams.get('g') || urlParams.get('guest');
+let rewardAmount = 10;
+let isPreviousGuest = false;
 
-// Secret codes:
-// r=h24p or reward=hyatus2024premium for $20
 if (rewardParam === 'h24p' || rewardParam === 'hyatus2024premium') {
     rewardAmount = 20;
 }
 
-// g=vip2024 or guest=returning for previous guest
 if (guestParam === 'vip2024' || guestParam === 'returning') {
     isPreviousGuest = true;
 }
 
-// Update all reward amount displays and handle warning
 document.addEventListener('DOMContentLoaded', () => {
     const amountElements = ['rewardAmount', 'submitRewardAmount', 'disclaimerAmount', 'successRewardAmount'];
     amountElements.forEach(id => {
@@ -46,8 +33,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // Show/hide account requirements warning based on URL parameter
-    // v=x7k or warning=true to show warning
     const warningElement = document.getElementById('accountRequirementsWarning');
     if (warningElement) {
         if (warningParam === 'x7k' || warningParam === 'true') {
@@ -57,9 +42,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // Campaign pause logic for non-previous guests
     if (!isPreviousGuest) {
-        // Disable all form elements - supports both old and new class names
         const formElements = document.querySelectorAll('#formContainer input, #formContainer button, #formContainer .payment-method, #formContainer .gift-option, #formContainer .upload-zone');
         formElements.forEach(element => {
             element.disabled = true;
@@ -68,7 +51,6 @@ document.addEventListener('DOMContentLoaded', () => {
             element.style.pointerEvents = 'none';
         });
 
-        // Replace submit button with disabled message
         const submitButton = document.getElementById('submitButton');
         if (submitButton) {
             submitButton.textContent = 'Currently Unavailable';
@@ -76,7 +58,6 @@ document.addEventListener('DOMContentLoaded', () => {
             submitButton.style.cursor = 'not-allowed';
         }
 
-        // Show campaign pause alert - editorial style
         const formContainer = document.getElementById('formContainer');
         if (formContainer) {
             const pauseAlert = document.createElement('div');
@@ -101,18 +82,14 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
-// Toggle tutorial/help visibility
 function toggleTutorial() {
     const tutorial = document.getElementById('tutorialContent') || document.getElementById('helpContent');
     if (tutorial) tutorial.classList.toggle('show');
 }
 
-// Payment method selection - supports both .payment-method and .gift-option classes
 const paymentMethods = document.querySelectorAll('.payment-method, .gift-option');
 const paymentHandle = document.getElementById('paymentHandle');
 const paymentLabel = document.getElementById('paymentLabel');
-
-
 
 paymentMethods.forEach((method) => {
     method.addEventListener('click', () => {
@@ -133,7 +110,6 @@ paymentMethods.forEach((method) => {
     });
 });
 
-// File upload - supports both old and new element IDs
 const fileUploadArea = document.getElementById('fileUploadArea') || document.getElementById('uploadZone');
 const fileInput = document.getElementById('reviewScreenshot') || document.getElementById('fileInput');
 const fileName = document.getElementById('fileName');
@@ -177,7 +153,6 @@ function handleFileSelect() {
     }
 }
 
-// Convert file to base64
 function fileToBase64(file) {
     return new Promise((resolve, reject) => {
         const reader = new FileReader();
@@ -187,50 +162,21 @@ function fileToBase64(file) {
     });
 }
 
-// Show error message
 function showError(message) {
     console.log('Showing error:', message);
     const errorDiv = document.getElementById('errorMessage');
     if (!errorDiv) {
         console.error('Error message div not found!');
-        alert(message); // Fallback to alert if div not found
+        alert(message);
         return;
     }
     errorDiv.textContent = message;
     errorDiv.classList.add('show');
-    console.log('Error div classes:', errorDiv.className);
-    console.log('Error div display:', window.getComputedStyle(errorDiv).display);
     setTimeout(() => {
         errorDiv.classList.remove('show');
     }, 5000);
 }
 
-// Send admin notification email via Replit backend (SendGrid)
-async function sendAdminNotification(submission) {
-    const requestBody = { record: submission };
-
-    try {
-        const response = await fetch('/api/email/admin-notification', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(requestBody)
-        });
-
-        if (!response.ok) {
-            const errorText = await response.text();
-            throw new Error(`HTTP error! status: ${response.status} - ${errorText}`);
-        }
-
-        return await response.json();
-    } catch (error) {
-        console.error('Failed to send email notification:', error);
-        throw error;
-    }
-}
-
-// Create floating dollar signs and confetti animation
 function createFloatingDollars() {
     const successContainer = document.getElementById('successMessage');
     if (!successContainer) return;
@@ -238,11 +184,9 @@ function createFloatingDollars() {
     const confettiCount = 20;
     const colors = ['#C4956A', '#722F37', '#D4B896', '#8B4049', '#E8DBC8', '#7A8B6E'];
 
-    // Remove any existing animations
     const existingElements = successContainer.querySelectorAll('.dollar-sign, .confetti');
     existingElements.forEach((el) => el.remove());
 
-    // Create dollar signs
     for (let i = 0; i < dollarCount; i++) {
         const dollar = document.createElement('div');
         dollar.className = 'dollar-sign';
@@ -254,7 +198,6 @@ function createFloatingDollars() {
         successContainer.appendChild(dollar);
     }
 
-    // Create confetti
     for (let i = 0; i < confettiCount; i++) {
         const confetti = document.createElement('div');
         confetti.className = 'confetti';
@@ -266,35 +209,23 @@ function createFloatingDollars() {
         successContainer.appendChild(confetti);
     }
 
-    // Clean up after animation
     setTimeout(() => {
         const elements = successContainer.querySelectorAll('.dollar-sign, .confetti');
         elements.forEach((el) => el.remove());
     }, 6000);
 }
 
-// Form submission - supports both form element and direct button click
 const form = document.getElementById('rewardForm');
 const formContainer = document.getElementById('formContainer');
 const successMessage = document.getElementById('successMessage');
 const submitButton = document.getElementById('submitButton');
 
-// Form submission handler function
 async function handleFormSubmit(e) {
     if (e) e.preventDefault();
 
     const reviewLinkInput = document.getElementById('reviewLink');
     const reviewLink = reviewLinkInput ? reviewLinkInput.value : '';
     const hasScreenshot = fileInput && fileInput.files && fileInput.files.length > 0;
-
-    console.log('Validation check:', {
-        selectedMethod,
-        paymentHandleValue: paymentHandle ? paymentHandle.value : 'no handle',
-        reviewLink,
-        hasScreenshot,
-        fileInputExists: !!fileInput,
-        fileInputFiles: fileInput ? fileInput.files : 'no files'
-    });
 
     if (!selectedMethod) return showError('Please choose how you would like to receive your gift');
     if (!paymentHandle || !paymentHandle.value) return showError('Please enter your email so we can send your gift');
@@ -311,43 +242,22 @@ async function handleFormSubmit(e) {
             screenshotData = await fileToBase64(uploadedFile);
         }
 
-        const { data: userResp, error: userError } = await supabase.auth.getUser();
-        if (userError) {
-            console.error('User error:', userError);
-        }
-        const userId = userResp?.user?.id || null;
+        const response = await fetch('/api/submissions', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                payment_method: selectedMethod,
+                payment_handle: paymentHandle.value,
+                review_link: reviewLink || null,
+                screenshot_url: screenshotData,
+                award_amount: rewardAmount,
+                previous_guest: isPreviousGuest,
+            })
+        });
 
-        const { data, error } = await supabase
-            .from('review_rewards')
-            .insert([
-                {
-                    payment_method: selectedMethod,
-                    payment_handle: paymentHandle.value,
-                    review_link: reviewLink || null,
-                    screenshot_url: screenshotData,
-                    status: 'pending',
-                    user_id: userId,
-                    award_amount: rewardAmount,
-                    previous_guest: isPreviousGuest,
-                },
-            ]);
-
-        if (error) {
-            console.error('Database error:', error);
-            throw error;
-        }
-
-        // Send admin notification
-        const submissionData = {
-            payment_method: selectedMethod,
-            payment_handle: paymentHandle.value,
-            created_at: new Date().toISOString(),
-        };
-
-        try {
-            await sendAdminNotification(submissionData);
-        } catch (emailError) {
-            console.error('Failed to send admin notification:', emailError);
+        const result = await response.json();
+        if (!response.ok) {
+            throw new Error(result.error || 'Failed to submit');
         }
 
         if (formContainer) formContainer.style.display = 'none';
@@ -355,12 +265,6 @@ async function handleFormSubmit(e) {
         createFloatingDollars();
     } catch (err) {
         console.error('Error submitting:', err);
-        console.error('Error details:', {
-            message: err.message,
-            code: err.code,
-            details: err.details,
-            hint: err.hint
-        });
         showError('There was an error submitting your claim. Please try again.');
         if (submitButton) {
             submitButton.textContent = 'Submit for Review';
@@ -369,7 +273,6 @@ async function handleFormSubmit(e) {
     }
 }
 
-// Attach event listeners for form submission
 if (submitButton) {
     submitButton.addEventListener('click', handleFormSubmit);
 }
@@ -377,7 +280,6 @@ if (form) {
     form.addEventListener('submit', handleFormSubmit);
 }
 
-// ---------- Auth + User Dashboard ----------
 const userAuthLink = document.getElementById('userAuthLink');
 const authModal = document.getElementById('authModal');
 const authTitle = document.getElementById('authTitle');
@@ -493,7 +395,6 @@ function validatePasswordMatch() {
     return isMatch;
 }
 
-// Live password validation
 document.getElementById('authPassword')?.addEventListener('input', () => {
     if (authMode === 'signup') {
         validatePasswordRequirements();
@@ -537,14 +438,12 @@ if (toggleAuthModeBtn) {
     });
 }
 
-// Auth tabs (Sign In / Create Account)
 const authTabs = document.querySelectorAll('.auth-tab[data-tab]');
 authTabs.forEach(tab => {
     tab.addEventListener('click', (e) => {
         e.preventDefault();
         const mode = tab.dataset.tab === 'signup' ? 'signup' : 'signin';
         setAuthMode(mode);
-        // Update active tab styling
         authTabs.forEach(t => t.classList.remove('active'));
         tab.classList.add('active');
     });
@@ -562,18 +461,15 @@ async function handleAuthSubmit() {
         return;
     }
 
-    // Additional validation for signup mode
     if (authMode === 'signup') {
         const confirmPassword = document.getElementById('authConfirmPassword')?.value;
         
-        // Password length validation
         if (password.length < 8) {
             authError.textContent = 'Password must be at least 8 characters';
             authError.style.display = 'block';
             return;
         }
         
-        // Confirm password validation
         if (password !== confirmPassword) {
             authError.textContent = 'Passwords do not match';
             authError.style.display = 'block';
@@ -583,24 +479,38 @@ async function handleAuthSubmit() {
 
     authSubmitBtn.disabled = true;
     authSubmitBtn.textContent = authMode === 'signin' ? 'Signing In...' : 'Creating Account...';
+    
     try {
-        if (authMode === 'signin') {
-            const { error } = await supabase.auth.signInWithPassword({ email, password });
-            if (error) throw error;
-        } else {
-            const { error } = await supabase.auth.signUp({ email, password });
-            if (error) throw error;
-            // Show success message for signup
-            authError.style.color = 'var(--success, #3D6635)';
-            authError.textContent = 'Account created! Please check your email to verify.';
-            authError.style.display = 'block';
-            authSubmitBtn.disabled = false;
-            authSubmitBtn.textContent = 'Create Account';
-            return;
+        const endpoint = authMode === 'signin' ? '/api/auth/signin' : '/api/auth/signup';
+        const response = await fetch(endpoint, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email, password })
+        });
+
+        const result = await response.json();
+        
+        if (!response.ok) {
+            throw new Error(result.error || 'Authentication failed');
         }
-        closeAuthModal();
+
+        if (authMode === 'signup') {
+            authError.style.color = 'var(--success, #3D6635)';
+            authError.style.background = 'linear-gradient(135deg, #B8C4AD 0%, #C5D5C3 100%)';
+            authError.textContent = 'Account created successfully!';
+            authError.style.display = 'block';
+            
+            currentUser = result.user;
+            updateAuthUI();
+            setTimeout(() => closeAuthModal(), 1500);
+        } else {
+            currentUser = result.user;
+            updateAuthUI();
+            closeAuthModal();
+        }
     } catch (err) {
         authError.style.color = '';
+        authError.style.background = '';
         authError.textContent = err.message || 'Authentication error';
         authError.style.display = 'block';
     } finally {
@@ -625,11 +535,14 @@ if (forgotPasswordBtn) {
         }
         authError.style.display = 'none';
         try {
-            const { error } = await supabase.auth.resetPasswordForEmail(email, {
-                redirectTo: window.MAIN_BASE_URL || window.location.origin + '/',
+            const response = await fetch('/api/auth/reset-password-request', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email })
             });
-            if (error) throw error;
-            authError.textContent = 'Password reset email sent. Check your inbox.';
+
+            const result = await response.json();
+            authError.textContent = 'If an account exists, a password reset email will be sent.';
             authError.style.display = 'block';
             authError.style.background = 'linear-gradient(135deg, #B8C4AD 0%, #C5D5C3 100%)';
             authError.style.color = '#3D6635';
@@ -642,12 +555,10 @@ if (forgotPasswordBtn) {
     });
 }
 
-// Close auth modal functionality
 if (closeAuthModalBtn) {
     closeAuthModalBtn.addEventListener('click', closeAuthModal);
 }
 
-// Close modal when clicking outside
 if (authModal) {
     authModal.addEventListener('click', (e) => {
         if (e.target === authModal) {
@@ -656,7 +567,6 @@ if (authModal) {
     });
 }
 
-// Close modal with Escape key
 document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape' && authModal && authModal.classList.contains('active')) {
         closeAuthModal();
@@ -666,13 +576,7 @@ document.addEventListener('keydown', (e) => {
 function updateAuthUI() {
     const userAuthLinkMobileEl = document.getElementById('userAuthLinkMobile');
     if (currentUser) {
-        // Get initials from email
         const email = currentUser.email;
-        let displayText = email;
-
-        // For mobile, show initials instead of full email
-        // If there's a name, use first letter of first and last name
-        // Otherwise, use first letter of email
         const emailPrefix = email.split('@')[0];
         const initials = emailPrefix.charAt(0).toUpperCase();
 
@@ -714,25 +618,16 @@ function updateAuthUI() {
 async function loadMySubmissions() {
     if (!currentUser) return;
     
-    // Find submissions by user_id OR by matching email in payment_handle
-    const { data, error } = await supabase
-        .from('review_rewards')
-        .select('*')
-        .or(`user_id.eq.${currentUser.id},payment_handle.ilike.${currentUser.email}`)
-        .order('created_at', { ascending: false });
-    
-    if (error) {
-        console.error('Error loading submissions:', error);
-        return;
+    try {
+        const response = await fetch('/api/submissions?user_only=true');
+        const result = await response.json();
+        
+        if (response.ok && result.data) {
+            mySubmissions = result.data;
+        }
+    } catch (err) {
+        console.error('Error loading submissions:', err);
     }
-    
-    // Deduplicate by id in case same submission matches both conditions
-    const seen = new Set();
-    mySubmissions = (data || []).filter(row => {
-        if (seen.has(row.id)) return false;
-        seen.add(row.id);
-        return true;
-    });
     
     if (profilePopover && profilePopover.classList.contains('active')) renderProfilePopover();
     if (submissionsModal && submissionsModal.classList.contains('active')) renderMySubmissions(mySubmissions);
@@ -802,7 +697,10 @@ function renderProfilePopover() {
     const signOutBtn = document.getElementById('signOutBtn');
     if (openBtn) openBtn.onclick = () => openSubmissionsModal();
     if (signOutBtn) signOutBtn.onclick = async () => {
-        await supabase.auth.signOut();
+        await fetch('/api/auth/signout', { method: 'POST' });
+        currentUser = null;
+        mySubmissions = [];
+        updateAuthUI();
     };
 }
 
@@ -854,14 +752,13 @@ if (submissionsModal) {
     });
 }
 
-// Success actions
 if (viewMySubsBtn) viewMySubsBtn.addEventListener('click', () => openSubmissionsModal());
 if (backHomeBtn) {
     backHomeBtn.addEventListener('click', () => {
         if (successMessage) successMessage.style.display = 'none';
         if (formContainer) formContainer.style.display = 'block';
         if (submitButton) {
-                    submitButton.textContent = 'Send Details & Receive Your Gift';
+            submitButton.textContent = 'Send Details & Receive Your Gift';
             submitButton.disabled = false;
         }
         if (form) form.reset();
@@ -877,94 +774,74 @@ if (backHomeBtn) {
     });
 }
 
-// Check for password reset token in URL
 async function checkForPasswordReset() {
-    const hashParams = new URLSearchParams(window.location.hash.substring(1));
-    const accessToken = hashParams.get('access_token');
-    const refreshToken = hashParams.get('refresh_token');
-    const type = hashParams.get('type');
-    const error = hashParams.get('error');
-    const errorCode = hashParams.get('error_code');
-
-    if (error === 'access_denied' && errorCode === 'otp_expired') {
-        const message = 'Password reset link has expired. Please request a new one.\n\nWould you like to go to the admin login page?';
-        if (confirm(message)) window.location.href = 'admin.html?reset_expired=true';
-        window.location.hash = '';
-        return;
-    }
-
-    if (accessToken && type === 'recovery') {
-        const { error } = await supabase.auth.setSession({
-            access_token: accessToken,
-            refresh_token: refreshToken,
-        });
-        if (error) {
-            alert('Error setting up password reset session: ' + error.message);
-            return;
-        }
+    const resetToken = urlParams.get('reset_token');
+    if (resetToken) {
         const modal = document.getElementById('resetModal');
         if (modal) modal.classList.add('active');
     }
 }
 
-// Password reset function
 async function resetPassword() {
     const newPasswordInput = document.getElementById('newPassword');
     const confirmPasswordInput = document.getElementById('confirmPassword');
     const newPassword = newPasswordInput ? newPasswordInput.value : '';
     const confirmPassword = confirmPasswordInput ? confirmPasswordInput.value : '';
+    const resetToken = urlParams.get('reset_token');
 
     if (newPassword !== confirmPassword) {
         alert('Passwords do not match!');
         return;
     }
 
-    if (newPassword.length < 6) {
-        alert('Password must be at least 6 characters long!');
+    if (newPassword.length < 8) {
+        alert('Password must be at least 8 characters long!');
         return;
     }
 
     try {
-        const { data: { session } } = await supabase.auth.getSession();
-        if (!session) {
-            alert('Session expired. Please request a new password reset link.');
-            closeResetModal();
-            return;
+        const response = await fetch('/api/auth/reset-password', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ token: resetToken, password: newPassword })
+        });
+
+        const result = await response.json();
+        
+        if (!response.ok) {
+            throw new Error(result.error || 'Failed to reset password');
         }
 
-        const { error } = await supabase.auth.updateUser({ password: newPassword });
-        if (error) throw error;
-        alert('Password updated successfully! Redirecting to admin login...');
-        await supabase.auth.signOut();
-        window.location.href = 'index.html';
+        alert('Password updated successfully!');
+        closeResetModal();
+        window.location.href = '/';
     } catch (error) {
         alert('Error updating password: ' + error.message);
     }
 }
 
-// Close reset modal
 function closeResetModal() {
     const modal = document.getElementById('resetModal');
     if (modal) modal.classList.remove('active');
-    window.location.hash = '';
+    const url = new URL(window.location);
+    url.searchParams.delete('reset_token');
+    window.history.replaceState({}, '', url);
 }
 
-// Auth state + initial session
 async function initAuth() {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (user) currentUser = user;
+    try {
+        const response = await fetch('/api/auth/session');
+        const result = await response.json();
+        if (result.user) {
+            currentUser = result.user;
+        }
+    } catch (err) {
+        console.error('Error checking session:', err);
+    }
     updateAuthUI();
 }
-
-supabase.auth.onAuthStateChange((_event, session) => {
-    currentUser = session?.user || null;
-    updateAuthUI();
-});
 
 window.addEventListener('load', () => {
     initAuth();
     checkForPasswordReset();
 });
-
-
-

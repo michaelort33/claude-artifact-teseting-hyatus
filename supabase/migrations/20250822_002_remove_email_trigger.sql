@@ -1,2 +1,0 @@
--- This migration was already applied to remote database
--- Placeholder file to sync migration history

@@ -1,78 +1,77 @@
-# Review Rewards Application
+# Guest Appreciation Platform
 
 ## Overview
-A web application that allows users to claim rewards for leaving Google reviews. The application uses Supabase as a backend for authentication, database, and serverless functions, with a Node.js server that proxies task API requests.
+A web application that allows guests to receive thank-you gifts for sharing their feedback. The application uses a Node.js backend with PostgreSQL database for authentication, data storage, and email notifications via SendGrid.
 
 ## Project Type
 - **Frontend**: Static HTML, CSS, and vanilla JavaScript
-- **Backend**: Node.js server + Supabase (PostgreSQL database, authentication, edge functions)
-- **Task API Integration**: Server-side proxy for secure API communication
-- **Deployment**: Originally designed for Netlify, adapted for Replit
+- **Backend**: Node.js server with PostgreSQL database
+- **Authentication**: Custom session-based authentication (bcrypt password hashing)
+- **Email**: SendGrid for notifications and password reset
+- **Task API Integration**: Server-side proxy for automated gift fulfillment
 
 ## Architecture
 
 ### Server
-- `server.js` - Node.js HTTP server that serves static files and proxies task API requests
+- `server.js` - Node.js HTTP server with:
+  - Static file serving
+  - Authentication API (signup, signin, signout, password reset)
+  - Submissions CRUD API
+  - Task API proxy
+  - Email API (SendGrid)
+
+### Database Tables
+- `users` - User accounts (id, email, password_hash, reset_token, etc.)
+- `sessions` - Session management (user_id, token, expires_at)
+- `admins` - Admin email whitelist
+- `review_rewards` - Submission data (payment_method, payment_handle, status, etc.)
 
 ### Frontend Files
-- `index.html` - Main user-facing page for submitting review rewards
-- `admin.html` - Admin dashboard for managing submissions with task creation modal
-- `test.html` - Testing page
-- `js/index.js` - Main application logic, Supabase client initialization, form handling
-- `js/admin.js` - Admin dashboard logic, authentication, submission management, task API integration
+- `index.html` - Main user-facing page for submitting reward claims
+- `admin.html` - Admin dashboard for managing submissions with analytics
+- `js/index.js` - Main application logic, form handling, authentication
+- `js/admin.js` - Admin dashboard logic, submission management
 
 ### Design System
-The application uses a Warm Editorial aesthetic inspired by high-end architectural magazines (Kinfolk, Cereal, Architectural Digest):
+The application uses a Warm Editorial aesthetic inspired by high-end architectural magazines:
 
 **Typography:**
-- **Headlines**: Playfair Display (high-contrast serif) - large, tight tracking (-0.02em)
-- **Body**: Inter (Swiss minimal grotesk) - generous line-height (1.6)
+- **Headlines**: Playfair Display (high-contrast serif)
+- **Body**: Inter (Swiss minimal grotesk)
 
 **Color Palette (Warm Neutrals):**
 - Cream (#FDFCF8) - Primary background
 - Alabaster (#F7F3EA) - Secondary background
-- Bone (#EDE7D9) - Accents, subtle backgrounds
 - Deep Moss (#0F2C1F) - Primary accent, headers
-- Terracotta (#D96F52) - Secondary accent, highlights
+- Terracotta (#D96F52) - Secondary accent
 - Charcoal (#2A2A2A) - Text, borders
 
-**UI Principles:**
-- Sharp corners only (0-2px radius)
-- No drop shadows - flat, matte design
-- 1px charcoal borders for separation
-- Asymmetrical magazine-style layouts
-- Abundant negative space
-- Subtle film grain texture overlay
+### API Endpoints
 
-**Interactions:**
-- Slow ease-out transitions (0.4s)
-- Underline effects on hover
-- No bounce or spring animations
+**Authentication:**
+- POST `/api/auth/signup` - Create new account
+- POST `/api/auth/signin` - Sign in
+- POST `/api/auth/signout` - Sign out
+- GET `/api/auth/session` - Check current session
+- POST `/api/auth/reset-password-request` - Request password reset
+- POST `/api/auth/reset-password` - Reset password with token
 
-### Backend (Supabase)
-- Database: PostgreSQL with tables for review rewards and user management
-- Key Fields: `task_created` (boolean), `task_id` (text) for tracking task creation
-- Authentication: Email/password authentication
-- Edge Functions:
-  - `send-admin-notification` - Sends email notifications to admins
-  - `test-secrets` - Testing endpoint for secrets
+**Submissions:**
+- GET `/api/submissions` - List submissions (with filters)
+- POST `/api/submissions` - Create new submission
+- GET `/api/submissions/:id` - Get submission details
+- PATCH `/api/submissions/:id` - Update submission (admin only)
 
-### Task API Integration
-- **Endpoint**: POST `/api/tasks` (proxied through server.js)
-- **Health Check**: GET `/api/tasks/health`
-- **Authentication**: Server-side using TASKS_API_EMAIL and TASKS_API_PASSWORD secrets
-- **Trigger**: When status changes to "awarded", shows modal to create task
-- **Behavior**: 
-  - Creates task with reward details (email, type, amount)
-  - Marks task_created=true to prevent duplicate prompts
-  - Handles skip/duplicate cases gracefully
+**Email:**
+- POST `/api/email/send` - Send custom email
+- GET `/api/email/health` - Check email configuration
 
-### Configuration
-- `supabase/config.toml` - Supabase local development configuration
-- `supabase/migrations/` - Database migration files (including task_created field)
-- `netifly.toml` - Original Netlify deployment configuration
+**Tasks:**
+- POST `/api/tasks` - Create payment task
+- GET `/api/tasks/health` - Check task API configuration
 
 ## Environment Variables
+- `DATABASE_URL` - PostgreSQL connection string
 - `TASKS_API_EMAIL` - Email for task API authentication
 - `TASKS_API_PASSWORD` - Password for task API authentication
 - `SENDGRID_API_KEY` - SendGrid API key for sending emails
@@ -83,63 +82,32 @@ The application uses a Warm Editorial aesthetic inspired by high-end architectur
 The application is served via Node.js server on port 5000.
 
 ### Key Configurations
-1. Node.js server runs on `0.0.0.0:5000` with static file serving and API proxy
-2. Supabase connection is configured in `js/index.js` with production credentials
-3. Task API credentials stored as Replit secrets
+1. Node.js server runs on `0.0.0.0:5000`
+2. PostgreSQL database via Replit's built-in database
+3. Session-based authentication with HTTP-only cookies
+4. All secrets stored as Replit secrets
 
-## Performance Optimizations
-- Screenshots (base64) are NOT loaded in the main query - fetched on-demand when viewing details
-- This provides 10-50x faster page loads on admin dashboard
-
-## Important Notes
-- The application connects to an existing Supabase project (not local)
-- Supabase URL and keys are hardcoded in `js/index.js`
-- Campaign can be paused for non-previous guests via URL parameters
-- Supports multiple payment methods: PayPal, Venmo, CashApp, Amazon, Starbucks
+## Campaign Control
+- `?g=vip2024` - Enable for returning guests
+- `?r=h24p` - Set $20 reward amount (default $10)
+- Without guest parameter, campaign is paused for non-returning guests
 
 ## Recent Changes
+- **2025-11-30**: Complete Migration from Supabase to Replit PostgreSQL
+  - Built custom authentication system (signup, signin, password reset)
+  - Created users and sessions tables for auth
+  - All frontend code updated to use new API endpoints
+  - Removed all Supabase dependencies and references
+  - Email notifications via SendGrid (not Supabase Edge Functions)
 - **2025-11-30**: Admin Panel Fix & Analytics Overhaul
-  - Fixed broken admin panel where grouping tabs made data invisible
-  - Primary view is now ungrouped submissions table (as intended)
-  - Added "Group By" dropdown for analytics (Gift Type, Email, Status, Month)
-  - Added "Reviews Over Time" chart showing weekly submission trends
-  - Grouped analytics show count, awarded, paid, and total amount per group
-  - Removed confusing tab system, streamlined to single dashboard view
+  - Fixed broken admin panel, added analytics features
+  - "Group By" dropdown for analytics (Gift Type, Email, Status, Month)
+  - "Reviews Over Time" weekly chart
 - **2025-11-30**: User Authentication & Submissions View
-  - Sign In button now fully functional for regular users
-  - Users can create accounts and sign in to view their submissions
-  - "My Submissions" modal shows all submissions linked to user's email
-  - Submissions matched by user_id OR payment_handle email for pre-account submissions
+  - Sign In button fully functional for regular users
+  - Users can create accounts and view their submissions
   - Profile dropdown with submission count and sign out option
-- **2025-11-30**: Logo Update
-  - Replaced placeholder logo with actual Hyatus Living logo
-  - Logo displays in header on main page and admin dashboard
-- **2025-11-30**: Form Validation Update
-  - Step 2 now requires either link OR screenshot (not both)
-  - Added "or" divider between link and screenshot options
 - **2025-11-30**: Warm Editorial Design Overhaul
-  - Complete redesign following Anti-Generic Design Cookbook principles
-  - New typography: Playfair Display (serif headlines) + Inter (Swiss sans body)
-  - New color palette: Deep Moss, Terracotta, Cream, Charcoal (warm neutrals)
-  - Sharp corners (0-2px radius), no shadows, 1px charcoal borders
-  - Magazine-style asymmetrical layouts with abundant whitespace
-  - Film grain texture overlay for analog feel
-  - Slow ease-out transitions (0.4s) replacing bounce animations
-- **2025-11-30**: SendGrid Email Integration
-  - Migrated email from Supabase Edge Functions to Replit backend
-  - POST /api/email/send - Custom email sending
-  - POST /api/email/admin-notification - Admin notifications
-  - GET /api/email/health - Email configuration status
-- **2025-11-30**: Task API Integration
-  - Added server-side proxy for task API (credentials kept secure on server)
-  - Task creation modal triggers when status changes to "awarded"
-  - Added task_created and task_id fields to track task creation
-  - Skip and duplicate cases properly update database to prevent re-prompting
-  - Health endpoint at /api/tasks/health to verify configuration
-- **2025-11-30**: Performance Optimization
-  - Removed screenshot_url from main query - now loads on-demand
-  - Reduced page load time from ~15s to ~500ms (30x improvement)
-- **2025-01-29**: Initial import and setup for Replit environment
-  - Created .gitignore for Node.js projects
-  - Set up static file server on port 5000
-  - Configured workflow for automatic server startup
+  - New typography: Playfair Display + Inter
+  - Warm neutral color palette
+  - Magazine-style layouts

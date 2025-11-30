@@ -1,21 +1,3 @@
-// Supabase configuration
-const SUPABASE_URL = 'https://dugjgmwlzyjillkemzhz.supabase.co';
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR1Z2pnbXdsenlqaWxsa2Vtemh6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTU3MjE3MTIsImV4cCI6MjA3MTI5NzcxMn0.s9uM3exfI3hBvbiT3nZrC_whJ03IAy18202qmgJ4GOg';
-
-let supabase;
-try {
-    if (!window.supabase) {
-        console.error('Supabase library not loaded');
-        alert('Error: Database library not loaded. Please check your internet connection and refresh the page.');
-    } else {
-        supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-        console.log('Supabase client initialized successfully');
-    }
-} catch (err) {
-    console.error('Error initializing Supabase:', err);
-    alert('Error initializing database connection: ' + err.message);
-}
-
 const ADMIN_EMAILS = ['admin@example.com', 'michaelort@hyatus.com', 'aahim7406@gmail.com'];
 
 function isAdminEmail(email) {
@@ -24,15 +6,6 @@ function isAdminEmail(email) {
     if (ADMIN_EMAILS.includes(e)) return true;
     if (e.endsWith('@hyatus.com')) return true;
     return false;
-}
-
-async function isAdminUser(user) {
-    if (!user) return false;
-    try {
-        const { data, error } = await supabase.from('admins').select('email').eq('email', user.email).maybeSingle();
-        if (!error && data && data.email) return true;
-    } catch (_) { }
-    return isAdminEmail(user.email);
 }
 
 function showLoginError(msg) {
@@ -49,11 +22,6 @@ let hasMoreData = true;
 let currentSearchTerm = '';
 let reviewsChart = null;
 const ROWS_PER_PAGE = 50;
-const SUBMISSION_COLUMNS = [
-    'id', 'created_at', 'payment_method', 'payment_handle', 'review_link',
-    'award_amount', 'previous_guest', 'status', 'awarded_at', 'paid_at',
-    'notes', 'user_id'
-].join(', ');
 
 function getAwardAmount(submissionId) {
     return submissionId <= 95 ? 20.00 : 10.00;
@@ -66,16 +34,21 @@ async function checkAuth() {
         window.history.replaceState({}, document.title, window.location.pathname);
     }
 
-    const { data: { user } } = await supabase.auth.getUser();
-    if (user) {
-        const ok = await isAdminUser(user);
-        if (!ok) {
-            showLoginError('You do not have admin access.');
-            await supabase.auth.signOut();
-            return;
+    try {
+        const response = await fetch('/api/auth/session');
+        const result = await response.json();
+        
+        if (result.user) {
+            if (!result.user.is_admin && !isAdminEmail(result.user.email)) {
+                showLoginError('You do not have admin access.');
+                await fetch('/api/auth/signout', { method: 'POST' });
+                return;
+            }
+            currentUser = result.user;
+            showDashboard();
         }
-        currentUser = user;
-        showDashboard();
+    } catch (err) {
+        console.error('Error checking auth:', err);
     }
 }
 
@@ -85,28 +58,33 @@ document.getElementById('loginForm').addEventListener('submit', async (e) => {
     const password = document.getElementById('password').value;
 
     try {
-        const { data, error } = await supabase.auth.signInWithPassword({
-            email: email,
-            password: password,
+        const response = await fetch('/api/auth/signin', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email, password })
         });
 
-        if (error) throw error;
+        const result = await response.json();
+        
+        if (!response.ok) {
+            throw new Error(result.error || 'Invalid email or password');
+        }
 
-        if (!(await isAdminUser({ email }))) {
+        if (!result.user.is_admin && !isAdminEmail(email)) {
             showLoginError('You do not have admin access.');
-            await supabase.auth.signOut();
+            await fetch('/api/auth/signout', { method: 'POST' });
             return;
         }
 
-        currentUser = data.user;
+        currentUser = result.user;
         showDashboard();
     } catch (error) {
-        showLoginError('Invalid email or password');
+        showLoginError(error.message || 'Invalid email or password');
     }
 });
 
 document.getElementById('logoutBtn').addEventListener('click', async () => {
-    await supabase.auth.signOut();
+    await fetch('/api/auth/signout', { method: 'POST' });
     currentUser = null;
     document.getElementById('loginSection').style.display = 'flex';
     document.getElementById('dashboard').classList.remove('active');
@@ -124,12 +102,13 @@ document.getElementById('forgotPasswordLink').addEventListener('click', async (e
     if (!email) return;
 
     try {
-        const { error } = await supabase.auth.resetPasswordForEmail(email, {
-            redirectTo: `${window.location.origin}/index.html`,
+        const response = await fetch('/api/auth/reset-password-request', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email })
         });
 
-        if (error) throw error;
-        alert('Password reset email sent! Please check your inbox.');
+        alert('If an account exists, a password reset email will be sent.');
     } catch (error) {
         alert('Error sending password reset email: ' + error.message);
     }
@@ -160,47 +139,26 @@ async function loadSubmissions(resetPagination = true) {
     }
 
     try {
-        if (!supabase) {
-            alert('Database connection not initialized. Please refresh the page.');
-            return;
-        }
-
         const statusFilter = document.getElementById('statusFilter')?.value || 'all';
         const paymentFilter = document.getElementById('paymentFilter')?.value || 'all';
         const searchHandle = document.getElementById('searchHandle')?.value.trim() || '';
         currentSearchTerm = searchHandle;
 
-        let query = supabase
-            .from('review_rewards')
-            .select(SUBMISSION_COLUMNS)
-            .order('created_at', { ascending: false })
-            .range(currentPage * ROWS_PER_PAGE, (currentPage + 1) * ROWS_PER_PAGE - 1);
+        const params = new URLSearchParams();
+        if (statusFilter !== 'all') params.append('status', statusFilter);
+        if (paymentFilter !== 'all') params.append('payment_method', paymentFilter);
+        if (searchHandle) params.append('search', searchHandle);
+        params.append('page', currentPage);
+        params.append('limit', ROWS_PER_PAGE);
 
-        if (statusFilter !== 'all') {
-            if (statusFilter === 'pending') {
-                query = query.or('status.eq.pending,status.is.null');
-            } else {
-                query = query.eq('status', statusFilter);
-            }
-        }
-        if (paymentFilter !== 'all') {
-            query = query.eq('payment_method', paymentFilter);
-        }
-        if (searchHandle) {
-            query = query.ilike('payment_handle', `%${searchHandle}%`);
+        const response = await fetch(`/api/submissions?${params.toString()}`);
+        const result = await response.json();
+
+        if (!response.ok) {
+            throw new Error(result.error || 'Failed to load submissions');
         }
 
-        const { data, error } = await query;
-
-        if (error) {
-            console.error('Error loading submissions:', error);
-            if (tbody) {
-                tbody.innerHTML = '<tr><td colspan="10" style="text-align: center; padding: 40px; color: var(--danger);">Error loading submissions. Please refresh.</td></tr>';
-            }
-            return;
-        }
-
-        const newData = data || [];
+        const newData = result.data || [];
         hasMoreData = newData.length === ROWS_PER_PAGE;
 
         if (resetPagination) {
@@ -218,6 +176,9 @@ async function loadSubmissions(resetPagination = true) {
         }
     } catch (err) {
         console.error('Unexpected error:', err);
+        if (tbody) {
+            tbody.innerHTML = '<tr><td colspan="10" style="text-align: center; padding: 40px; color: var(--danger);">Error loading submissions. Please refresh.</td></tr>';
+        }
     } finally {
         isLoadingSubmissions = false;
     }
@@ -225,13 +186,11 @@ async function loadSubmissions(resetPagination = true) {
 
 async function loadAllForAnalytics() {
     try {
-        const { data, error } = await supabase
-            .from('review_rewards')
-            .select('id, created_at, payment_method, payment_handle, status, award_amount, previous_guest')
-            .order('created_at', { ascending: true });
+        const response = await fetch('/api/submissions?limit=1000');
+        const result = await response.json();
 
-        if (!error && data) {
-            allSubmissions = data;
+        if (response.ok && result.data) {
+            allSubmissions = result.data;
             renderReviewsChart();
             renderGroupedAnalytics();
         }
@@ -548,12 +507,11 @@ async function bulkMarkPaid() {
         }
 
         for (const sub of awardedSubmissions) {
-            const { error } = await supabase
-                .from('review_rewards')
-                .update({ status: 'paid', paid_at: new Date().toISOString() })
-                .eq('id', sub.id);
-
-            if (error) console.error(`Error updating ${sub.id}:`, error);
+            await fetch(`/api/submissions/${sub.id}`, {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ status: 'paid' })
+            });
         }
 
         alert(`Successfully marked ${awardedSubmissions.length} submissions as paid`);
@@ -566,50 +524,48 @@ async function bulkMarkPaid() {
 }
 
 async function viewDetails(id) {
-    const submission = submissions.find(s => s.id === id);
-    if (!submission) return;
+    try {
+        const response = await fetch(`/api/submissions/${id}`);
+        const result = await response.json();
 
-    const { data, error } = await supabase
-        .from('review_rewards')
-        .select('*')
-        .eq('id', id)
-        .single();
+        if (!response.ok) {
+            throw new Error(result.error || 'Failed to load details');
+        }
 
-    if (error) {
-        alert('Error loading details: ' + error.message);
-        return;
+        const data = result.data;
+        const content = document.getElementById('detailContent');
+        content.innerHTML = `
+            <div class="detail-grid">
+                <div class="detail-label">ID</div>
+                <div class="detail-value">#${data.id}</div>
+                <div class="detail-label">Date</div>
+                <div class="detail-value">${new Date(data.created_at).toLocaleString()}</div>
+                <div class="detail-label">Gift Type</div>
+                <div class="detail-value">${(data.payment_method || '').toUpperCase()}</div>
+                <div class="detail-label">Email</div>
+                <div class="detail-value">${data.payment_handle || 'N/A'}</div>
+                <div class="detail-label">Amount</div>
+                <div class="detail-value">$${(data.award_amount || getAwardAmount(data.id)).toFixed(2)}</div>
+                <div class="detail-label">Previous Guest</div>
+                <div class="detail-value">${data.previous_guest ? 'Yes' : 'No'}</div>
+                <div class="detail-label">Status</div>
+                <div class="detail-value"><span class="status-badge status-${data.status || 'pending'}">${(data.status || 'pending').toUpperCase()}</span></div>
+                ${data.review_link ? `
+                    <div class="detail-label">Review Link</div>
+                    <div class="detail-value"><a href="${data.review_link}" target="_blank" style="color: var(--info);">${data.review_link}</a></div>
+                ` : ''}
+                ${data.notes ? `
+                    <div class="detail-label">Notes</div>
+                    <div class="detail-value">${data.notes}</div>
+                ` : ''}
+            </div>
+            ${data.screenshot_url ? `<img src="${data.screenshot_url}" class="screenshot-preview" alt="Screenshot">` : ''}
+        `;
+
+        document.getElementById('detailModal').classList.add('active');
+    } catch (err) {
+        alert('Error loading details: ' + err.message);
     }
-
-    const content = document.getElementById('detailContent');
-    content.innerHTML = `
-        <div class="detail-grid">
-            <div class="detail-label">ID</div>
-            <div class="detail-value">#${data.id}</div>
-            <div class="detail-label">Date</div>
-            <div class="detail-value">${new Date(data.created_at).toLocaleString()}</div>
-            <div class="detail-label">Gift Type</div>
-            <div class="detail-value">${(data.payment_method || '').toUpperCase()}</div>
-            <div class="detail-label">Email</div>
-            <div class="detail-value">${data.payment_handle || 'N/A'}</div>
-            <div class="detail-label">Amount</div>
-            <div class="detail-value">$${(data.award_amount || getAwardAmount(data.id)).toFixed(2)}</div>
-            <div class="detail-label">Previous Guest</div>
-            <div class="detail-value">${data.previous_guest ? 'Yes' : 'No'}</div>
-            <div class="detail-label">Status</div>
-            <div class="detail-value"><span class="status-badge status-${data.status || 'pending'}">${(data.status || 'pending').toUpperCase()}</span></div>
-            ${data.review_link ? `
-                <div class="detail-label">Review Link</div>
-                <div class="detail-value"><a href="${data.review_link}" target="_blank" style="color: var(--info);">${data.review_link}</a></div>
-            ` : ''}
-            ${data.notes ? `
-                <div class="detail-label">Notes</div>
-                <div class="detail-value">${data.notes}</div>
-            ` : ''}
-        </div>
-        ${data.screenshot_url ? `<img src="${data.screenshot_url}" class="screenshot-preview" alt="Screenshot">` : ''}
-    `;
-
-    document.getElementById('detailModal').classList.add('active');
 }
 
 function closeDetailModal() {
@@ -639,12 +595,16 @@ async function saveAwardAmount() {
     }
 
     try {
-        const { error } = await supabase
-            .from('review_rewards')
-            .update({ award_amount: amount })
-            .eq('id', currentEditSubmissionId);
+        const response = await fetch(`/api/submissions/${currentEditSubmissionId}`, {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ award_amount: amount })
+        });
 
-        if (error) throw error;
+        if (!response.ok) {
+            const result = await response.json();
+            throw new Error(result.error || 'Failed to update');
+        }
 
         const submission = submissions.find(s => s.id === currentEditSubmissionId);
         if (submission) submission.award_amount = amount;
@@ -664,23 +624,21 @@ async function updateStatus(id, newStatus) {
     if (!submission) return;
 
     try {
-        const updates = { status: newStatus };
-        if (newStatus === 'awarded') {
-            updates.awarded_at = new Date().toISOString();
-        } else if (newStatus === 'paid') {
-            updates.paid_at = new Date().toISOString();
+        const response = await fetch(`/api/submissions/${id}`, {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ status: newStatus })
+        });
+
+        if (!response.ok) {
+            const result = await response.json();
+            throw new Error(result.error || 'Failed to update status');
         }
 
-        const { error } = await supabase
-            .from('review_rewards')
-            .update(updates)
-            .eq('id', id);
-
-        if (error) throw error;
-
+        const result = await response.json();
         submission.status = newStatus;
-        if (updates.awarded_at) submission.awarded_at = updates.awarded_at;
-        if (updates.paid_at) submission.paid_at = updates.paid_at;
+        if (result.data?.awarded_at) submission.awarded_at = result.data.awarded_at;
+        if (result.data?.paid_at) submission.paid_at = result.data.paid_at;
 
         updateStats(submissions);
         renderSubmissions(submissions);
@@ -755,14 +713,15 @@ async function createTask() {
 
 async function exportCSV() {
     try {
-        const { data, error } = await supabase
-            .from('review_rewards')
-            .select('id, payment_method, payment_handle, review_link, status, award_amount, user_email, created_at, awarded_at, paid_at')
-            .order('created_at', { ascending: false });
+        const response = await fetch('/api/submissions?limit=10000');
+        const result = await response.json();
 
-        if (error) throw error;
+        if (!response.ok) {
+            throw new Error(result.error || 'Failed to export');
+        }
 
-        let csv = 'ID,Gift Type,Email,Review Link,Status,Amount,User Email,Created At,Awarded At,Paid At\n';
+        const data = result.data || [];
+        let csv = 'ID,Gift Type,Email,Review Link,Status,Amount,Created At,Awarded At,Paid At\n';
 
         data.forEach(row => {
             const fields = [
@@ -772,7 +731,6 @@ async function exportCSV() {
                 row.review_link || '',
                 row.status || 'pending',
                 row.award_amount || '10.00',
-                row.user_email || '',
                 row.created_at || '',
                 row.awarded_at || '',
                 row.paid_at || ''
