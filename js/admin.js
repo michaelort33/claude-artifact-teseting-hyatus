@@ -133,25 +133,30 @@ document.getElementById('logoutBtn').addEventListener('click', async () => {
     allSubmissions = [];
 });
 
-// Forgot password modal functionality
-document.getElementById('forgotPasswordLink').addEventListener('click', (e) => {
-    e.preventDefault();
+// Switch between Sign In and Reset Password views
+function showResetPasswordView() {
     const loginEmail = document.getElementById('email').value;
     document.getElementById('forgotEmail').value = loginEmail;
-    document.getElementById('forgotPasswordModal').style.display = 'flex';
+    document.getElementById('signInView').style.display = 'none';
+    document.getElementById('resetPasswordView').style.display = 'block';
     document.getElementById('forgotError').style.display = 'none';
-    document.getElementById('forgotSuccess').style.display = 'none';
+    document.getElementById('forgotPasswordForm').style.display = 'block';
+}
+
+function showSignInView() {
+    document.getElementById('signInView').style.display = 'block';
+    document.getElementById('resetPasswordView').style.display = 'none';
+    document.getElementById('loginError').style.display = 'none';
+}
+
+document.getElementById('forgotPasswordLink').addEventListener('click', (e) => {
+    e.preventDefault();
+    showResetPasswordView();
 });
 
 document.getElementById('backToLoginLink').addEventListener('click', (e) => {
     e.preventDefault();
-    document.getElementById('forgotPasswordModal').style.display = 'none';
-});
-
-document.getElementById('forgotPasswordModal').addEventListener('click', (e) => {
-    if (e.target.id === 'forgotPasswordModal') {
-        document.getElementById('forgotPasswordModal').style.display = 'none';
-    }
+    showSignInView();
 });
 
 document.getElementById('forgotPasswordForm').addEventListener('submit', async (e) => {
@@ -159,7 +164,6 @@ document.getElementById('forgotPasswordForm').addEventListener('submit', async (
     const email = document.getElementById('forgotEmail').value;
     const sendBtn = document.getElementById('sendResetBtn');
     const forgotError = document.getElementById('forgotError');
-    const forgotSuccess = document.getElementById('forgotSuccess');
 
     if (!email) {
         forgotError.textContent = 'Please enter your email address';
@@ -178,12 +182,15 @@ document.getElementById('forgotPasswordForm').addEventListener('submit', async (
             body: JSON.stringify({ email })
         });
 
-        forgotSuccess.textContent = 'If an account exists, a password reset email has been sent.';
-        forgotSuccess.style.display = 'block';
-        document.getElementById('forgotPasswordForm').style.display = 'none';
+        forgotError.textContent = 'If an account exists, a password reset email has been sent.';
+        forgotError.style.display = 'block';
+        forgotError.style.background = 'linear-gradient(135deg, #B8C4AD 0%, #C5D5C3 100%)';
+        forgotError.style.color = '#3D6635';
     } catch (error) {
         forgotError.textContent = 'Error sending reset email. Please try again.';
         forgotError.style.display = 'block';
+        forgotError.style.background = '';
+        forgotError.style.color = '';
     } finally {
         sendBtn.textContent = 'Get Reset Link';
         sendBtn.disabled = false;
