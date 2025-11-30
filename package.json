@@ -3,6 +3,7 @@
     "supabase": "^2.34.3"
   },
   "dependencies": {
+    "@sendgrid/mail": "^8.1.6",
     "http-server": "^14.1.1"
   }
 }
