@@ -254,6 +254,7 @@ async function handlePasswordResetRequest(req, res) {
                     to: email.toLowerCase(),
                     from: 'hello@hyatus.com',
                     subject: 'Password Reset Request',
+                    text: `Password Reset\n\nClick the link below to reset your password. This link expires in 1 hour.\n\n${resetUrl}\n\nIf you didn't request this, you can ignore this email.`,
                     html: `
                         <h2>Password Reset</h2>
                         <p>Click the link below to reset your password. This link expires in 1 hour.</p>
@@ -421,6 +422,7 @@ async function handleCreateSubmission(req, res) {
                     to: process.env.ADMIN_EMAIL,
                     from: 'hello@hyatus.com',
                     subject: 'New Review Reward Submission!',
+                    text: `New Submission Received\n\nReward Choice: ${payment_method || 'N/A'}\nDelivery Email: ${payment_handle || 'N/A'}\nPrevious Guest: ${previous_guest ? 'Yes' : 'No'}\nSubmitted: ${new Date().toLocaleString()}\n\nView in Admin Dashboard: https://feedback.hyatus.com/admin.html`,
                     html: `
                         <h2>New Submission Received</h2>
                         <p><strong>Reward Choice:</strong> ${payment_method || 'N/A'}</p>
