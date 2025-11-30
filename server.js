@@ -252,7 +252,7 @@ async function handlePasswordResetRequest(req, res) {
             try {
                 const [response] = await sgMail.send({
                     to: email.toLowerCase(),
-                    from: 'no-reply@hyatus.com',
+                    from: 'hello@hyatus.com',
                     subject: 'Password Reset Request',
                     html: `
                         <h2>Password Reset</h2>
@@ -419,7 +419,7 @@ async function handleCreateSubmission(req, res) {
             try {
                 await sgMail.send({
                     to: process.env.ADMIN_EMAIL,
-                    from: 'no-reply@hyatus.com',
+                    from: 'hello@hyatus.com',
                     subject: 'New Review Reward Submission!',
                     html: `
                         <h2>New Submission Received</h2>
@@ -593,7 +593,7 @@ async function handleSendEmail(req, res) {
 
         await sgMail.send({
             to: recipient,
-            from: 'no-reply@hyatus.com',
+            from: 'hello@hyatus.com',
             subject: subject || 'Hyatus Notification',
             text: text || '',
             html: html || text || ''

@@ -92,7 +92,13 @@ The application is served via Node.js server on port 5000.
 - `?r=h24p` - Set $20 reward amount (default $10)
 - Without guest parameter, campaign is paused for non-returning guests
 
+## Email Configuration
+- **FROM address**: hello@hyatus.com (all outgoing emails)
+- **Admin notifications**: michaelort@hyatus.com (new submissions)
+- **Password resets**: Sent to user's email address
+
 ## Recent Changes
+- **2025-11-30**: Changed email FROM address from no-reply@hyatus.com to hello@hyatus.com for better deliverability
 - **2025-11-30**: Complete Migration from Supabase to Replit PostgreSQL
   - Built custom authentication system (signup, signin, password reset)
   - Created users and sessions tables for auth
