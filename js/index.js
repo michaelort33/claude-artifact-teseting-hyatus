@@ -71,7 +71,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // Replace submit button with disabled message
         const submitButton = document.getElementById('submitButton');
         if (submitButton) {
-            submitButton.textContent = 'Campaign Paused';
+            submitButton.textContent = 'Currently Unavailable';
             submitButton.style.background = 'var(--warm-gray, #C4C0B8)';
             submitButton.style.cursor = 'not-allowed';
         }
@@ -93,8 +93,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 line-height: 1.6;
             `;
             pauseAlert.innerHTML = `
-                <strong style="color: #D96F52; display: block; margin-bottom: 4px;">Campaign Paused</strong>
-                Our current review campaign is paused due to high demand. We will be back soon!
+                <strong style="color: #D96F52; display: block; margin-bottom: 4px;">Thank You for Visiting</strong>
+                Our guest appreciation program is currently reserved for returning guests. We hope to welcome you back soon.
             `;
             formContainer.insertBefore(pauseAlert, formContainer.firstChild);
         }
@@ -296,10 +296,10 @@ async function handleFormSubmit(e) {
         fileInputFiles: fileInput ? fileInput.files : 'no files'
     });
 
-    if (!selectedMethod) return showError('Please select a reward choice');
-    if (!paymentHandle || !paymentHandle.value) return showError('Please enter your delivery email');
-    if (!reviewLink) return showError('Please paste your Google review link');
-    if (!hasScreenshot) return showError('Please upload a screenshot of your review');
+    if (!selectedMethod) return showError('Please choose how you would like to receive your gift');
+    if (!paymentHandle || !paymentHandle.value) return showError('Please enter your email so we can send your gift');
+    if (!reviewLink) return showError('Please share the link to your feedback');
+    if (!hasScreenshot) return showError('Please share a screenshot so our team can read your thoughts');
 
     if (submitButton) {
         submitButton.textContent = 'Submitting...';
