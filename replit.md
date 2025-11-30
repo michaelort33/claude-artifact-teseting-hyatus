@@ -22,11 +22,32 @@ A web application that allows users to claim rewards for leaving Google reviews.
 - `js/admin.js` - Admin dashboard logic, authentication, submission management, task API integration
 
 ### Design System
-The application uses a wine/gold Claude-inspired design theme:
-- **Fonts**: Instrument Serif (headings) and DM Sans (body)
-- **Colors**: Wine burgundy (#722F37) and warm gold (#C4956A) palette
-- **UI Elements**: Elegant rounded corners, subtle shadows, refined gradients
-- **Animations**: Smooth transitions, hover effects
+The application uses a Warm Editorial aesthetic inspired by high-end architectural magazines (Kinfolk, Cereal, Architectural Digest):
+
+**Typography:**
+- **Headlines**: Playfair Display (high-contrast serif) - large, tight tracking (-0.02em)
+- **Body**: Inter (Swiss minimal grotesk) - generous line-height (1.6)
+
+**Color Palette (Warm Neutrals):**
+- Cream (#FDFCF8) - Primary background
+- Alabaster (#F7F3EA) - Secondary background
+- Bone (#EDE7D9) - Accents, subtle backgrounds
+- Deep Moss (#0F2C1F) - Primary accent, headers
+- Terracotta (#D96F52) - Secondary accent, highlights
+- Charcoal (#2A2A2A) - Text, borders
+
+**UI Principles:**
+- Sharp corners only (0-2px radius)
+- No drop shadows - flat, matte design
+- 1px charcoal borders for separation
+- Asymmetrical magazine-style layouts
+- Abundant negative space
+- Subtle film grain texture overlay
+
+**Interactions:**
+- Slow ease-out transitions (0.4s)
+- Underline effects on hover
+- No bounce or spring animations
 
 ### Backend (Supabase)
 - Database: PostgreSQL with tables for review rewards and user management
@@ -77,6 +98,19 @@ The application is served via Node.js server on port 5000.
 - Supports multiple payment methods: PayPal, Venmo, CashApp, Amazon, Starbucks
 
 ## Recent Changes
+- **2025-11-30**: Warm Editorial Design Overhaul
+  - Complete redesign following Anti-Generic Design Cookbook principles
+  - New typography: Playfair Display (serif headlines) + Inter (Swiss sans body)
+  - New color palette: Deep Moss, Terracotta, Cream, Charcoal (warm neutrals)
+  - Sharp corners (0-2px radius), no shadows, 1px charcoal borders
+  - Magazine-style asymmetrical layouts with abundant whitespace
+  - Film grain texture overlay for analog feel
+  - Slow ease-out transitions (0.4s) replacing bounce animations
+- **2025-11-30**: SendGrid Email Integration
+  - Migrated email from Supabase Edge Functions to Replit backend
+  - POST /api/email/send - Custom email sending
+  - POST /api/email/admin-notification - Admin notifications
+  - GET /api/email/health - Email configuration status
 - **2025-11-30**: Task API Integration
   - Added server-side proxy for task API (credentials kept secure on server)
   - Task creation modal triggers when status changes to "awarded"
@@ -86,13 +120,6 @@ The application is served via Node.js server on port 5000.
 - **2025-11-30**: Performance Optimization
   - Removed screenshot_url from main query - now loads on-demand
   - Reduced page load time from ~15s to ~500ms (30x improvement)
-- **2025-11-29**: Whimsical design overhaul
-  - Complete UI redesign with cute, friendly, fun aesthetic
-  - Added Nunito font family and pink-purple-blue gradient color scheme
-  - Implemented floating emoji decorations and playful animations
-  - Created external js/admin.js file for admin dashboard logic
-  - Updated both index.html and admin.html with matching design language
-  - Fixed Supabase CDN script loading in admin.html
 - **2025-01-29**: Initial import and setup for Replit environment
   - Created .gitignore for Node.js projects
   - Set up static file server on port 5000
