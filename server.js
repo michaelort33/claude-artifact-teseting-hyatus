@@ -250,7 +250,7 @@ async function handlePasswordResetRequest(req, res) {
             const resetUrl = `${req.headers.origin || 'https://feedback.hyatus.com'}/?reset_token=${resetToken}`;
             
             try {
-                await sgMail.send({
+                const [response] = await sgMail.send({
                     to: email.toLowerCase(),
                     from: 'no-reply@hyatus.com',
                     subject: 'Password Reset Request',
@@ -261,9 +261,9 @@ async function handlePasswordResetRequest(req, res) {
                         <p>If you didn't request this, you can ignore this email.</p>
                     `
                 });
-                console.log(`Password reset email sent to ${email}`);
+                console.log(`Password reset email sent to ${email} - Status: ${response.statusCode}`);
             } catch (emailErr) {
-                console.error('Failed to send reset email:', emailErr.response?.body || emailErr.message || emailErr);
+                console.error('Failed to send reset email:', JSON.stringify(emailErr.response?.body || emailErr.message || emailErr, null, 2));
             }
         } else if (result.rows.length > 0) {
             console.log('Password reset not sent - SENDGRID_API_KEY not configured');
