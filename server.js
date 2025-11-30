@@ -252,14 +252,24 @@ async function handlePasswordResetRequest(req, res) {
             try {
                 const [response] = await sgMail.send({
                     to: email.toLowerCase(),
-                    from: 'hello@hyatus.com',
-                    subject: 'Password Reset Request',
-                    text: `Password Reset\n\nClick the link below to reset your password. This link expires in 1 hour.\n\n${resetUrl}\n\nIf you didn't request this, you can ignore this email.`,
+                    from: { name: 'Hyatus Living', email: 'hello@hyatus.com' },
+                    subject: 'Your Hyatus Account - Secure Access Link',
+                    text: `Hi there,\n\nWe received a request to access your Hyatus guest account. Use the secure link below to set a new password:\n\n${resetUrl}\n\nThis link is valid for the next 60 minutes.\n\nDidn't request this? No worries - simply ignore this message and your account stays safe.\n\nWarmly,\nThe Hyatus Team\nhyatus.com`,
                     html: `
-                        <h2>Password Reset</h2>
-                        <p>Click the link below to reset your password. This link expires in 1 hour.</p>
-                        <p><a href="${resetUrl}">Reset Password</a></p>
-                        <p>If you didn't request this, you can ignore this email.</p>
+                        <div style="font-family: Inter, -apple-system, sans-serif; max-width: 560px; margin: 0 auto; padding: 40px 20px;">
+                            <div style="text-align: center; margin-bottom: 32px;">
+                                <h1 style="font-family: 'Playfair Display', Georgia, serif; color: #0F2C1F; font-size: 24px; margin: 0;">Hyatus</h1>
+                            </div>
+                            <p style="color: #2A2A2A; font-size: 16px; line-height: 1.6;">Hi there,</p>
+                            <p style="color: #2A2A2A; font-size: 16px; line-height: 1.6;">We received a request to access your Hyatus guest account. Use the button below to set a new password:</p>
+                            <div style="text-align: center; margin: 32px 0;">
+                                <a href="${resetUrl}" style="display: inline-block; background: #0F2C1F; color: #FDFCF8; padding: 14px 32px; text-decoration: none; border-radius: 8px; font-weight: 500;">Set New Password</a>
+                            </div>
+                            <p style="color: #666; font-size: 14px; line-height: 1.6;">This link is valid for the next 60 minutes.</p>
+                            <p style="color: #666; font-size: 14px; line-height: 1.6;">Didn't request this? No worries - simply ignore this message and your account stays safe.</p>
+                            <hr style="border: none; border-top: 1px solid #E5E5E5; margin: 32px 0;" />
+                            <p style="color: #999; font-size: 13px; text-align: center;">Warmly, The Hyatus Team<br/><a href="https://hyatus.com" style="color: #D96F52;">hyatus.com</a></p>
+                        </div>
                     `
                 });
                 console.log(`Password reset email sent to ${email} - Status: ${response.statusCode}`);
@@ -420,16 +430,27 @@ async function handleCreateSubmission(req, res) {
             try {
                 await sgMail.send({
                     to: process.env.ADMIN_EMAIL,
-                    from: 'hello@hyatus.com',
-                    subject: 'New Review Reward Submission!',
-                    text: `New Submission Received\n\nReward Choice: ${payment_method || 'N/A'}\nDelivery Email: ${payment_handle || 'N/A'}\nPrevious Guest: ${previous_guest ? 'Yes' : 'No'}\nSubmitted: ${new Date().toLocaleString()}\n\nView in Admin Dashboard: https://feedback.hyatus.com/admin.html`,
+                    from: { name: 'Hyatus Living', email: 'hello@hyatus.com' },
+                    subject: `Guest Appreciation - New ${payment_method || 'Gift'} Request`,
+                    text: `A guest just submitted a thank-you gift request!\n\nGift Choice: ${payment_method || 'N/A'}\nDelivery Email: ${payment_handle || 'N/A'}\nReturning Guest: ${previous_guest ? 'Yes' : 'No'}\nSubmitted: ${new Date().toLocaleString()}\n\nView details: https://feedback.hyatus.com/admin.html`,
                     html: `
-                        <h2>New Submission Received</h2>
-                        <p><strong>Reward Choice:</strong> ${payment_method || 'N/A'}</p>
-                        <p><strong>Delivery Email:</strong> ${payment_handle || 'N/A'}</p>
-                        <p><strong>Previous Guest:</strong> ${previous_guest ? 'Yes' : 'No'}</p>
-                        <p><strong>Submitted:</strong> ${new Date().toLocaleString()}</p>
-                        <p><a href="https://feedback.hyatus.com/admin.html">View in Admin Dashboard</a></p>
+                        <div style="font-family: Inter, -apple-system, sans-serif; max-width: 560px; margin: 0 auto; padding: 40px 20px;">
+                            <div style="text-align: center; margin-bottom: 32px;">
+                                <h1 style="font-family: 'Playfair Display', Georgia, serif; color: #0F2C1F; font-size: 24px; margin: 0;">Hyatus</h1>
+                            </div>
+                            <div style="background: #F7F3EA; border-radius: 12px; padding: 24px; margin-bottom: 24px;">
+                                <p style="color: #0F2C1F; font-size: 18px; font-weight: 600; margin: 0 0 16px 0;">New Gift Request Received</p>
+                                <table style="width: 100%; border-collapse: collapse;">
+                                    <tr><td style="color: #666; padding: 8px 0;">Gift Choice</td><td style="color: #2A2A2A; font-weight: 500; text-align: right;">${payment_method || 'N/A'}</td></tr>
+                                    <tr><td style="color: #666; padding: 8px 0;">Delivery Email</td><td style="color: #2A2A2A; font-weight: 500; text-align: right;">${payment_handle || 'N/A'}</td></tr>
+                                    <tr><td style="color: #666; padding: 8px 0;">Returning Guest</td><td style="color: #2A2A2A; font-weight: 500; text-align: right;">${previous_guest ? 'Yes' : 'No'}</td></tr>
+                                    <tr><td style="color: #666; padding: 8px 0;">Submitted</td><td style="color: #2A2A2A; font-weight: 500; text-align: right;">${new Date().toLocaleString()}</td></tr>
+                                </table>
+                            </div>
+                            <div style="text-align: center;">
+                                <a href="https://feedback.hyatus.com/admin.html" style="display: inline-block; background: #0F2C1F; color: #FDFCF8; padding: 14px 32px; text-decoration: none; border-radius: 8px; font-weight: 500;">View in Dashboard</a>
+                            </div>
+                        </div>
                     `
                 });
                 console.log(`Admin notification email sent to ${process.env.ADMIN_EMAIL}`);
@@ -595,8 +616,8 @@ async function handleSendEmail(req, res) {
 
         await sgMail.send({
             to: recipient,
-            from: 'hello@hyatus.com',
-            subject: subject || 'Hyatus Notification',
+            from: { name: 'Hyatus Living', email: 'hello@hyatus.com' },
+            subject: subject || 'A Message from Hyatus',
             text: text || '',
             html: html || text || ''
         });
