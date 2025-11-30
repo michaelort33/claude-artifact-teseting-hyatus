@@ -98,6 +98,13 @@ The application is served via Node.js server on port 5000.
 - Supports multiple payment methods: PayPal, Venmo, CashApp, Amazon, Starbucks
 
 ## Recent Changes
+- **2025-11-30**: Admin Panel Fix & Analytics Overhaul
+  - Fixed broken admin panel where grouping tabs made data invisible
+  - Primary view is now ungrouped submissions table (as intended)
+  - Added "Group By" dropdown for analytics (Gift Type, Email, Status, Month)
+  - Added "Reviews Over Time" chart showing weekly submission trends
+  - Grouped analytics show count, awarded, paid, and total amount per group
+  - Removed confusing tab system, streamlined to single dashboard view
 - **2025-11-30**: User Authentication & Submissions View
   - Sign In button now fully functional for regular users
   - Users can create accounts and sign in to view their submissions
