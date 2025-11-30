@@ -454,6 +454,19 @@ if (toggleAuthModeBtn) {
     });
 }
 
+// Auth tabs (Sign In / Create Account)
+const authTabs = document.querySelectorAll('.auth-tab[data-tab]');
+authTabs.forEach(tab => {
+    tab.addEventListener('click', (e) => {
+        e.preventDefault();
+        const mode = tab.dataset.tab === 'signup' ? 'signup' : 'signin';
+        setAuthMode(mode);
+        // Update active tab styling
+        authTabs.forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+    });
+});
+
 async function handleAuthSubmit() {
     if (!authError || !authEmail || !authPassword || !authSubmitBtn) return;
     authError.style.display = 'none';
