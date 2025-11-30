@@ -410,15 +410,21 @@ function closeAuthModal() {
 
 function setAuthMode(mode) {
     authMode = mode;
-    if (!authTitle || !authSubmitBtn || !toggleAuthModeBtn) return;
+    const confirmPasswordGroup = document.getElementById('confirmPasswordGroup');
+    const passwordHint = document.getElementById('passwordHint');
+    const authConfirmPassword = document.getElementById('authConfirmPassword');
+    
     if (mode === 'signin') {
-        authTitle.textContent = 'Sign In';
-        authSubmitBtn.textContent = 'Sign In';
-        toggleAuthModeBtn.textContent = 'Create an account';
+        if (authSubmitBtn) authSubmitBtn.textContent = 'Sign In';
+        if (toggleAuthModeBtn) toggleAuthModeBtn.textContent = 'Create an account';
+        if (confirmPasswordGroup) confirmPasswordGroup.style.display = 'none';
+        if (passwordHint) passwordHint.style.display = 'none';
+        if (authConfirmPassword) authConfirmPassword.value = '';
     } else {
-        authTitle.textContent = 'Create Account';
-        authSubmitBtn.textContent = 'Create Account';
-        toggleAuthModeBtn.textContent = 'Have an account? Sign in';
+        if (authSubmitBtn) authSubmitBtn.textContent = 'Create Account';
+        if (toggleAuthModeBtn) toggleAuthModeBtn.textContent = 'Have an account? Sign in';
+        if (confirmPasswordGroup) confirmPasswordGroup.style.display = 'block';
+        if (passwordHint) passwordHint.style.display = 'block';
     }
 }
 
@@ -471,11 +477,31 @@ async function handleAuthSubmit() {
     if (!authError || !authEmail || !authPassword || !authSubmitBtn) return;
     authError.style.display = 'none';
     const email = authEmail.value.trim();
-    const password = authPassword.value.trim();
+    const password = authPassword.value;
+    
     if (!email || !password) {
         authError.textContent = 'Please enter email and password';
         authError.style.display = 'block';
         return;
+    }
+
+    // Additional validation for signup mode
+    if (authMode === 'signup') {
+        const confirmPassword = document.getElementById('authConfirmPassword')?.value;
+        
+        // Password length validation
+        if (password.length < 8) {
+            authError.textContent = 'Password must be at least 8 characters';
+            authError.style.display = 'block';
+            return;
+        }
+        
+        // Confirm password validation
+        if (password !== confirmPassword) {
+            authError.textContent = 'Passwords do not match';
+            authError.style.display = 'block';
+            return;
+        }
     }
 
     authSubmitBtn.disabled = true;
@@ -487,9 +513,17 @@ async function handleAuthSubmit() {
         } else {
             const { error } = await supabase.auth.signUp({ email, password });
             if (error) throw error;
+            // Show success message for signup
+            authError.style.color = 'var(--success, #3D6635)';
+            authError.textContent = 'Account created! Please check your email to verify.';
+            authError.style.display = 'block';
+            authSubmitBtn.disabled = false;
+            authSubmitBtn.textContent = 'Create Account';
+            return;
         }
         closeAuthModal();
     } catch (err) {
+        authError.style.color = '';
         authError.textContent = err.message || 'Authentication error';
         authError.style.display = 'block';
     } finally {
