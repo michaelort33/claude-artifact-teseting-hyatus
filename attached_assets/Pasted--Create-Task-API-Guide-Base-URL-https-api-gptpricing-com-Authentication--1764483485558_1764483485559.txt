@@ -1,0 +1,417 @@
+# Create Task API Guide
+
+## Base URL
+```
+https://api.gptpricing.com
+```
+
+---
+
+## Authentication
+
+### Step 1: Get Access Token
+
+```http
+POST /auth/login
+Content-Type: application/json
+
+{
+  "email": "<TASKS_API_EMAIL>",
+  "password": "<TASKS_API_PASSWORD>"
+}
+```
+
+**Response:**
+```json
+{
+  "data": {
+    "access_token": "eyJhbGciOiJIUzI1...",
+    "token_type": "Bearer"
+  }
+}
+```
+
+### Step 2: Use Token in Requests
+
+Include in all subsequent requests:
+```
+Authorization: Bearer <access_token>
+```
+
+---
+
+## Create Task Endpoint
+
+```http
+POST /tasks
+```
+
+### Content Types
+
+| Scenario | Content-Type |
+|----------|--------------|
+| No file uploads | `application/json` |
+| With file uploads | `multipart/form-data` |
+
+---
+
+## Request Body Fields
+
+### Required Fields
+
+| Field | Type | Default | Description |
+|-------|------|---------|-------------|
+| `priority` | string | `"medium"` | Task priority: `"low"`, `"medium"`, `"high"` |
+| `category` | string | `"housekeeping"` | Task category (e.g., `"housekeeping"`, `"maintenance"`) |
+| `name` | string | `"Task"` | Task title/name |
+| `description` | string | `""` | Task description |
+
+### Optional Fields
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `link_id` | string | ID to link task to an entity (e.g., unit internal_name like `"NH101A"`) |
+| `task_parent` | string | Parent type: `"internal_name"`, `"city"`, `"building"`, etc. |
+| `assigned_user_id` | string | User ID to assign the task to |
+| `task_id` | string | External ID for idempotency (prevents duplicates) |
+| `subcategory` | string | Subcategory: `"checkout_cleaning"`, `"breezeway_cleaning"`, `"inspection"`, etc. |
+| `tags` | string[] | Array of tag strings |
+| `engagement_status` | string | Status like `"pending"`, `"in_progress"`, `"done"` |
+| `due_date` | string | ISO date: `"2025-12-31"` |
+| `start_date` | string | ISO date: `"2025-12-01"` |
+| `notes` | string | Additional notes |
+| `auto_generated` | boolean | Whether task was auto-generated |
+
+---
+
+## Examples
+
+### TypeScript/JavaScript (JSON - No Files)
+
+```typescript
+interface CreateTaskPayload {
+  priority: 'low' | 'medium' | 'high';
+  category: string;
+  name: string;
+  description: string;
+  link_id?: string;
+  task_parent?: string;
+  assigned_user_id?: string;
+  task_id?: string;
+  subcategory?: string;
+  tags?: string[];
+  engagement_status?: string;
+  due_date?: string;
+  start_date?: string;
+  notes?: string;
+  auto_generated?: boolean;
+}
+
+async function createTask(token: string, payload: CreateTaskPayload) {
+  const response = await fetch('https://api.gptpricing.com/tasks', {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'application/json',
+      'Accept': 'application/json',
+    },
+    body: JSON.stringify(payload),
+  });
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    // Handle duplicate gracefully
+    if (errorText.includes('uniq_external_id_subcategory')) {
+      return { duplicate: true };
+    }
+    throw new Error(`Create task failed: ${response.status} ${errorText}`);
+  }
+
+  return response.json();
+}
+
+// Usage
+const task = await createTask(accessToken, {
+  priority: 'medium',
+  category: 'housekeeping',
+  name: 'Checkout Cleaning',
+  description: 'Clean unit after guest checkout',
+  link_id: 'NH101A',
+  task_parent: 'internal_name',
+  task_id: 'ext-12345',           // external ID for idempotency
+  subcategory: 'checkout_cleaning',
+  tags: ['cleaning', 'checkout'],
+  due_date: '2025-12-31',
+});
+```
+
+### TypeScript/JavaScript (With File Uploads)
+
+```typescript
+async function createTaskWithFiles(
+  token: string,
+  payload: Omit<CreateTaskPayload, 'tags'> & { tags?: string },
+  files: File[]
+) {
+  const formData = new FormData();
+
+  // Add all fields
+  Object.entries(payload).forEach(([key, value]) => {
+    if (value !== undefined && value !== null) {
+      formData.append(key, String(value));
+    }
+  });
+
+  // Add files (use "files" key for each file)
+  files.forEach((file) => {
+    formData.append('files', file);
+  });
+
+  const response = await fetch('https://api.gptpricing.com/tasks', {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${token}`,
+      'Accept': 'application/json',
+      // Don't set Content-Type - browser sets it with boundary
+    },
+    body: formData,
+  });
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    if (errorText.includes('uniq_external_id_subcategory')) {
+      return { duplicate: true };
+    }
+    throw new Error(`Create task failed: ${response.status} ${errorText}`);
+  }
+
+  return response.json();
+}
+
+// Usage
+const fileInput = document.querySelector<HTMLInputElement>('#file-input');
+const files = Array.from(fileInput?.files || []);
+
+const task = await createTaskWithFiles(
+  accessToken,
+  {
+    priority: 'medium',
+    category: 'housekeeping',
+    name: 'Inspection with Photos',
+    description: 'Unit inspection',
+    link_id: 'NH101A',
+    task_parent: 'internal_name',
+    task_id: 'ext-99999',
+    subcategory: 'inspection',
+    tags: 'inspection,photos',  // comma-separated string for multipart
+  },
+  files
+);
+```
+
+### React Hook Example
+
+```typescript
+import { useState } from 'react';
+
+interface UseCreateTaskOptions {
+  token: string;
+}
+
+export function useCreateTask({ token }: UseCreateTaskOptions) {
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const createTask = async (payload: CreateTaskPayload) => {
+    setLoading(true);
+    setError(null);
+
+    try {
+      const response = await fetch('https://api.gptpricing.com/tasks', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+        body: JSON.stringify(payload),
+      });
+
+      if (!response.ok) {
+        const text = await response.text();
+        if (text.includes('uniq_external_id_subcategory')) {
+          return { duplicate: true, id: null };
+        }
+        throw new Error(text);
+      }
+
+      return await response.json();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Unknown error');
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return { createTask, loading, error };
+}
+
+// Usage in component
+function TaskForm() {
+  const { createTask, loading, error } = useCreateTask({ token: authToken });
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    const result = await createTask({
+      priority: 'medium',
+      category: 'housekeeping',
+      name: 'New Cleaning Task',
+      description: 'Clean the unit',
+      link_id: 'NH101A',
+      task_parent: 'internal_name',
+      due_date: '2025-12-31',
+    });
+
+    if (result.duplicate) {
+      console.log('Task already exists');
+    } else {
+      console.log('Created task:', result.id);
+    }
+  };
+
+  return (
+    <form onSubmit={handleSubmit}>
+      {/* form fields */}
+      <button type="submit" disabled={loading}>
+        {loading ? 'Creating...' : 'Create Task'}
+      </button>
+      {error && <p className="error">{error}</p>}
+    </form>
+  );
+}
+```
+
+---
+
+## Response
+
+### Success (201 Created)
+
+```json
+{
+  "id": "abc123",
+  "name": "Checkout Cleaning",
+  "priority": "medium",
+  "category": "housekeeping",
+  "description": "Clean unit after guest checkout",
+  "link_id": "NH101A",
+  "task_parent": "internal_name",
+  "task_id": "ext-12345",
+  "subcategory": "checkout_cleaning",
+  "tags": ["cleaning", "checkout"],
+  "due_date": "2025-12-31",
+  "created_at": "2025-11-30T12:00:00Z"
+}
+```
+
+### Duplicate (Idempotent)
+
+If `task_id` + `subcategory` already exists, the API returns an error containing `uniq_external_id_subcategory`. Handle this gracefully as a duplicate:
+
+```json
+{
+  "duplicate": true
+}
+```
+
+### Error (4xx/5xx)
+
+```json
+{
+  "error": "Validation failed",
+  "details": { ... }
+}
+```
+
+---
+
+## Common Patterns
+
+### Linking Tasks to Units
+
+```typescript
+// Link to a specific apartment unit
+{
+  link_id: 'NH101A',        // internal_name of the unit
+  task_parent: 'internal_name'
+}
+
+// Link to a city
+{
+  link_id: 'new-haven',
+  task_parent: 'city'
+}
+
+// Link to a building
+{
+  link_id: 'The Andi',
+  task_parent: 'building'
+}
+```
+
+### Idempotent Task Creation
+
+Use `task_id` + `subcategory` to prevent duplicate tasks:
+
+```typescript
+{
+  task_id: `res-${reservationId}`,      // unique external ID
+  subcategory: 'checkout_cleaning',
+  // ... other fields
+}
+```
+
+If this combination already exists, you'll get `{ duplicate: true }` instead of creating a new task.
+
+---
+
+## Field Reference: task_parent Values
+
+| Value | Description |
+|-------|-------------|
+| `internal_name` | Links to apartment unit (e.g., `NH101A`) |
+| `city` | Links to city (e.g., `new-haven`) |
+| `building` | Links to building name |
+
+## Field Reference: subcategory Values
+
+| Value | Description |
+|-------|-------------|
+| `checkout_cleaning` | Cleaning after guest checkout |
+| `breezeway_cleaning` | Cleaning synced from Breezeway |
+| `inspection` | Unit inspection |
+| `maintenance` | Maintenance task |
+
+## Field Reference: priority Values
+
+| Value |
+|-------|
+| `low` |
+| `medium` |
+| `high` |
+
+---
+
+## Helper Endpoint: Get Dropdown Options
+
+To get valid values for dropdowns (categories, subcategories, etc.):
+
+```http
+GET /tasks/options/dropdown
+Authorization: Bearer <token>
+```
+
+Returns available options for form dropdowns.
+
