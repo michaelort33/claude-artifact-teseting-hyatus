@@ -523,17 +523,69 @@ if (authSubmitBtn) {
     authSubmitBtn.addEventListener('click', handleAuthSubmit);
 }
 
+const forgotPasswordForm = document.getElementById('forgotPasswordForm');
+const forgotEmail = document.getElementById('forgotEmail');
+const forgotError = document.getElementById('forgotError');
+const sendResetBtn = document.getElementById('sendResetBtn');
+const backToSignInBtn = document.getElementById('backToSignIn');
+const authTabsContainer = document.querySelector('.auth-tabs');
+const authFormElement = document.getElementById('authForm');
+const forgotPasswordDiv = document.querySelector('.forgot-password');
+const authModalHeader = document.querySelector('.auth-modal-header h3');
+
+function showForgotPasswordForm() {
+    if (authTabsContainer) authTabsContainer.style.display = 'none';
+    if (authFormElement) authFormElement.style.display = 'none';
+    if (forgotPasswordDiv) forgotPasswordDiv.style.display = 'none';
+    if (forgotPasswordForm) forgotPasswordForm.style.display = 'block';
+    if (authModalHeader) authModalHeader.textContent = 'Reset Password';
+    if (authError) authError.style.display = 'none';
+    if (forgotError) forgotError.style.display = 'none';
+    if (forgotEmail && authEmail) {
+        forgotEmail.value = authEmail.value.trim();
+    }
+}
+
+function showSignInForm() {
+    if (authTabsContainer) authTabsContainer.style.display = 'flex';
+    if (authFormElement) authFormElement.style.display = 'block';
+    if (forgotPasswordDiv) forgotPasswordDiv.style.display = 'block';
+    if (forgotPasswordForm) forgotPasswordForm.style.display = 'none';
+    if (authModalHeader) authModalHeader.textContent = 'Welcome';
+    if (forgotError) forgotError.style.display = 'none';
+}
+
 if (forgotPasswordBtn) {
-    forgotPasswordBtn.addEventListener('click', async (e) => {
+    forgotPasswordBtn.addEventListener('click', (e) => {
         e.preventDefault();
-        if (!authError || !authEmail) return;
-        const email = authEmail.value.trim();
+        showForgotPasswordForm();
+    });
+}
+
+if (backToSignInBtn) {
+    backToSignInBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        showSignInForm();
+    });
+}
+
+if (sendResetBtn) {
+    sendResetBtn.addEventListener('click', async (e) => {
+        e.preventDefault();
+        const email = forgotEmail?.value.trim();
         if (!email) {
-            authError.textContent = 'Enter your email above first to receive a reset link';
-            authError.style.display = 'block';
+            if (forgotError) {
+                forgotError.textContent = 'Please enter your email address';
+                forgotError.style.display = 'block';
+                forgotError.style.background = '';
+                forgotError.style.color = '';
+            }
             return;
         }
-        authError.style.display = 'none';
+        
+        sendResetBtn.disabled = true;
+        sendResetBtn.textContent = 'Sending...';
+        
         try {
             const response = await fetch('/api/auth/reset-password-request', {
                 method: 'POST',
@@ -542,15 +594,22 @@ if (forgotPasswordBtn) {
             });
 
             const result = await response.json();
-            authError.textContent = 'If an account exists, a password reset email will be sent.';
-            authError.style.display = 'block';
-            authError.style.background = 'linear-gradient(135deg, #B8C4AD 0%, #C5D5C3 100%)';
-            authError.style.color = '#3D6635';
+            if (forgotError) {
+                forgotError.textContent = 'If an account exists with this email, a password reset link will be sent.';
+                forgotError.style.display = 'block';
+                forgotError.style.background = 'linear-gradient(135deg, #B8C4AD 0%, #C5D5C3 100%)';
+                forgotError.style.color = '#3D6635';
+            }
         } catch (err) {
-            authError.textContent = err.message || 'Failed to send reset email';
-            authError.style.display = 'block';
-            authError.style.background = 'linear-gradient(135deg, #FEE2E2 0%, #FECACA 100%)';
-            authError.style.color = '#991B1B';
+            if (forgotError) {
+                forgotError.textContent = err.message || 'Failed to send reset email';
+                forgotError.style.display = 'block';
+                forgotError.style.background = 'linear-gradient(135deg, #FEE2E2 0%, #FECACA 100%)';
+                forgotError.style.color = '#991B1B';
+            }
+        } finally {
+            sendResetBtn.disabled = false;
+            sendResetBtn.textContent = 'Get Reset Link';
         }
     });
 }
