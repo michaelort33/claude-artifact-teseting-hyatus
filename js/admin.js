@@ -52,7 +52,7 @@ const ROWS_PER_PAGE = 50;
 const SUBMISSION_COLUMNS = [
     'id', 'created_at', 'payment_method', 'payment_handle', 'review_link',
     'award_amount', 'previous_guest', 'status', 'awarded_at', 'paid_at',
-    'notes', 'task_created', 'task_id'
+    'notes', 'user_id'
 ].join(', ');
 
 function getAwardAmount(submissionId) {
@@ -605,10 +605,6 @@ async function viewDetails(id) {
                 <div class="detail-label">Notes</div>
                 <div class="detail-value">${data.notes}</div>
             ` : ''}
-            ${data.task_id ? `
-                <div class="detail-label">Task ID</div>
-                <div class="detail-value">${data.task_id}</div>
-            ` : ''}
         </div>
         ${data.screenshot_url ? `<img src="${data.screenshot_url}" class="screenshot-preview" alt="Screenshot">` : ''}
     `;
@@ -689,7 +685,7 @@ async function updateStatus(id, newStatus) {
         updateStats(submissions);
         renderSubmissions(submissions);
 
-        if (newStatus === 'awarded' && !submission.task_created) {
+        if (newStatus === 'awarded') {
             showTaskModal(submission);
         }
     } catch (error) {
@@ -719,12 +715,6 @@ function showTaskModal(submission) {
 }
 
 async function skipTask() {
-    if (pendingTaskSubmission) {
-        await supabase
-            .from('review_rewards')
-            .update({ task_created: true })
-            .eq('id', pendingTaskSubmission.id);
-    }
     document.getElementById('taskModal').classList.remove('active');
     pendingTaskSubmission = null;
 }
@@ -750,11 +740,6 @@ async function createTask() {
         const result = await response.json();
 
         if (response.ok) {
-            await supabase
-                .from('review_rewards')
-                .update({ task_created: true, task_id: result.task_id || result.id })
-                .eq('id', submission.id);
-
             alert('Task created successfully!');
         } else {
             throw new Error(result.error || 'Failed to create task');
