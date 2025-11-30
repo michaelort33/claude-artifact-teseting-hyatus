@@ -1,0 +1,44 @@
+0 verbose cli /nix/store/r1smm331j6crqs02mn986g06f7cpbggh-nodejs-22.17.0/bin/node /nix/store/r1smm331j6crqs02mn986g06f7cpbggh-nodejs-22.17.0/bin/npm
+1 info using npm@10.9.2
+2 info using node@v22.17.0
+3 silly config load:file:/nix/store/r1smm331j6crqs02mn986g06f7cpbggh-nodejs-22.17.0/lib/node_modules/npm/npmrc
+4 silly config load:file:/home/runner/workspace/.cache/typescript/5.8/.npmrc
+5 silly config load:file:/home/runner/.npmrc
+6 silly config load:file:/home/runner/workspace/.config/npm/node_global/etc/npmrc
+7 verbose title npm install types-registry@latest
+8 verbose argv "install" "--ignore-scripts" "types-registry@latest"
+9 verbose logfile logs-max:10 dir:/home/runner/.npm/_logs/2025-11-30T16_04_52_869Z-
+10 verbose logfile /home/runner/.npm/_logs/2025-11-30T16_04_52_869Z-debug-0.log
+11 silly logfile done cleaning log files
+12 silly packumentCache heap:4345298944 maxSize:1086324736 maxEntrySize:543162368
+13 silly packumentCache corgi:https://registry.npmjs.org/types-registry cache-miss
+14 http fetch GET 200 https://registry.npmjs.org/npm 221ms
+15 http fetch GET 200 https://registry.npmjs.org/types-registry 218ms (cache miss)
+16 silly packumentCache corgi:https://registry.npmjs.org/types-registry set size:undefined disposed:false
+17 silly idealTree buildDeps
+18 silly fetch manifest types-registry@0.1.748
+19 silly packumentCache full:https://registry.npmjs.org/types-registry cache-miss
+20 http fetch GET 200 https://registry.npmjs.org/types-registry 98ms (cache miss)
+21 silly packumentCache full:https://registry.npmjs.org/types-registry set size:undefined disposed:false
+22 silly placeDep ROOT types-registry@0.1.748 REPLACE for:  want: 0.1.748
+23 silly reify moves {}
+24 silly audit bulk request {
+24 silly audit   '@types/connect': [ '3.4.38' ],
+24 silly audit   '@types/http-server': [ '0.12.4' ],
+24 silly audit   '@types/node': [ '24.10.1' ],
+24 silly audit   'undici-types': [ '7.16.0' ],
+24 silly audit   'types-registry': [ '0.1.748' ]
+24 silly audit }
+25 http fetch POST 200 https://registry.npmjs.org/-/npm/v1/security/advisories/bulk 144ms
+26 silly audit report {}
+27 verbose cwd /home/runner/workspace/.cache/typescript/5.8
+28 verbose os Linux 6.14.11
+29 verbose node v22.17.0
+30 verbose npm  v10.9.2
+31 notice
+31 notice New major version of npm available! 10.9.2 -> 11.6.4
+31 notice Changelog: https://github.com/npm/cli/releases/tag/v11.6.4
+31 notice To update run: npm install -g npm@11.6.4
+31 notice  { force: true, [Symbol(proc-log.meta)]: true }
+32 verbose exit 0
+33 info ok
