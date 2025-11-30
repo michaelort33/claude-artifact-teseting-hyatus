@@ -62,8 +62,12 @@
             'status',
             'awarded_at',
             'paid_at',
-            'notes'
+            'notes',
+            'task_created',
+            'task_id'
         ].join(', ');
+
+        // Task API configuration (proxied through server)
         const ROWS_PER_PAGE = 50;
         const supportsAbortTimeout = typeof AbortSignal !== 'undefined' && typeof AbortSignal.timeout === 'function';
         let loggedAbortTimeoutWarning = false;
@@ -651,7 +655,7 @@
                             submission.status = newStatus;
                             if (newStatus === 'awarded') {
                                 submission.awarded_at = updateData.awarded_at;
-                                submission.award_amount = updateData.award_amount;
+                                submission.award_amount = updateData.award_amount || submission.award_amount;
                             } else if (newStatus === 'paid') {
                                 submission.paid_at = updateData.paid_at;
                             } else if (newStatus === 'pending') {
@@ -679,6 +683,15 @@
                             button.style.background = '';
                             button.style.color = '';
                         }, 2000);
+
+                        // Show task creation modal when status changes to "awarded"
+                        // Only if task hasn't been created already
+                        if (newStatus === 'awarded' && submission && !submission.task_created) {
+                            // Small delay to let the status update complete visually
+                            setTimeout(() => {
+                                showTaskModal(submission);
+                            }, 500);
+                        }
 
                         return; // Success, exit retry loop
                     } catch (error) {
@@ -772,6 +785,161 @@
                 button.textContent = originalText;
 
                 alert(`Failed to save notes: ${error.message || 'Unknown error'}`);
+            }
+        }
+
+        // ==========================================
+        // TASK API INTEGRATION
+        // ==========================================
+        
+        let pendingTaskSubmission = null;
+
+        // Create a task via the server-side API proxy
+        async function createTaskViaApi(submission) {
+            const taskPayload = {
+                priority: 'medium',
+                category: 'housekeeping',
+                subcategory: 'checkout_cleaning',
+                name: `Review Reward: ${(submission.payment_method || 'Gift Card').toUpperCase()} - $${(submission.award_amount || 10).toFixed(2)}`,
+                description: `Process reward fulfillment for review submission #${submission.id}\n\nDelivery Email: ${submission.payment_handle}\nReward Type: ${(submission.payment_method || 'unknown').toUpperCase()}\nAmount: $${(submission.award_amount || 10).toFixed(2)}\nPrevious Guest: ${submission.previous_guest ? 'Yes' : 'No'}\nSubmitted: ${new Date(submission.created_at).toLocaleString()}`,
+                task_id: `review-reward-${submission.id}`,
+                tags: ['review-reward', submission.payment_method || 'gift-card'],
+                notes: `Automatically created from Review Rewards admin dashboard`,
+                auto_generated: true
+            };
+
+            const response = await fetch('/api/tasks', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                },
+                body: JSON.stringify(taskPayload),
+            });
+
+            const data = await response.json();
+            
+            if (!response.ok) {
+                throw new Error(data.error || `Create task failed: ${response.status}`);
+            }
+
+            return data;
+        }
+
+        // Show the task creation modal
+        function showTaskModal(submission) {
+            pendingTaskSubmission = submission;
+            
+            document.getElementById('taskEmail').textContent = submission.payment_handle || 'N/A';
+            document.getElementById('taskRewardType').textContent = (submission.payment_method || 'Unknown').toUpperCase();
+            document.getElementById('taskAmount').textContent = (submission.award_amount || 10).toFixed(2);
+            document.getElementById('taskSubmissionId').textContent = submission.id;
+            
+            // Reset UI state
+            document.getElementById('taskError').style.display = 'none';
+            document.getElementById('taskSuccess').style.display = 'none';
+            document.getElementById('createTaskBtn').disabled = false;
+            document.getElementById('createTaskBtn').textContent = 'Create Task';
+            
+            document.getElementById('taskModal').classList.add('active');
+        }
+
+        // Close the task modal
+        function closeTaskModal() {
+            document.getElementById('taskModal').classList.remove('active');
+            pendingTaskSubmission = null;
+        }
+
+        // Skip task creation - mark as skipped so we don't nag again
+        async function skipTaskCreation() {
+            if (pendingTaskSubmission) {
+                try {
+                    // Mark task_created=true with null task_id to indicate skipped
+                    await supabase
+                        .from('review_rewards')
+                        .update({ task_created: true, task_id: null })
+                        .eq('id', pendingTaskSubmission.id);
+                    
+                    // Update local data
+                    const submission = submissions.find(s => s.id === pendingTaskSubmission.id);
+                    if (submission) {
+                        submission.task_created = true;
+                    }
+                } catch (error) {
+                    console.error('Failed to mark task as skipped:', error);
+                }
+            }
+            closeTaskModal();
+        }
+
+        // Create task button handler
+        async function createTask() {
+            if (!pendingTaskSubmission) return;
+            
+            const btn = document.getElementById('createTaskBtn');
+            const errorDiv = document.getElementById('taskError');
+            const successDiv = document.getElementById('taskSuccess');
+            
+            btn.disabled = true;
+            btn.textContent = 'Creating...';
+            errorDiv.style.display = 'none';
+            successDiv.style.display = 'none';
+            
+            try {
+                const result = await createTaskViaApi(pendingTaskSubmission);
+                
+                if (result.duplicate) {
+                    // Mark task_created=true since a task already exists
+                    await supabase
+                        .from('review_rewards')
+                        .update({ task_created: true })
+                        .eq('id', pendingTaskSubmission.id);
+                    
+                    const submission = submissions.find(s => s.id === pendingTaskSubmission.id);
+                    if (submission) {
+                        submission.task_created = true;
+                    }
+                    
+                    successDiv.textContent = 'Task already exists for this submission (marked as created).';
+                    successDiv.style.display = 'block';
+                } else {
+                    // Update the submission in the database to mark task as created
+                    const { error } = await supabase
+                        .from('review_rewards')
+                        .update({ 
+                            task_created: true,
+                            task_id: result.id || null
+                        })
+                        .eq('id', pendingTaskSubmission.id);
+                    
+                    if (error) {
+                        console.error('Failed to update task_created flag:', error);
+                    } else {
+                        // Update local data
+                        const submission = submissions.find(s => s.id === pendingTaskSubmission.id);
+                        if (submission) {
+                            submission.task_created = true;
+                            submission.task_id = result.id;
+                        }
+                    }
+                    
+                    successDiv.textContent = `Task created successfully! Task ID: ${result.id || 'N/A'}`;
+                    successDiv.style.display = 'block';
+                }
+                
+                btn.textContent = 'Done';
+                
+                // Auto-close after success
+                setTimeout(() => {
+                    closeTaskModal();
+                }, 2000);
+                
+            } catch (error) {
+                console.error('Failed to create task:', error);
+                errorDiv.textContent = `Failed to create task: ${error.message}`;
+                errorDiv.style.display = 'block';
+                btn.disabled = false;
+                btn.textContent = 'Retry';
             }
         }
 
