@@ -298,8 +298,7 @@ async function handleFormSubmit(e) {
 
     if (!selectedMethod) return showError('Please choose how you would like to receive your gift');
     if (!paymentHandle || !paymentHandle.value) return showError('Please enter your email so we can send your gift');
-    if (!reviewLink) return showError('Please share the link to your feedback');
-    if (!hasScreenshot) return showError('Please share a screenshot so our team can read your thoughts');
+    if (!reviewLink && !hasScreenshot) return showError('Please share either a link to your feedback or upload a screenshot');
 
     if (submitButton) {
         submitButton.textContent = 'Submitting...';

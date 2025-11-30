@@ -681,6 +681,47 @@
             cursor: pointer;
         }
 
+        .feedback-options {
+            display: flex;
+            flex-direction: column;
+            gap: 0;
+        }
+
+        .or-divider {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 16px 0;
+        }
+
+        .or-divider span {
+            font-size: 12px;
+            font-weight: 500;
+            color: var(--warm-gray-dark);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            padding: 0 16px;
+            position: relative;
+        }
+
+        .or-divider span::before,
+        .or-divider span::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            width: 60px;
+            height: 1px;
+            background: var(--border-light);
+        }
+
+        .or-divider span::before {
+            right: 100%;
+        }
+
+        .or-divider span::after {
+            left: 100%;
+        }
+
         .submit-button {
             width: 100%;
             padding: 18px 24px;
@@ -1307,21 +1348,27 @@
                             </div>
                         </div>
 
-                        <div class="form-group">
-                            <label for="reviewLink">Link to Your Feedback</label>
-                            <input type="url" id="reviewLink" placeholder="Paste the link to your feedback here">
-                        </div>
+                        <div class="feedback-options">
+                            <div class="form-group">
+                                <label for="reviewLink">Link to Your Feedback</label>
+                                <input type="url" id="reviewLink" placeholder="Paste the link to your feedback here">
+                            </div>
 
-                        <div class="upload-zone" id="uploadZone">
-                            <input type="file" id="fileInput" accept="image/*">
-                            <div class="upload-content">
-                                <svg class="upload-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                                    <polyline points="17 8 12 3 7 8"></polyline>
-                                    <line x1="12" y1="3" x2="12" y2="15"></line>
-                                </svg>
-                                <div class="upload-title">Share a Screenshot</div>
-                                <div class="upload-hint">So our team can read your thoughts</div>
+                            <div class="or-divider">
+                                <span>or</span>
+                            </div>
+
+                            <div class="upload-zone" id="uploadZone">
+                                <input type="file" id="fileInput" accept="image/*">
+                                <div class="upload-content">
+                                    <svg class="upload-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                        <polyline points="17 8 12 3 7 8"></polyline>
+                                        <line x1="12" y1="3" x2="12" y2="15"></line>
+                                    </svg>
+                                    <div class="upload-title">Upload a Screenshot</div>
+                                    <div class="upload-hint">Share a photo of your feedback</div>
+                                </div>
                             </div>
                         </div>
                     </div>
