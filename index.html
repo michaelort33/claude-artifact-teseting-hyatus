@@ -1092,6 +1092,193 @@
             color: white;
         }
 
+        .btn-primary-small {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, var(--moss) 0%, var(--moss-soft) 100%);
+            border: none;
+            border-radius: var(--radius-sm);
+            color: white;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 500;
+            font-family: 'Inter', sans-serif;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            transition: all 0.3s ease-out;
+            margin-bottom: 8px;
+        }
+
+        .btn-primary-small:hover {
+            background: linear-gradient(135deg, var(--moss-light) 0%, var(--moss) 100%);
+        }
+
+        .btn-secondary-small {
+            width: 100%;
+            padding: 12px;
+            background: transparent;
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius-sm);
+            color: var(--charcoal);
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 500;
+            font-family: 'Inter', sans-serif;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            transition: all 0.3s ease-out;
+        }
+
+        .btn-secondary-small:hover {
+            border-color: var(--charcoal);
+        }
+
+        .submissions-modal-content {
+            background: linear-gradient(180deg, white 0%, var(--cream) 100%);
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius-xl);
+            max-width: 700px;
+            width: 95%;
+            max-height: 80vh;
+            position: relative;
+            box-shadow: 0 24px 48px rgba(0, 0, 0, 0.15);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .submissions-modal-header {
+            padding: 24px 32px;
+            border-bottom: 1px solid var(--border-light);
+        }
+
+        .submissions-modal-header h3 {
+            font-family: 'Playfair Display', Georgia, serif;
+            font-size: 22px;
+            font-weight: 400;
+            color: var(--charcoal);
+            margin: 0 0 4px 0;
+        }
+
+        .submissions-modal-header p {
+            font-size: 13px;
+            color: var(--warm-gray-dark);
+            margin: 0;
+        }
+
+        .submissions-modal-body {
+            padding: 0;
+            overflow-y: auto;
+            flex: 1;
+        }
+
+        .loading-message {
+            padding: 32px;
+            text-align: center;
+            color: var(--warm-gray-dark);
+            font-size: 14px;
+        }
+
+        .subs-table {
+            width: 100%;
+            overflow-x: auto;
+        }
+
+        .subs-table table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+
+        .subs-table th {
+            text-align: left;
+            padding: 14px 16px;
+            background: var(--alabaster);
+            color: var(--warm-gray-dark);
+            font-weight: 500;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            border-bottom: 1px solid var(--border-light);
+        }
+
+        .subs-table td {
+            padding: 14px 16px;
+            border-bottom: 1px solid var(--border-light);
+            color: var(--charcoal);
+        }
+
+        .subs-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .subs-table .pill {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: var(--radius-sm);
+            font-size: 10px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .subs-table .pill.amazon {
+            background: #FFF3E0;
+            color: #E65100;
+        }
+
+        .subs-table .pill.starbucks {
+            background: #E8F5E9;
+            color: #2E7D32;
+        }
+
+        .subs-table .pill.surprise {
+            background: #FBE9E7;
+            color: #BF360C;
+        }
+
+        .subs-table .pill.link {
+            background: #E3F2FD;
+            color: #1565C0;
+        }
+
+        .subs-table .pill.screenshot {
+            background: #F3E5F5;
+            color: #7B1FA2;
+        }
+
+        .subs-table .status-chip {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: var(--radius-sm);
+            font-size: 10px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .subs-table .status-chip.pending {
+            background: #FFF8E1;
+            color: #F57F17;
+        }
+
+        .subs-table .status-chip.approved,
+        .subs-table .status-chip.awarded {
+            background: #E8F5E9;
+            color: #2E7D32;
+        }
+
+        .subs-table .status-chip.rejected {
+            background: #FFEBEE;
+            color: #C62828;
+        }
+
+        .subs-table .handle {
+            font-family: monospace;
+            font-size: 12px;
+            color: var(--warm-gray-dark);
+        }
+
         .topbar-auth-container {
             position: relative;
         }
@@ -1381,17 +1568,30 @@
                 <form id="authForm">
                     <div class="form-group">
                         <label for="authEmail">Email</label>
-                        <input type="email" id="authEmail" placeholder="email@example.com" required>
+                        <input type="email" id="authEmail" placeholder="email@example.com" required autocomplete="email">
                     </div>
                     <div class="form-group">
                         <label for="authPassword">Password</label>
-                        <input type="password" id="authPassword" placeholder="Enter password" required>
+                        <input type="password" id="authPassword" placeholder="Enter password" required autocomplete="current-password">
                     </div>
                     <button type="submit" class="auth-submit" id="authSubmitBtn">Sign In</button>
                 </form>
                 <div class="forgot-password">
                     <button type="button" id="forgotPasswordBtn">Forgot password?</button>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="auth-modal" id="submissionsModal">
+        <div class="submissions-modal-content">
+            <button class="auth-close" id="closeSubmissionsModal">&times;</button>
+            <div class="submissions-modal-header">
+                <h3>My Submissions</h3>
+                <p>Track the status of your gift requests</p>
+            </div>
+            <div class="submissions-modal-body" id="mySubmissionsContent">
+                <div class="loading-message">Loading your submissions...</div>
             </div>
         </div>
     </div>

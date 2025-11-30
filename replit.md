@@ -98,6 +98,18 @@ The application is served via Node.js server on port 5000.
 - Supports multiple payment methods: PayPal, Venmo, CashApp, Amazon, Starbucks
 
 ## Recent Changes
+- **2025-11-30**: User Authentication & Submissions View
+  - Sign In button now fully functional for regular users
+  - Users can create accounts and sign in to view their submissions
+  - "My Submissions" modal shows all submissions linked to user's email
+  - Submissions matched by user_id OR payment_handle email for pre-account submissions
+  - Profile dropdown with submission count and sign out option
+- **2025-11-30**: Logo Update
+  - Replaced placeholder logo with actual Hyatus Living logo
+  - Logo displays in header on main page and admin dashboard
+- **2025-11-30**: Form Validation Update
+  - Step 2 now requires either link OR screenshot (not both)
+  - Added "or" divider between link and screenshot options
 - **2025-11-30**: Warm Editorial Design Overhaul
   - Complete redesign following Anti-Generic Design Cookbook principles
   - New typography: Playfair Display (serif headlines) + Inter (Swiss sans body)

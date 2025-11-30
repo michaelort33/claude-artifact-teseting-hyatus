@@ -387,10 +387,10 @@ const authPassword = document.getElementById('authPassword');
 const authSubmitBtn = document.getElementById('authSubmitBtn');
 const toggleAuthModeBtn = document.getElementById('toggleAuthMode');
 const forgotPasswordBtn = document.getElementById('forgotPasswordBtn');
-const profilePopover = document.getElementById('profilePopover');
+const profilePopover = document.getElementById('userProfileDropdown');
 const submissionsModal = document.getElementById('submissionsModal');
 const closeSubmissionsModalBtn = document.getElementById('closeSubmissionsModal');
-const closeAuthModalBtn = document.getElementById('closeAuthModal');
+const closeAuthModalBtn = document.getElementById('authClose');
 const viewMySubsBtn = document.getElementById('viewMySubsBtn');
 const backHomeBtn = document.getElementById('backHomeBtn');
 
@@ -589,14 +589,28 @@ function updateAuthUI() {
 
 async function loadMySubmissions() {
     if (!currentUser) return;
+    
+    // Find submissions by user_id OR by matching email in payment_handle
     const { data, error } = await supabase
         .from('review_rewards')
         .select('*')
-        .eq('user_id', currentUser.id)
+        .or(`user_id.eq.${currentUser.id},payment_handle.ilike.${currentUser.email}`)
         .order('created_at', { ascending: false });
-    if (error) return;
-    mySubmissions = data || [];
-    if (profilePopover && profilePopover.style.display === 'block') renderProfilePopover();
+    
+    if (error) {
+        console.error('Error loading submissions:', error);
+        return;
+    }
+    
+    // Deduplicate by id in case same submission matches both conditions
+    const seen = new Set();
+    mySubmissions = (data || []).filter(row => {
+        if (seen.has(row.id)) return false;
+        seen.add(row.id);
+        return true;
+    });
+    
+    if (profilePopover && profilePopover.classList.contains('active')) renderProfilePopover();
     if (submissionsModal && submissionsModal.classList.contains('active')) renderMySubmissions(mySubmissions);
 }
 
