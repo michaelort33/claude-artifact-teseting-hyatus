@@ -263,8 +263,10 @@ async function handlePasswordResetRequest(req, res) {
                 });
                 console.log(`Password reset email sent to ${email}`);
             } catch (emailErr) {
-                console.error('Failed to send reset email:', emailErr);
+                console.error('Failed to send reset email:', emailErr.response?.body || emailErr.message || emailErr);
             }
+        } else if (result.rows.length > 0) {
+            console.log('Password reset not sent - SENDGRID_API_KEY not configured');
         }
 
     } catch (err) {
@@ -428,9 +430,12 @@ async function handleCreateSubmission(req, res) {
                         <p><a href="https://feedback.hyatus.com/admin.html">View in Admin Dashboard</a></p>
                     `
                 });
+                console.log(`Admin notification email sent to ${process.env.ADMIN_EMAIL}`);
             } catch (emailErr) {
-                console.error('Failed to send admin notification:', emailErr);
+                console.error('Failed to send admin notification:', emailErr.response?.body || emailErr.message || emailErr);
             }
+        } else {
+            console.log('Admin email not sent - missing SENDGRID_API_KEY or ADMIN_EMAIL');
         }
 
         sendJson(res, 200, { data: submission });
