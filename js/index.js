@@ -4,6 +4,58 @@ window.addEventListener('error', (e) => {
     console.error('Global JavaScript error:', e.message, e.filename, e.lineno);
 });
 
+// Toast notification function
+function showToast(message, type = 'info') {
+    const container = document.getElementById('toastContainer');
+    if (!container) return;
+    
+    const toast = document.createElement('div');
+    toast.style.cssText = `
+        padding: 14px 20px;
+        border-radius: 10px;
+        font-size: 14px;
+        font-family: Inter, -apple-system, sans-serif;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+        animation: slideIn 0.3s ease;
+        max-width: 320px;
+        line-height: 1.4;
+    `;
+    
+    if (type === 'success') {
+        toast.style.background = '#0F2C1F';
+        toast.style.color = '#FDFCF8';
+    } else if (type === 'error') {
+        toast.style.background = '#D96F52';
+        toast.style.color = '#FDFCF8';
+    } else {
+        toast.style.background = '#F7F3EA';
+        toast.style.color = '#2A2A2A';
+        toast.style.border = '1px solid #E5DDD3';
+    }
+    
+    toast.textContent = message;
+    container.appendChild(toast);
+    
+    setTimeout(() => {
+        toast.style.animation = 'slideOut 0.3s ease forwards';
+        setTimeout(() => toast.remove(), 300);
+    }, 4000);
+}
+
+// Add toast animation styles
+const toastStyles = document.createElement('style');
+toastStyles.textContent = `
+    @keyframes slideIn {
+        from { opacity: 0; transform: translateX(100%); }
+        to { opacity: 1; transform: translateX(0); }
+    }
+    @keyframes slideOut {
+        from { opacity: 1; transform: translateX(0); }
+        to { opacity: 0; transform: translateX(100%); }
+    }
+`;
+document.head.appendChild(toastStyles);
+
 let currentUser = null;
 let selectedMethod = '';
 let uploadedFile = null;
@@ -167,7 +219,7 @@ function showError(message) {
     const errorDiv = document.getElementById('errorMessage');
     if (!errorDiv) {
         console.error('Error message div not found!');
-        alert(message);
+        showToast(message, 'error');
         return;
     }
     errorDiv.textContent = message;
@@ -844,18 +896,24 @@ async function checkForPasswordReset() {
 async function resetPassword() {
     const newPasswordInput = document.getElementById('newPassword');
     const confirmPasswordInput = document.getElementById('confirmPassword');
+    const resetBtn = document.getElementById('resetPasswordBtn');
     const newPassword = newPasswordInput ? newPasswordInput.value : '';
     const confirmPassword = confirmPasswordInput ? confirmPasswordInput.value : '';
     const resetToken = urlParams.get('reset_token');
 
     if (newPassword !== confirmPassword) {
-        alert('Passwords do not match!');
+        showToast('Passwords do not match', 'error');
         return;
     }
 
     if (newPassword.length < 8) {
-        alert('Password must be at least 8 characters long!');
+        showToast('Password must be at least 8 characters', 'error');
         return;
+    }
+
+    if (resetBtn) {
+        resetBtn.textContent = 'Updating...';
+        resetBtn.disabled = true;
     }
 
     try {
@@ -871,11 +929,17 @@ async function resetPassword() {
             throw new Error(result.error || 'Failed to reset password');
         }
 
-        alert('Password updated successfully!');
+        showToast('Password updated successfully!', 'success');
         closeResetModal();
-        window.location.href = '/';
+        setTimeout(() => {
+            window.location.href = '/';
+        }, 1500);
     } catch (error) {
-        alert('Error updating password: ' + error.message);
+        showToast(error.message || 'Error updating password', 'error');
+        if (resetBtn) {
+            resetBtn.textContent = 'Update Password';
+            resetBtn.disabled = false;
+        }
     }
 }
 
@@ -903,4 +967,18 @@ async function initAuth() {
 window.addEventListener('load', () => {
     initAuth();
     checkForPasswordReset();
+    
+    // Reset modal close button
+    const closeResetModalBtn = document.getElementById('closeResetModal');
+    if (closeResetModalBtn) {
+        closeResetModalBtn.addEventListener('click', closeResetModal);
+    }
+    
+    // Close reset modal on backdrop click
+    const resetModal = document.getElementById('resetModal');
+    if (resetModal) {
+        resetModal.addEventListener('click', (e) => {
+            if (e.target === resetModal) closeResetModal();
+        });
+    }
 });
