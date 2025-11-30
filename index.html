@@ -1573,11 +1573,20 @@
                     <div class="form-group">
                         <label for="authPassword">Password</label>
                         <input type="password" id="authPassword" placeholder="Enter password" required autocomplete="current-password">
-                        <span class="password-hint" id="passwordHint" style="display: none; font-size: 11px; color: var(--warm-gray-dark); margin-top: 4px;">Minimum 8 characters</span>
+                        <div class="password-requirements" id="passwordRequirements" style="display: none; margin-top: 8px; font-size: 12px;">
+                            <div class="requirement" id="reqLength" style="display: flex; align-items: center; gap: 6px; margin-bottom: 4px; color: var(--warm-gray-dark);">
+                                <span class="req-icon" style="width: 14px; height: 14px; border-radius: 50%; border: 1.5px solid var(--warm-gray); display: inline-flex; align-items: center; justify-content: center; font-size: 10px;"></span>
+                                <span>At least 8 characters</span>
+                            </div>
+                        </div>
                     </div>
                     <div class="form-group" id="confirmPasswordGroup" style="display: none;">
                         <label for="authConfirmPassword">Confirm Password</label>
                         <input type="password" id="authConfirmPassword" placeholder="Confirm password" autocomplete="new-password">
+                        <div class="password-match" id="passwordMatch" style="margin-top: 6px; font-size: 12px; display: flex; align-items: center; gap: 6px;">
+                            <span class="match-icon" id="matchIcon" style="width: 14px; height: 14px; border-radius: 50%; border: 1.5px solid var(--warm-gray); display: inline-flex; align-items: center; justify-content: center; font-size: 10px;"></span>
+                            <span id="matchText" style="color: var(--warm-gray-dark);">Passwords must match</span>
+                        </div>
                     </div>
                     <button type="submit" class="auth-submit" id="authSubmitBtn">Sign In</button>
                 </form>

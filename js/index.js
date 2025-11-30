@@ -411,22 +411,99 @@ function closeAuthModal() {
 function setAuthMode(mode) {
     authMode = mode;
     const confirmPasswordGroup = document.getElementById('confirmPasswordGroup');
-    const passwordHint = document.getElementById('passwordHint');
+    const passwordRequirements = document.getElementById('passwordRequirements');
     const authConfirmPassword = document.getElementById('authConfirmPassword');
     
     if (mode === 'signin') {
         if (authSubmitBtn) authSubmitBtn.textContent = 'Sign In';
         if (toggleAuthModeBtn) toggleAuthModeBtn.textContent = 'Create an account';
         if (confirmPasswordGroup) confirmPasswordGroup.style.display = 'none';
-        if (passwordHint) passwordHint.style.display = 'none';
+        if (passwordRequirements) passwordRequirements.style.display = 'none';
         if (authConfirmPassword) authConfirmPassword.value = '';
     } else {
         if (authSubmitBtn) authSubmitBtn.textContent = 'Create Account';
         if (toggleAuthModeBtn) toggleAuthModeBtn.textContent = 'Have an account? Sign in';
         if (confirmPasswordGroup) confirmPasswordGroup.style.display = 'block';
-        if (passwordHint) passwordHint.style.display = 'block';
+        if (passwordRequirements) passwordRequirements.style.display = 'block';
+        validatePasswordRequirements();
+        validatePasswordMatch();
     }
 }
+
+function validatePasswordRequirements() {
+    const password = document.getElementById('authPassword')?.value || '';
+    const reqLength = document.getElementById('reqLength');
+    
+    if (!reqLength) return;
+    
+    const icon = reqLength.querySelector('.req-icon');
+    const isValid = password.length >= 8;
+    
+    if (isValid) {
+        reqLength.style.color = 'var(--success, #3D6635)';
+        icon.style.borderColor = 'var(--success, #3D6635)';
+        icon.style.background = 'var(--success, #3D6635)';
+        icon.style.color = 'white';
+        icon.innerHTML = '✓';
+    } else {
+        reqLength.style.color = 'var(--warm-gray-dark)';
+        icon.style.borderColor = 'var(--warm-gray)';
+        icon.style.background = 'transparent';
+        icon.style.color = 'transparent';
+        icon.innerHTML = '';
+    }
+    
+    return isValid;
+}
+
+function validatePasswordMatch() {
+    const password = document.getElementById('authPassword')?.value || '';
+    const confirmPassword = document.getElementById('authConfirmPassword')?.value || '';
+    const matchIcon = document.getElementById('matchIcon');
+    const matchText = document.getElementById('matchText');
+    
+    if (!matchIcon || !matchText) return false;
+    
+    const hasConfirmInput = confirmPassword.length > 0;
+    const isMatch = password === confirmPassword && hasConfirmInput;
+    
+    if (isMatch) {
+        matchIcon.style.borderColor = 'var(--success, #3D6635)';
+        matchIcon.style.background = 'var(--success, #3D6635)';
+        matchIcon.style.color = 'white';
+        matchIcon.innerHTML = '✓';
+        matchText.style.color = 'var(--success, #3D6635)';
+        matchText.textContent = 'Passwords match';
+    } else if (hasConfirmInput && password !== confirmPassword) {
+        matchIcon.style.borderColor = 'var(--danger, #991B1B)';
+        matchIcon.style.background = 'transparent';
+        matchIcon.style.color = 'var(--danger, #991B1B)';
+        matchIcon.innerHTML = '✗';
+        matchText.style.color = 'var(--danger, #991B1B)';
+        matchText.textContent = 'Passwords do not match';
+    } else {
+        matchIcon.style.borderColor = 'var(--warm-gray)';
+        matchIcon.style.background = 'transparent';
+        matchIcon.style.color = 'transparent';
+        matchIcon.innerHTML = '';
+        matchText.style.color = 'var(--warm-gray-dark)';
+        matchText.textContent = 'Passwords must match';
+    }
+    
+    return isMatch;
+}
+
+// Live password validation
+document.getElementById('authPassword')?.addEventListener('input', () => {
+    if (authMode === 'signup') {
+        validatePasswordRequirements();
+        validatePasswordMatch();
+    }
+});
+
+document.getElementById('authConfirmPassword')?.addEventListener('input', () => {
+    validatePasswordMatch();
+});
 
 if (userAuthLink) {
     userAuthLink.addEventListener('click', async (e) => {
