@@ -57,7 +57,6 @@
             'payment_method',
             'payment_handle',
             'review_link',
-            'screenshot_url',
             'award_amount',
             'previous_guest',
             'status',
@@ -500,8 +499,8 @@
             }
         }
 
-        // View submission details
-        function viewDetails(id) {
+        // View submission details - fetches screenshot on-demand for performance
+        async function viewDetails(id) {
             const submission = submissions.find(s => s.id === id);
             if (!submission) return;
 
@@ -543,14 +542,12 @@
                         <div class="detail-value"><a href="${submission.review_link}" target="_blank">${submission.review_link}</a></div>
                     </div>
                 ` : ''}
-                ${submission.screenshot_url ? `
-                    <div class="detail-row">
-                        <div class="detail-label">Screenshot:</div>
-                        <div class="detail-value">
-                            <img src="${submission.screenshot_url}" class="screenshot-preview" alt="Review Screenshot">
-                        </div>
+                <div class="detail-row" id="screenshot-row-${id}">
+                    <div class="detail-label">Screenshot:</div>
+                    <div class="detail-value" id="screenshot-container-${id}">
+                        <div style="color: var(--text-muted); font-size: 13px;">Loading screenshot...</div>
                     </div>
-                ` : ''}
+                </div>
                 ${submission.awarded_at ? `
                     <div class="detail-row">
                         <div class="detail-label">Awarded At:</div>
@@ -573,6 +570,30 @@
             `;
 
             modal.classList.add('active');
+
+            // Fetch screenshot on-demand
+            try {
+                const { data, error } = await supabase
+                    .from('review_rewards')
+                    .select('screenshot_url')
+                    .eq('id', id)
+                    .single();
+
+                const container = document.getElementById(`screenshot-container-${id}`);
+                if (container) {
+                    if (error || !data?.screenshot_url) {
+                        container.innerHTML = '<span style="color: var(--text-muted); font-size: 13px;">No screenshot available</span>';
+                    } else {
+                        container.innerHTML = `<img src="${data.screenshot_url}" class="screenshot-preview" alt="Review Screenshot">`;
+                    }
+                }
+            } catch (err) {
+                console.error('Error fetching screenshot:', err);
+                const container = document.getElementById(`screenshot-container-${id}`);
+                if (container) {
+                    container.innerHTML = '<span style="color: var(--text-muted); font-size: 13px;">Failed to load screenshot</span>';
+                }
+            }
         }
 
         // Close modal
