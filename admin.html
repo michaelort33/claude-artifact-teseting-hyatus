@@ -179,6 +179,38 @@
             z-index: 1;
         }
 
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            padding: 20px;
+        }
+
+        .success-message {
+            background: var(--deep-moss);
+            color: var(--cream);
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin-bottom: 16px;
+            font-size: 14px;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(100%); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+        @keyframes slideOut {
+            from { opacity: 1; transform: translateX(0); }
+            to { opacity: 0; transform: translateX(100%); }
+        }
+
         .login-container {
             max-width: 400px;
             width: 100%;
@@ -1004,6 +1036,31 @@
             </div>
         </div>
     </div>
+
+    <!-- Forgot Password Modal -->
+    <div id="forgotPasswordModal" class="modal-overlay" style="display: none;">
+        <div class="login-container" style="max-width: 400px;">
+            <div class="login-header">
+                <h2>Reset Password</h2>
+                <p class="login-subtitle">Enter your email to receive a reset link</p>
+            </div>
+            <div class="login-body">
+                <div id="forgotError" class="error-message"></div>
+                <div id="forgotSuccess" class="success-message" style="display: none; background: var(--deep-moss); color: var(--cream); padding: 12px 16px; border-radius: 8px; margin-bottom: 16px; font-size: 14px;"></div>
+                <form id="forgotPasswordForm">
+                    <div class="form-group">
+                        <label for="forgotEmail">Email</label>
+                        <input type="email" id="forgotEmail" placeholder="admin@example.com" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-full" id="sendResetBtn">Get Reset Link</button>
+                </form>
+                <a class="forgot-link" id="backToLoginLink" style="display: block; margin-top: 16px; text-align: center;">Back to Sign In</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div id="toastContainer" style="position: fixed; top: 20px; right: 20px; z-index: 10001; display: flex; flex-direction: column; gap: 10px;"></div>
 
     <div id="dashboard" class="dashboard">
         <h2 class="page-title">Submissions Overview</h2>

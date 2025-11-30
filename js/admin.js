@@ -8,6 +8,44 @@ function isAdminEmail(email) {
     return false;
 }
 
+// Toast notification function
+function showToast(message, type = 'info') {
+    const container = document.getElementById('toastContainer');
+    if (!container) return;
+    
+    const toast = document.createElement('div');
+    toast.style.cssText = `
+        padding: 14px 20px;
+        border-radius: 10px;
+        font-size: 14px;
+        font-family: Inter, -apple-system, sans-serif;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+        animation: slideIn 0.3s ease;
+        max-width: 320px;
+        line-height: 1.4;
+    `;
+    
+    if (type === 'success') {
+        toast.style.background = '#0F2C1F';
+        toast.style.color = '#FDFCF8';
+    } else if (type === 'error') {
+        toast.style.background = '#D96F52';
+        toast.style.color = '#FDFCF8';
+    } else {
+        toast.style.background = '#F7F3EA';
+        toast.style.color = '#2A2A2A';
+        toast.style.border = '1px solid #E5DDD3';
+    }
+    
+    toast.textContent = message;
+    container.appendChild(toast);
+    
+    setTimeout(() => {
+        toast.style.animation = 'slideOut 0.3s ease forwards';
+        setTimeout(() => toast.remove(), 300);
+    }, 4000);
+}
+
 function showLoginError(msg) {
     const el = document.getElementById('loginError');
     el.style.display = 'block';
@@ -95,11 +133,43 @@ document.getElementById('logoutBtn').addEventListener('click', async () => {
     allSubmissions = [];
 });
 
-document.getElementById('forgotPasswordLink').addEventListener('click', async (e) => {
+// Forgot password modal functionality
+document.getElementById('forgotPasswordLink').addEventListener('click', (e) => {
     e.preventDefault();
-    const email = document.getElementById('email').value || prompt('Please enter your email address:');
+    const loginEmail = document.getElementById('email').value;
+    document.getElementById('forgotEmail').value = loginEmail;
+    document.getElementById('forgotPasswordModal').style.display = 'flex';
+    document.getElementById('forgotError').style.display = 'none';
+    document.getElementById('forgotSuccess').style.display = 'none';
+});
 
-    if (!email) return;
+document.getElementById('backToLoginLink').addEventListener('click', (e) => {
+    e.preventDefault();
+    document.getElementById('forgotPasswordModal').style.display = 'none';
+});
+
+document.getElementById('forgotPasswordModal').addEventListener('click', (e) => {
+    if (e.target.id === 'forgotPasswordModal') {
+        document.getElementById('forgotPasswordModal').style.display = 'none';
+    }
+});
+
+document.getElementById('forgotPasswordForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const email = document.getElementById('forgotEmail').value;
+    const sendBtn = document.getElementById('sendResetBtn');
+    const forgotError = document.getElementById('forgotError');
+    const forgotSuccess = document.getElementById('forgotSuccess');
+
+    if (!email) {
+        forgotError.textContent = 'Please enter your email address';
+        forgotError.style.display = 'block';
+        return;
+    }
+
+    sendBtn.textContent = 'Sending...';
+    sendBtn.disabled = true;
+    forgotError.style.display = 'none';
 
     try {
         const response = await fetch('/api/auth/reset-password-request', {
@@ -108,9 +178,15 @@ document.getElementById('forgotPasswordLink').addEventListener('click', async (e
             body: JSON.stringify({ email })
         });
 
-        alert('If an account exists, a password reset email will be sent.');
+        forgotSuccess.textContent = 'If an account exists, a password reset email has been sent.';
+        forgotSuccess.style.display = 'block';
+        document.getElementById('forgotPasswordForm').style.display = 'none';
     } catch (error) {
-        alert('Error sending password reset email: ' + error.message);
+        forgotError.textContent = 'Error sending reset email. Please try again.';
+        forgotError.style.display = 'block';
+    } finally {
+        sendBtn.textContent = 'Get Reset Link';
+        sendBtn.disabled = false;
     }
 });
 
@@ -502,7 +578,7 @@ async function bulkMarkPaid() {
         );
 
         if (awardedSubmissions.length === 0) {
-            alert('No awarded submissions selected. Only awarded submissions can be marked as paid.');
+            showToast('No awarded submissions selected. Only awarded submissions can be marked as paid.', 'error');
             return;
         }
 
@@ -514,12 +590,12 @@ async function bulkMarkPaid() {
             });
         }
 
-        alert(`Successfully marked ${awardedSubmissions.length} submissions as paid`);
+        showToast(`Successfully marked ${awardedSubmissions.length} submissions as paid`, 'success');
         clearSelection();
         await loadSubmissions();
     } catch (err) {
         console.error('Error in bulk update:', err);
-        alert('Error updating submissions: ' + err.message);
+        showToast('Error updating submissions: ' + err.message, 'error');
     }
 }
 
@@ -564,7 +640,7 @@ async function viewDetails(id) {
 
         document.getElementById('detailModal').classList.add('active');
     } catch (err) {
-        alert('Error loading details: ' + err.message);
+        showToast('Error loading details: ' + err.message, 'error');
     }
 }
 
@@ -590,7 +666,7 @@ function closeEditAwardModal() {
 async function saveAwardAmount() {
     const amount = parseFloat(document.getElementById('editAwardAmount').value);
     if (isNaN(amount) || amount < 0) {
-        alert('Please enter a valid amount');
+        showToast('Please enter a valid amount', 'error');
         return;
     }
 
@@ -611,9 +687,9 @@ async function saveAwardAmount() {
 
         renderSubmissions(submissions);
         closeEditAwardModal();
-        alert(`Award amount updated to $${amount.toFixed(2)}`);
+        showToast(`Award amount updated to $${amount.toFixed(2)}`, 'success');
     } catch (error) {
-        alert('Failed to update: ' + error.message);
+        showToast('Failed to update: ' + error.message, 'error');
     }
 }
 
@@ -647,7 +723,7 @@ async function updateStatus(id, newStatus) {
             showTaskModal(submission);
         }
     } catch (error) {
-        alert('Failed to update status: ' + error.message);
+        showToast('Failed to update status: ' + error.message, 'error');
     }
 }
 
@@ -698,13 +774,13 @@ async function createTask() {
         const result = await response.json();
 
         if (response.ok) {
-            alert('Task created successfully!');
+            showToast('Task created successfully!', 'success');
         } else {
             throw new Error(result.error || 'Failed to create task');
         }
     } catch (error) {
         console.error('Error creating task:', error);
-        alert('Error creating task: ' + error.message);
+        showToast('Error creating task: ' + error.message, 'error');
     }
 
     document.getElementById('taskModal').classList.remove('active');
@@ -753,7 +829,7 @@ async function exportCSV() {
         a.click();
         window.URL.revokeObjectURL(url);
     } catch (err) {
-        alert('Error exporting CSV: ' + err.message);
+        showToast('Error exporting CSV: ' + err.message, 'error');
     }
 }
 
