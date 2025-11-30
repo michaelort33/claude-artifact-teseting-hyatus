@@ -140,7 +140,7 @@ async function handleSendEmail(req, res) {
 
             const msg = {
                 to: recipient,
-                from: 'feedback@hyatus.com',
+                from: 'no-reply@hyatus.com',
                 subject: subject || 'Review Rewards Notification',
                 text: text || '',
                 html: html || text || ''
@@ -179,7 +179,7 @@ async function handleAdminNotification(req, res) {
             
             const msg = {
                 to: process.env.ADMIN_EMAIL,
-                from: 'feedback@hyatus.com',
+                from: 'no-reply@hyatus.com',
                 subject: 'New Review Reward Submission!',
                 html: `
                     <h2>New Submission Received</h2>
