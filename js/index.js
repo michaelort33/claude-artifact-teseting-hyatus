@@ -204,16 +204,15 @@ function showError(message) {
     }, 5000);
 }
 
-// Send admin notification email
+// Send admin notification email via Replit backend (SendGrid)
 async function sendAdminNotification(submission) {
     const requestBody = { record: submission };
 
     try {
-        const response = await fetch('https://dugjgmwlzyjillkemzhz.supabase.co/functions/v1/send-admin-notification', {
+        const response = await fetch('/api/email/admin-notification', {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
+                'Content-Type': 'application/json'
             },
             body: JSON.stringify(requestBody)
         });
@@ -223,12 +222,7 @@ async function sendAdminNotification(submission) {
             throw new Error(`HTTP error! status: ${response.status} - ${errorText}`);
         }
 
-        const responseText = await response.text();
-        try {
-            return JSON.parse(responseText);
-        } catch (e) {
-            return { success: true, rawResponse: responseText };
-        }
+        return await response.json();
     } catch (error) {
         console.error('Failed to send email notification:', error);
         throw error;
