@@ -1,0 +1,48 @@
+I will analyze `js/index.js` and `index.html` to identify all URL parameters and their effects on the application state, UI, and logic.
+Then, I will provide a clear summary of each parameter, its trigger values, and the specific changes it triggers in the user experience.
+
+[1 tool called]
+
+I will break down the URL logic based on `js/index.js`.
+
+### 1. Reward Amount Logic (`r` or `reward`)
+Controls the dollar amount shown to the user.
+- **Parameters:** `?r=...` or `?reward=...`
+- **Default:** `$10`
+- **Triggers:**
+  - If value is `h24p` or `hyatus2024premium` → Sets reward to **$20**.
+  - Otherwise → Stays at **$10**.
+- **Effect:** Updates all text elements showing the amount (`$10` vs `$20`).
+
+### 2. Guest Status Logic (`g` or `guest`)
+Controls whether the campaign is "active" or "paused" for the user.
+- **Parameters:** `?g=...` or `?guest=...`
+- **Default:** `false` (Not a previous guest)
+- **Triggers:**
+  - If value is `vip2024` or `returning` → Marks user as **Previous Guest**.
+  - Otherwise → Considered **Non-Previous Guest**.
+- **Effect:**
+  - **If Previous Guest:** Form is fully active and submittable.
+  - **If Non-Previous Guest:**
+    - Form inputs are **disabled**.
+    - Submit button is grayed out and says "Campaign Paused".
+    - A warning banner appears: "Campaign Paused due to high demand."
+
+### 3. Account Warning Logic (`v` or `warning`)
+Controls visibility of the Google account warning banner.
+- **Parameters:** `?v=...` or `?warning=...`
+- **Triggers:**
+  - If value is `x7k` or `true` → **Shows** the warning banner.
+  - Otherwise → **Hides** the warning banner.
+- **Effect:** Displays the "Friendly reminder: Gifts are for reviews from established Google accounts..." box.
+
+### Summary of Combinations
+
+| Scenario | URL Params | Result |
+| :--- | :--- | :--- |
+| **Standard (Public)** | `(none)` | $10 Reward, **Campaign Paused** (Form Disabled) |
+| **Returning Guest ($10)** | `?g=returning` | $10 Reward, **Form Active** |
+| **VIP Guest ($20)** | `?r=h24p&g=vip2024` | **$20 Reward**, **Form Active** |
+| **Warning Mode** | `?v=true` | Shows "Established Account" warning |
+
+The logic is strictly client-side in `js/index.js` (lines 20-99).
