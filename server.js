@@ -14,9 +14,13 @@ const SESSION_EXPIRY_DAYS = 7;
 const IS_PRODUCTION = process.env.NODE_ENV === 'production' || !process.env.DATABASE_URL?.includes('localhost');
 const COOKIE_SECURE = IS_PRODUCTION ? '; Secure' : '';
 
+const dbUrl = process.env.DATABASE_URL;
+const dbHost = dbUrl ? new URL(dbUrl).hostname : 'unknown';
+console.log('Database host:', dbHost);
+
 const pool = new Pool({
-    connectionString: process.env.DATABASE_URL,
-    ssl: process.env.DATABASE_URL?.includes('localhost') ? false : { rejectUnauthorized: false }
+    connectionString: dbUrl,
+    ssl: dbUrl?.includes('localhost') ? false : { rejectUnauthorized: false }
 });
 
 if (process.env.SENDGRID_API_KEY) {
