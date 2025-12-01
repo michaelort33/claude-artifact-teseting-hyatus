@@ -588,8 +588,9 @@ async function getTasksApiToken() {
     }
 
     const data = await response.json();
-    cachedToken = data.data?.access_token || data.access_token;
+    cachedToken = data.accessToken || data.data?.access_token || data.access_token;
     tokenExpiry = Date.now() + (55 * 60 * 1000);
+    console.log('Tasks API authenticated successfully');
     return cachedToken;
 }
 

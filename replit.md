@@ -98,6 +98,7 @@ The application is served via Node.js server on port 5000.
 - **Password resets**: Sent to user's email address
 
 ## Recent Changes
+- **2025-12-01**: Fixed Task API integration - Corrected token field name (`accessToken` vs `access_token`) and added required fields (name, category, priority, description, external_id, subcategory) for successful task creation on external API
 - **2025-12-01**: Security hardening - Admin endpoints now require authenticated admin session
 - **2025-12-01**: Performance optimization - Excluded large screenshot data (up to 4MB) from admin listings
 - **2025-11-30**: Changed email FROM address from no-reply@hyatus.com to hello@hyatus.com for better deliverability

@@ -770,16 +770,19 @@ async function createTask() {
 
     const submission = pendingTaskSubmission;
     const amount = parseFloat(submission.award_amount) || getAwardAmount(submission.id);
+    const giftType = (submission.payment_method || 'gift').toUpperCase();
 
     try {
         const response = await fetch('/api/tasks', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-                email: submission.payment_handle,
-                reward_type: submission.payment_method,
-                amount: amount,
-                submission_id: submission.id
+                name: `Send $${amount} ${giftType} gift card to ${submission.payment_handle}`,
+                category: 'guest_satisfaction',
+                priority: 'medium',
+                description: `Guest appreciation gift - ${giftType} $${amount}\nRecipient: ${submission.payment_handle}\nSubmission ID: ${submission.id}`,
+                external_id: `reward-${submission.id}`,
+                subcategory: 'gift_card'
             })
         });
 
