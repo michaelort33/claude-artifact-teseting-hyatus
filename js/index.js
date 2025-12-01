@@ -109,28 +109,6 @@ document.addEventListener('DOMContentLoaded', () => {
             submitButton.style.background = 'var(--warm-gray, #C4C0B8)';
             submitButton.style.cursor = 'not-allowed';
         }
-
-        const formContainer = document.getElementById('formContainer');
-        if (formContainer) {
-            const pauseAlert = document.createElement('div');
-            pauseAlert.id = 'campaignPauseAlert';
-            pauseAlert.style.cssText = `
-                background: #F7F3EA;
-                border: 1px solid #E5E2DB;
-                border-left: 3px solid #D96F52;
-                color: #2A2A2A;
-                padding: 20px 24px;
-                margin-bottom: 24px;
-                text-align: center;
-                font-size: 14px;
-                line-height: 1.6;
-            `;
-            pauseAlert.innerHTML = `
-                <strong style="color: #D96F52; display: block; margin-bottom: 4px;">Thank You for Visiting</strong>
-                Our guest appreciation program is currently reserved for returning guests. We hope to welcome you back soon.
-            `;
-            formContainer.insertBefore(pauseAlert, formContainer.firstChild);
-        }
     }
 });
 
