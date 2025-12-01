@@ -167,8 +167,10 @@ const fileInput = document.getElementById('reviewScreenshot') || document.getEle
 const fileName = document.getElementById('fileName');
 
 if (fileUploadArea && fileInput) {
-    fileUploadArea.addEventListener('click', () => {
-        fileInput.click();
+    fileUploadArea.addEventListener('click', (e) => {
+        if (e.target !== fileInput) {
+            fileInput.click();
+        }
     });
     fileUploadArea.addEventListener('keydown', (e) => {
         if (e.key === 'Enter' || e.key === ' ') {

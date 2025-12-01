@@ -464,8 +464,8 @@ async function handleCreateSubmission(req, res) {
         sendJson(res, 200, { data: submission });
 
     } catch (err) {
-        console.error('Create submission error:', err);
-        sendJson(res, 500, { error: 'Server error' });
+        console.error('Create submission error:', err.message, err.stack);
+        sendJson(res, 500, { error: 'Server error: ' + err.message });
     }
 }
 
