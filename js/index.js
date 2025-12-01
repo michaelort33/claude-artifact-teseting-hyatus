@@ -130,7 +130,6 @@ paymentMethods.forEach((method) => {
 
         if (paymentHandle) {
             paymentHandle.disabled = false;
-            paymentHandle.value = '';
         }
 
         if (!paymentLabel) return;
