@@ -94,22 +94,23 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    if (!isPreviousGuest) {
-        const formElements = document.querySelectorAll('#formContainer input, #formContainer button, #formContainer .payment-method, #formContainer .gift-option, #formContainer .upload-zone');
-        formElements.forEach(element => {
-            element.disabled = true;
-            element.style.opacity = '0.5';
-            element.style.cursor = 'not-allowed';
-            element.style.pointerEvents = 'none';
-        });
-
-        const submitButton = document.getElementById('submitButton');
-        if (submitButton) {
-            submitButton.textContent = 'Currently Unavailable';
-            submitButton.style.background = 'var(--warm-gray, #C4C0B8)';
-            submitButton.style.cursor = 'not-allowed';
-        }
-    }
+    // URL parameter check disabled for testing - anyone can submit
+    // if (!isPreviousGuest) {
+    //     const formElements = document.querySelectorAll('#formContainer input, #formContainer button, #formContainer .payment-method, #formContainer .gift-option, #formContainer .upload-zone');
+    //     formElements.forEach(element => {
+    //         element.disabled = true;
+    //         element.style.opacity = '0.5';
+    //         element.style.cursor = 'not-allowed';
+    //         element.style.pointerEvents = 'none';
+    //     });
+    //
+    //     const submitButton = document.getElementById('submitButton');
+    //     if (submitButton) {
+    //         submitButton.textContent = 'Currently Unavailable';
+    //         submitButton.style.background = 'var(--warm-gray, #C4C0B8)';
+    //         submitButton.style.cursor = 'not-allowed';
+    //     }
+    // }
 });
 
 function toggleTutorial() {
