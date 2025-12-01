@@ -345,6 +345,7 @@ async function handleGetSubmissions(req, res) {
         const userOnly = url.searchParams.get('user_only') === 'true';
         
         const user = await getSessionUser(req);
+        console.log('Get submissions - user:', user?.email || 'none', 'userOnly:', userOnly);
 
         if (userOnly) {
             if (!user) {
@@ -352,9 +353,11 @@ async function handleGetSubmissions(req, res) {
             }
         } else {
             if (!user) {
+                console.log('No user session found');
                 return sendJson(res, 401, { error: 'Authentication required' });
             }
             const admin = await isAdmin(user.email);
+            console.log('Admin check for', user.email, ':', admin);
             if (!admin) {
                 return sendJson(res, 403, { error: 'Admin access required' });
             }

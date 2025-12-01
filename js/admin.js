@@ -102,7 +102,12 @@ document.getElementById('loginForm').addEventListener('submit', async (e) => {
             body: JSON.stringify({ email, password })
         });
 
-        const result = await response.json();
+        let result;
+        try {
+            result = await response.json();
+        } catch (parseErr) {
+            throw new Error('Login failed - invalid response from server');
+        }
         
         if (!response.ok) {
             throw new Error(result.error || 'Invalid email or password');
