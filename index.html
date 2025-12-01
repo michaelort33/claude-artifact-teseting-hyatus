@@ -644,6 +644,33 @@
             color: var(--warm-gray-dark);
         }
 
+        .upload-success {
+            display: none;
+            position: absolute;
+            bottom: 12px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--moss);
+            background: white;
+            padding: 6px 16px;
+            border-radius: 20px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            max-width: 80%;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .upload-zone.has-file .upload-success {
+            display: block;
+        }
+
+        .upload-zone.has-file .upload-content {
+            opacity: 0.6;
+        }
+
         #fileInput {
             position: absolute;
             inset: 0;
@@ -1532,6 +1559,7 @@
                                     <div class="upload-title">Upload a Screenshot</div>
                                     <div class="upload-hint">Share a photo of your feedback</div>
                                 </div>
+                                <div class="upload-success" id="fileName"></div>
                             </div>
                         </div>
                     </div>
