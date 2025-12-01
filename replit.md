@@ -98,6 +98,8 @@ The application is served via Node.js server on port 5000.
 - **Password resets**: Sent to user's email address
 
 ## Recent Changes
+- **2025-12-01**: Security hardening - Admin endpoints now require authenticated admin session
+- **2025-12-01**: Performance optimization - Excluded large screenshot data (up to 4MB) from admin listings
 - **2025-11-30**: Changed email FROM address from no-reply@hyatus.com to hello@hyatus.com for better deliverability
 - **2025-11-30**: Complete Migration from Supabase to Replit PostgreSQL
   - Built custom authentication system (signup, signin, password reset)
