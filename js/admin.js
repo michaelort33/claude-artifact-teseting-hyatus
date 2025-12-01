@@ -651,6 +651,7 @@ async function viewDetails(id) {
         `;
 
         document.getElementById('detailModal').classList.add('active');
+        document.body.classList.add('modal-open');
     } catch (err) {
         showToast('Error loading details: ' + err.message, 'error');
     }
@@ -658,6 +659,7 @@ async function viewDetails(id) {
 
 function closeDetailModal() {
     document.getElementById('detailModal').classList.remove('active');
+    document.body.classList.remove('modal-open');
 }
 
 let currentEditSubmissionId = null;
@@ -668,10 +670,12 @@ function editAward(id) {
     const amount = parseFloat(submission?.award_amount) || getAwardAmount(id);
     document.getElementById('editAwardAmount').value = Number(amount).toFixed(2);
     document.getElementById('editAwardModal').classList.add('active');
+    document.body.classList.add('modal-open');
 }
 
 function closeEditAwardModal() {
     document.getElementById('editAwardModal').classList.remove('active');
+    document.body.classList.remove('modal-open');
     currentEditSubmissionId = null;
 }
 
@@ -758,10 +762,12 @@ function showTaskModal(submission) {
         </div>
     `;
     document.getElementById('taskModal').classList.add('active');
+    document.body.classList.add('modal-open');
 }
 
 async function skipTask() {
     document.getElementById('taskModal').classList.remove('active');
+    document.body.classList.remove('modal-open');
     pendingTaskSubmission = null;
 }
 
@@ -799,6 +805,7 @@ async function createTask() {
     }
 
     document.getElementById('taskModal').classList.remove('active');
+    document.body.classList.remove('modal-open');
     pendingTaskSubmission = null;
 }
 
