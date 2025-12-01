@@ -324,7 +324,7 @@ function renderSubmissions(data) {
         const row = document.createElement('tr');
         const date = new Date(submission.created_at || Date.now()).toLocaleDateString();
         const reviewType = submission.review_link ? 'Link' : 'Screenshot';
-        const amount = submission.award_amount || getAwardAmount(submission.id);
+        const amount = parseFloat(submission.award_amount) || getAwardAmount(submission.id);
 
         row.innerHTML = `
             <td><input type="checkbox" class="submission-checkbox" data-id="${submission.id}" onchange="updateSelection()"></td>
@@ -333,7 +333,7 @@ function renderSubmissions(data) {
             <td>${(submission.payment_method || '').toUpperCase()}</td>
             <td>${submission.payment_handle || ''}</td>
             <td>${reviewType}</td>
-            <td>$${amount.toFixed(2)}</td>
+            <td>$${Number(amount).toFixed(2)}</td>
             <td>${submission.previous_guest ? 'Yes' : 'No'}</td>
             <td><span class="status-badge status-${submission.status || 'pending'}">${(submission.status || 'pending').toUpperCase()}</span></td>
             <td>
@@ -465,7 +465,7 @@ function renderGroupedAnalytics() {
             groups[key] = { count: 0, totalAmount: 0, awarded: 0, paid: 0 };
         }
         groups[key].count++;
-        groups[key].totalAmount += item.award_amount || getAwardAmount(item.id);
+        groups[key].totalAmount += parseFloat(item.award_amount) || getAwardAmount(item.id);
         if (item.status === 'awarded' || item.status === 'paid') groups[key].awarded++;
         if (item.status === 'paid') groups[key].paid++;
     });
@@ -628,7 +628,7 @@ async function viewDetails(id) {
                 <div class="detail-label">Email</div>
                 <div class="detail-value">${data.payment_handle || 'N/A'}</div>
                 <div class="detail-label">Amount</div>
-                <div class="detail-value">$${(data.award_amount || getAwardAmount(data.id)).toFixed(2)}</div>
+                <div class="detail-value">$${(parseFloat(data.award_amount) || getAwardAmount(data.id)).toFixed(2)}</div>
                 <div class="detail-label">Previous Guest</div>
                 <div class="detail-value">${data.previous_guest ? 'Yes' : 'No'}</div>
                 <div class="detail-label">Status</div>
@@ -660,8 +660,8 @@ let currentEditSubmissionId = null;
 function editAward(id) {
     currentEditSubmissionId = id;
     const submission = submissions.find(s => s.id === id);
-    const amount = submission?.award_amount || getAwardAmount(id);
-    document.getElementById('editAwardAmount').value = amount.toFixed(2);
+    const amount = parseFloat(submission?.award_amount) || getAwardAmount(id);
+    document.getElementById('editAwardAmount').value = Number(amount).toFixed(2);
     document.getElementById('editAwardModal').classList.add('active');
 }
 
@@ -737,7 +737,7 @@ async function updateStatus(id, newStatus) {
 function showTaskModal(submission) {
     pendingTaskSubmission = submission;
     const details = document.getElementById('taskDetails');
-    const amount = submission.award_amount || getAwardAmount(submission.id);
+    const amount = parseFloat(submission.award_amount) || getAwardAmount(submission.id);
     details.innerHTML = `
         <div class="task-detail-row">
             <span>Email</span>
@@ -749,7 +749,7 @@ function showTaskModal(submission) {
         </div>
         <div class="task-detail-row">
             <span>Amount</span>
-            <span style="font-weight: 500;">$${amount.toFixed(2)}</span>
+            <span style="font-weight: 500;">$${Number(amount).toFixed(2)}</span>
         </div>
     `;
     document.getElementById('taskModal').classList.add('active');
@@ -764,7 +764,7 @@ async function createTask() {
     if (!pendingTaskSubmission) return;
 
     const submission = pendingTaskSubmission;
-    const amount = submission.award_amount || getAwardAmount(submission.id);
+    const amount = parseFloat(submission.award_amount) || getAwardAmount(submission.id);
 
     try {
         const response = await fetch('/api/tasks', {
