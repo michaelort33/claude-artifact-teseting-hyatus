@@ -346,8 +346,23 @@ async function handleGetSubmissions(req, res) {
         
         const user = await getSessionUser(req);
 
+        if (userOnly) {
+            if (!user) {
+                return sendJson(res, 401, { error: 'Authentication required' });
+            }
+        } else {
+            if (!user) {
+                return sendJson(res, 401, { error: 'Authentication required' });
+            }
+            const admin = await isAdmin(user.email);
+            if (!admin) {
+                return sendJson(res, 403, { error: 'Admin access required' });
+            }
+        }
+
         let query = `SELECT id, payment_method, payment_handle, review_link, status, 
-                     awarded_at, notes, created_at, user_id, award_amount, paid_at, previous_guest 
+                     awarded_at, notes, created_at, user_id, award_amount, paid_at, previous_guest,
+                     CASE WHEN screenshot_url IS NOT NULL THEN true ELSE false END as has_screenshot
                      FROM review_rewards`;
         const params = [];
         const conditions = [];
@@ -395,6 +410,13 @@ async function handleGetSubmissions(req, res) {
 
 async function handleGetSubmission(req, res, id) {
     try {
+        const user = await getSessionUser(req);
+        if (!user) {
+            return sendJson(res, 401, { error: 'Authentication required' });
+        }
+
+        const admin = await isAdmin(user.email);
+
         const result = await pool.query(
             'SELECT * FROM review_rewards WHERE id = $1',
             [id]
@@ -404,7 +426,13 @@ async function handleGetSubmission(req, res, id) {
             return sendJson(res, 404, { error: 'Submission not found' });
         }
 
-        sendJson(res, 200, { data: result.rows[0] });
+        const submission = result.rows[0];
+        
+        if (!admin && submission.user_id !== user.id && submission.payment_handle?.toLowerCase() !== user.email.toLowerCase()) {
+            return sendJson(res, 403, { error: 'Access denied' });
+        }
+
+        sendJson(res, 200, { data: submission });
 
     } catch (err) {
         console.error('Get submission error:', err);

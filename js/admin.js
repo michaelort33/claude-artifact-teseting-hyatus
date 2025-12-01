@@ -258,9 +258,9 @@ async function loadSubmissions(resetPagination = true) {
             loadAllForAnalytics();
         }
     } catch (err) {
-        console.error('Unexpected error:', err);
+        console.error('Error loading submissions:', err.message || err);
         if (tbody) {
-            tbody.innerHTML = '<tr><td colspan="10" style="text-align: center; padding: 40px; color: var(--danger);">Error loading submissions. Please refresh.</td></tr>';
+            tbody.innerHTML = `<tr><td colspan="10" style="text-align: center; padding: 40px; color: var(--danger);">Error loading submissions: ${err.message || 'Unknown error'}. Please refresh.</td></tr>`;
         }
     } finally {
         isLoadingSubmissions = false;
