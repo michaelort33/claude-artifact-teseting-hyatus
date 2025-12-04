@@ -509,7 +509,7 @@ async function handleCreateSubmission(req, res) {
             try {
                 await sgMail.send({
                     to: payment_handle,
-                    from: { name: 'Hyatus Living', email: 'hello@hyatus.com' },
+                    from: { name: 'Hyatus Living', email: 'feedback@hyatus.com' },
                     subject: `We've Received Your Request - Your ${giftDisplay} Is On Its Way!`,
                     text: `Dear Friend,\n\nThank you so much for taking the time to share your experience with us! We are truly grateful for your thoughtful feedback - it means the world to our team.\n\nGreat news: We've received your request, and your $${amount} ${giftDisplay} is on its way to your inbox!\n\nHere's what to expect:\nOur team is preparing your ${giftName} gift card now. Within 48 hours, you'll receive a separate email with your $${amount} ${giftDisplay} delivered right to this inbox (${payment_handle}).\n\nPlease keep an eye out for it - and be sure to check your spam folder just in case!\n\nFrom all of us at Hyatus, thank you for being part of our community. Your kind words and honest feedback help us continue to create wonderful experiences for guests like you.\n\nWith warmth and gratitude,\nThe Hyatus Team\nhyatus.com`,
                     html: `
