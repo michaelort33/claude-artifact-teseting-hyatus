@@ -500,15 +500,18 @@ async function handleCreateSubmission(req, res) {
         if (process.env.SENDGRID_API_KEY && payment_handle) {
             const giftName = payment_method === 'amazon' ? 'Amazon' : 
                             payment_method === 'starbucks' ? 'Starbucks' : 
-                            'surprise';
+                            'a surprise';
+            const giftDisplay = payment_method === 'amazon' ? 'Amazon Gift Card' : 
+                               payment_method === 'starbucks' ? 'Starbucks Gift Card' : 
+                               'Surprise Gift Card';
             const amount = award_amount || 10;
             
             try {
                 await sgMail.send({
                     to: payment_handle,
                     from: { name: 'Hyatus Living', email: 'hello@hyatus.com' },
-                    subject: 'Thank You for Sharing Your Experience with Us',
-                    text: `Dear Friend,\n\nThank you so much for taking the time to share your experience with us. We are truly grateful for your thoughtful feedback - it means the world to our team.\n\nWe've received your request for a $${amount} ${giftName} gift card, and we're so excited to send this small token of our appreciation your way!\n\nWhat happens next:\nOur team will review your submission and process your thank-you gift within 48 hours. You'll receive your gift card at this email address (${payment_handle}).\n\nFrom all of us at Hyatus, thank you for being part of our community. Your kind words and honest feedback help us continue to create wonderful experiences for guests like you.\n\nWith warmth and gratitude,\nThe Hyatus Team\nhyatus.com`,
+                    subject: `We've Received Your Request - Your ${giftDisplay} Is On Its Way!`,
+                    text: `Dear Friend,\n\nThank you so much for taking the time to share your experience with us! We are truly grateful for your thoughtful feedback - it means the world to our team.\n\nGreat news: We've received your request, and your $${amount} ${giftDisplay} is on its way to your inbox!\n\nHere's what to expect:\nOur team is preparing your ${giftName} gift card now. Within 48 hours, you'll receive a separate email with your $${amount} ${giftDisplay} delivered right to this inbox (${payment_handle}).\n\nPlease keep an eye out for it - and be sure to check your spam folder just in case!\n\nFrom all of us at Hyatus, thank you for being part of our community. Your kind words and honest feedback help us continue to create wonderful experiences for guests like you.\n\nWith warmth and gratitude,\nThe Hyatus Team\nhyatus.com`,
                     html: `
                         <div style="font-family: Inter, -apple-system, sans-serif; max-width: 560px; margin: 0 auto; padding: 40px 20px; background: #FDFCF8;">
                             <div style="text-align: center; margin-bottom: 32px;">
@@ -517,25 +520,31 @@ async function handleCreateSubmission(req, res) {
                             
                             <div style="text-align: center; margin-bottom: 32px;">
                                 <div style="font-size: 48px; margin-bottom: 16px;">🎁</div>
-                                <h2 style="font-family: 'Playfair Display', Georgia, serif; color: #0F2C1F; font-size: 24px; font-weight: 400; margin: 0;">Thank You for Sharing</h2>
+                                <h2 style="font-family: 'Playfair Display', Georgia, serif; color: #0F2C1F; font-size: 24px; font-weight: 400; margin: 0 0 8px 0;">We've Got Your Request!</h2>
+                                <p style="color: #666; font-size: 15px; margin: 0;">Your ${giftDisplay} is on its way</p>
                             </div>
                             
                             <p style="color: #2A2A2A; font-size: 16px; line-height: 1.7; margin-bottom: 20px;">Dear Friend,</p>
                             
-                            <p style="color: #2A2A2A; font-size: 16px; line-height: 1.7; margin-bottom: 20px;">Thank you so much for taking the time to share your experience with us. We are truly grateful for your thoughtful feedback — it means the world to our team.</p>
+                            <p style="color: #2A2A2A; font-size: 16px; line-height: 1.7; margin-bottom: 20px;">Thank you so much for taking the time to share your experience with us! We are truly grateful for your thoughtful feedback — it means the world to our team.</p>
                             
                             <div style="background: linear-gradient(135deg, #F7F3EA 0%, #EDE8DC 100%); border-radius: 16px; padding: 28px; margin: 28px 0; border: 1px solid #E5DDD3;">
-                                <p style="color: #0F2C1F; font-size: 15px; font-weight: 600; margin: 0 0 16px 0; text-transform: uppercase; letter-spacing: 1px;">Your Thank-You Gift</p>
+                                <p style="color: #0F2C1F; font-size: 15px; font-weight: 600; margin: 0 0 16px 0; text-transform: uppercase; letter-spacing: 1px;">Your Gift Is Coming</p>
                                 <div style="display: flex; align-items: center; justify-content: space-between;">
-                                    <span style="color: #2A2A2A; font-size: 16px;">${giftName.charAt(0).toUpperCase() + giftName.slice(1)} Gift Card</span>
+                                    <span style="color: #2A2A2A; font-size: 16px;">${giftDisplay}</span>
                                     <span style="color: #0F2C1F; font-size: 24px; font-family: 'Playfair Display', Georgia, serif; font-weight: 600;">$${amount}</span>
                                 </div>
                             </div>
                             
                             <div style="background: #0F2C1F; border-radius: 12px; padding: 24px; margin: 28px 0;">
                                 <p style="color: #D4C5A9; font-size: 13px; font-weight: 600; margin: 0 0 12px 0; text-transform: uppercase; letter-spacing: 1px;">What Happens Next</p>
-                                <p style="color: #FDFCF8; font-size: 15px; line-height: 1.6; margin: 0;">Our team will review your submission and process your thank-you gift within <strong>48 hours</strong>. You'll receive your gift card at <strong>${payment_handle}</strong>.</p>
+                                <p style="color: #FDFCF8; font-size: 15px; line-height: 1.6; margin: 0 0 12px 0;">Our team is preparing your ${giftName} gift card now. Within <strong>48 hours</strong>, you'll receive a <strong>separate email</strong> with your <strong>$${amount} ${giftDisplay}</strong> delivered right to this inbox.</p>
+                                <p style="color: #D4C5A9; font-size: 14px; line-height: 1.5; margin: 0;">📬 Sending to: <strong style="color: #FDFCF8;">${payment_handle}</strong></p>
                             </div>
+                            
+                            <p style="color: #666; font-size: 14px; line-height: 1.6; margin-bottom: 20px; background: #F7F3EA; padding: 16px; border-radius: 8px; text-align: center;">
+                                💡 <em>Tip: Keep an eye on your inbox (and check spam, just in case!)</em>
+                            </p>
                             
                             <p style="color: #2A2A2A; font-size: 16px; line-height: 1.7; margin-bottom: 20px;">From all of us at Hyatus, thank you for being part of our community. Your kind words and honest feedback help us continue to create wonderful experiences for guests like you.</p>
                             
