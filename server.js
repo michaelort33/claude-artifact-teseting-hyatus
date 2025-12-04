@@ -530,10 +530,12 @@ async function handleCreateSubmission(req, res) {
                             
                             <div style="background: linear-gradient(135deg, #F7F3EA 0%, #EDE8DC 100%); border-radius: 16px; padding: 28px; margin: 28px 0; border: 1px solid #E5DDD3;">
                                 <p style="color: #0F2C1F; font-size: 15px; font-weight: 600; margin: 0 0 16px 0; text-transform: uppercase; letter-spacing: 1px;">Your Gift Is Coming</p>
-                                <div style="display: flex; align-items: center; justify-content: space-between;">
-                                    <span style="color: #2A2A2A; font-size: 16px;">${giftDisplay}</span>
-                                    <span style="color: #0F2C1F; font-size: 24px; font-family: 'Playfair Display', Georgia, serif; font-weight: 600;">$${amount}</span>
-                                </div>
+                                <table style="width: 100%; border-collapse: collapse;">
+                                    <tr>
+                                        <td style="color: #2A2A2A; font-size: 16px; text-align: left; vertical-align: middle;">${giftDisplay}</td>
+                                        <td style="color: #0F2C1F; font-size: 24px; font-family: 'Playfair Display', Georgia, serif; font-weight: 600; text-align: right; vertical-align: middle;">$${amount}</td>
+                                    </tr>
+                                </table>
                             </div>
                             
                             <div style="background: #0F2C1F; border-radius: 12px; padding: 24px; margin: 28px 0;">
