@@ -98,6 +98,8 @@ The application is served via Node.js server on port 5000.
 - **Password resets**: Sent to user's email address
 
 ## Recent Changes
+- **2025-12-04**: Added guest thank-you confirmation email - When guests submit the form, they receive a beautifully branded HTML email confirming receipt and explaining the 48-hour processing timeline
+- **2025-12-04**: Fixed modal scroll locking - Admin panel popups now prevent background page scrolling
 - **2025-12-01**: Fixed Task API integration - Corrected token field name (`accessToken` vs `access_token`) and added required fields (name, category, priority, description, external_id, subcategory) for successful task creation on external API
 - **2025-12-01**: Security hardening - Admin endpoints now require authenticated admin session
 - **2025-12-01**: Performance optimization - Excluded large screenshot data (up to 4MB) from admin listings
