@@ -473,23 +473,43 @@ async function handleCreateSubmission(req, res) {
                     subject: `Guest Appreciation - New ${payment_method || 'Gift'} Request`,
                     text: `A guest just submitted a thank-you gift request!\n\nGift Choice: ${payment_method || 'N/A'}\nDelivery Email: ${payment_handle || 'N/A'}\nReturning Guest: ${previous_guest ? 'Yes' : 'No'}\nSubmitted: ${new Date().toLocaleString()}\n\nView details: https://feedback.hyatus.com/admin.html`,
                     html: `
-                        <div style="font-family: Inter, -apple-system, sans-serif; max-width: 560px; margin: 0 auto; padding: 40px 20px;">
+                        <!DOCTYPE html>
+                        <html>
+                        <head>
+                            <meta name="color-scheme" content="light dark">
+                            <meta name="supported-color-schemes" content="light dark">
+                            <style>
+                                :root { color-scheme: light dark; }
+                                @media (prefers-color-scheme: dark) {
+                                    .admin-wrapper { background-color: #1a1a1a !important; }
+                                    .admin-header { color: #FDFCF8 !important; }
+                                    .admin-card { background: #2d2d2d !important; }
+                                    .admin-title { color: #D96F52 !important; }
+                                    .admin-label { color: #cccccc !important; }
+                                    .admin-value { color: #e0e0e0 !important; }
+                                }
+                            </style>
+                        </head>
+                        <body style="margin: 0; padding: 0;">
+                        <div class="admin-wrapper" style="font-family: Inter, -apple-system, sans-serif; max-width: 560px; margin: 0 auto; padding: 40px 20px; background: #FDFCF8;">
                             <div style="text-align: center; margin-bottom: 32px;">
-                                <h1 style="font-family: 'Playfair Display', Georgia, serif; color: #0F2C1F; font-size: 24px; margin: 0;">Hyatus</h1>
+                                <h1 class="admin-header" style="font-family: 'Playfair Display', Georgia, serif; color: #0F2C1F; font-size: 24px; margin: 0;">Hyatus</h1>
                             </div>
-                            <div style="background: #F7F3EA; border-radius: 12px; padding: 24px; margin-bottom: 24px;">
-                                <p style="color: #0F2C1F; font-size: 18px; font-weight: 600; margin: 0 0 16px 0;">New Gift Request Received</p>
+                            <div class="admin-card" style="background: #F7F3EA; border-radius: 12px; padding: 24px; margin-bottom: 24px;">
+                                <p class="admin-title" style="color: #0F2C1F; font-size: 18px; font-weight: 600; margin: 0 0 16px 0;">New Gift Request Received</p>
                                 <table style="width: 100%; border-collapse: collapse;">
-                                    <tr><td style="color: #666; padding: 8px 0;">Gift Choice</td><td style="color: #2A2A2A; font-weight: 500; text-align: right;">${payment_method || 'N/A'}</td></tr>
-                                    <tr><td style="color: #666; padding: 8px 0;">Delivery Email</td><td style="color: #2A2A2A; font-weight: 500; text-align: right;">${payment_handle || 'N/A'}</td></tr>
-                                    <tr><td style="color: #666; padding: 8px 0;">Returning Guest</td><td style="color: #2A2A2A; font-weight: 500; text-align: right;">${previous_guest ? 'Yes' : 'No'}</td></tr>
-                                    <tr><td style="color: #666; padding: 8px 0;">Submitted</td><td style="color: #2A2A2A; font-weight: 500; text-align: right;">${new Date().toLocaleString()}</td></tr>
+                                    <tr><td class="admin-label" style="color: #666; padding: 8px 0;">Gift Choice</td><td class="admin-value" style="color: #2A2A2A; font-weight: 500; text-align: right;">${payment_method || 'N/A'}</td></tr>
+                                    <tr><td class="admin-label" style="color: #666; padding: 8px 0;">Delivery Email</td><td class="admin-value" style="color: #2A2A2A; font-weight: 500; text-align: right;">${payment_handle || 'N/A'}</td></tr>
+                                    <tr><td class="admin-label" style="color: #666; padding: 8px 0;">Returning Guest</td><td class="admin-value" style="color: #2A2A2A; font-weight: 500; text-align: right;">${previous_guest ? 'Yes' : 'No'}</td></tr>
+                                    <tr><td class="admin-label" style="color: #666; padding: 8px 0;">Submitted</td><td class="admin-value" style="color: #2A2A2A; font-weight: 500; text-align: right;">${new Date().toLocaleString()}</td></tr>
                                 </table>
                             </div>
                             <div style="text-align: center;">
                                 <a href="https://feedback.hyatus.com/admin.html" style="display: inline-block; background: #0F2C1F; color: #FDFCF8; padding: 14px 32px; text-decoration: none; border-radius: 8px; font-weight: 500;">View in Dashboard</a>
                             </div>
                         </div>
+                        </body>
+                        </html>
                     `
                 });
                 console.log(`Admin notification email sent to ${process.env.ADMIN_EMAIL}`);
@@ -517,27 +537,51 @@ async function handleCreateSubmission(req, res) {
                     subject: `We've Received Your Request - Your ${giftDisplay} Is On Its Way!`,
                     text: `Dear Friend,\n\nThank you so much for taking the time to share your experience with us! We are truly grateful for your thoughtful feedback - it means the world to our team.\n\nGreat news: We've received your request, and your $${amount} ${giftDisplay} is on its way to your inbox!\n\nHere's what to expect:\nOur team is preparing your ${giftName} gift card now. Within 48 hours, you'll receive a separate email with your $${amount} ${giftDisplay} delivered right to this inbox (${payment_handle}).\n\nPlease keep an eye out for it - and be sure to check your spam folder just in case!\n\nFrom all of us at Hyatus, thank you for being part of our community. Your kind words and honest feedback help us continue to create wonderful experiences for guests like you.\n\nWith warmth and gratitude,\nThe Hyatus Team\nhyatus.com`,
                     html: `
-                        <div style="font-family: Inter, -apple-system, sans-serif; max-width: 560px; margin: 0 auto; padding: 40px 20px; background: #FDFCF8;">
+                        <!DOCTYPE html>
+                        <html>
+                        <head>
+                            <meta name="color-scheme" content="light dark">
+                            <meta name="supported-color-schemes" content="light dark">
+                            <style>
+                                :root { color-scheme: light dark; }
+                                @media (prefers-color-scheme: dark) {
+                                    .email-wrapper { background-color: #1a1a1a !important; }
+                                    .header-text { color: #FDFCF8 !important; }
+                                    .subheader-text { color: #FDFCF8 !important; }
+                                    .muted-text { color: #cccccc !important; }
+                                    .body-text { color: #e0e0e0 !important; }
+                                    .gift-card { background: #2d2d2d !important; border-color: #444444 !important; }
+                                    .gift-title { color: #D96F52 !important; }
+                                    .gift-name { color: #e0e0e0 !important; }
+                                    .gift-amount { color: #D96F52 !important; }
+                                    .tip-box { background: #2d2d2d !important; color: #cccccc !important; }
+                                    .footer-text { color: #888888 !important; }
+                                    .divider { border-top-color: #444444 !important; }
+                                }
+                            </style>
+                        </head>
+                        <body style="margin: 0; padding: 0;">
+                        <div class="email-wrapper" style="font-family: Inter, -apple-system, sans-serif; max-width: 560px; margin: 0 auto; padding: 40px 20px; background: #FDFCF8;">
                             <div style="text-align: center; margin-bottom: 32px;">
-                                <h1 style="font-family: 'Playfair Display', Georgia, serif; color: #0F2C1F; font-size: 28px; margin: 0;">Hyatus</h1>
+                                <h1 class="header-text" style="font-family: 'Playfair Display', Georgia, serif; color: #0F2C1F; font-size: 28px; margin: 0;">Hyatus</h1>
                             </div>
                             
                             <div style="text-align: center; margin-bottom: 32px;">
                                 <div style="font-size: 48px; margin-bottom: 16px;">🎁</div>
-                                <h2 style="font-family: 'Playfair Display', Georgia, serif; color: #0F2C1F; font-size: 24px; font-weight: 400; margin: 0 0 8px 0;">We've Got Your Request!</h2>
-                                <p style="color: #666; font-size: 15px; margin: 0;">Your ${giftDisplay} is on its way</p>
+                                <h2 class="subheader-text" style="font-family: 'Playfair Display', Georgia, serif; color: #0F2C1F; font-size: 24px; font-weight: 400; margin: 0 0 8px 0;">We've Got Your Request!</h2>
+                                <p class="muted-text" style="color: #666; font-size: 15px; margin: 0;">Your ${giftDisplay} is on its way</p>
                             </div>
                             
-                            <p style="color: #2A2A2A; font-size: 16px; line-height: 1.7; margin-bottom: 20px;">Dear Friend,</p>
+                            <p class="body-text" style="color: #2A2A2A; font-size: 16px; line-height: 1.7; margin-bottom: 20px;">Dear Friend,</p>
                             
-                            <p style="color: #2A2A2A; font-size: 16px; line-height: 1.7; margin-bottom: 20px;">Thank you so much for taking the time to share your experience with us! We are truly grateful for your thoughtful feedback — it means the world to our team.</p>
+                            <p class="body-text" style="color: #2A2A2A; font-size: 16px; line-height: 1.7; margin-bottom: 20px;">Thank you so much for taking the time to share your experience with us! We are truly grateful for your thoughtful feedback — it means the world to our team.</p>
                             
-                            <div style="background: linear-gradient(135deg, #F7F3EA 0%, #EDE8DC 100%); border-radius: 16px; padding: 28px; margin: 28px 0; border: 1px solid #E5DDD3;">
-                                <p style="color: #0F2C1F; font-size: 15px; font-weight: 600; margin: 0 0 16px 0; text-transform: uppercase; letter-spacing: 1px;">Your Gift Is Coming</p>
+                            <div class="gift-card" style="background: linear-gradient(135deg, #F7F3EA 0%, #EDE8DC 100%); border-radius: 16px; padding: 28px; margin: 28px 0; border: 1px solid #E5DDD3;">
+                                <p class="gift-title" style="color: #0F2C1F; font-size: 15px; font-weight: 600; margin: 0 0 16px 0; text-transform: uppercase; letter-spacing: 1px;">Your Gift Is Coming</p>
                                 <table style="width: 100%; border-collapse: collapse;">
                                     <tr>
-                                        <td style="color: #2A2A2A; font-size: 16px; text-align: left; vertical-align: middle;">${giftDisplay}</td>
-                                        <td style="color: #0F2C1F; font-size: 24px; font-family: 'Playfair Display', Georgia, serif; font-weight: 600; text-align: right; vertical-align: middle;">$${amount}</td>
+                                        <td class="gift-name" style="color: #2A2A2A; font-size: 16px; text-align: left; vertical-align: middle;">${giftDisplay}</td>
+                                        <td class="gift-amount" style="color: #0F2C1F; font-size: 24px; font-family: 'Playfair Display', Georgia, serif; font-weight: 600; text-align: right; vertical-align: middle;">$${amount}</td>
                                     </tr>
                                 </table>
                             </div>
@@ -548,22 +592,24 @@ async function handleCreateSubmission(req, res) {
                                 <p style="color: #D4C5A9; font-size: 14px; line-height: 1.5; margin: 0;">📬 Sending to: <strong style="color: #FDFCF8;">${payment_handle}</strong></p>
                             </div>
                             
-                            <p style="color: #666; font-size: 14px; line-height: 1.6; margin-bottom: 20px; background: #F7F3EA; padding: 16px; border-radius: 8px; text-align: center;">
+                            <p class="tip-box" style="color: #666; font-size: 14px; line-height: 1.6; margin-bottom: 20px; background: #F7F3EA; padding: 16px; border-radius: 8px; text-align: center;">
                                 💡 <em>Tip: Keep an eye on your inbox (and check spam, just in case!)</em>
                             </p>
                             
-                            <p style="color: #2A2A2A; font-size: 16px; line-height: 1.7; margin-bottom: 20px;">From all of us at Hyatus, thank you for being part of our community. Your kind words and honest feedback help us continue to create wonderful experiences for guests like you.</p>
+                            <p class="body-text" style="color: #2A2A2A; font-size: 16px; line-height: 1.7; margin-bottom: 20px;">From all of us at Hyatus, thank you for being part of our community. Your kind words and honest feedback help us continue to create wonderful experiences for guests like you.</p>
                             
-                            <p style="color: #2A2A2A; font-size: 16px; line-height: 1.7; margin-bottom: 8px;">With warmth and gratitude,</p>
-                            <p style="color: #0F2C1F; font-size: 16px; font-weight: 600; margin: 0;">The Hyatus Team</p>
+                            <p class="body-text" style="color: #2A2A2A; font-size: 16px; line-height: 1.7; margin-bottom: 8px;">With warmth and gratitude,</p>
+                            <p class="header-text" style="color: #0F2C1F; font-size: 16px; font-weight: 600; margin: 0;">The Hyatus Team</p>
                             
-                            <hr style="border: none; border-top: 1px solid #E5DDD3; margin: 32px 0;" />
+                            <hr class="divider" style="border: none; border-top: 1px solid #E5DDD3; margin: 32px 0;" />
                             
-                            <p style="color: #999; font-size: 13px; text-align: center; line-height: 1.6;">
+                            <p class="footer-text" style="color: #999; font-size: 13px; text-align: center; line-height: 1.6;">
                                 Questions? We're here to help.<br/>
                                 <a href="mailto:hello@hyatus.com" style="color: #D96F52; text-decoration: none;">hello@hyatus.com</a> · <a href="https://hyatus.com" style="color: #D96F52; text-decoration: none;">hyatus.com</a>
                             </p>
                         </div>
+                        </body>
+                        </html>
                     `
                 });
                 console.log(`Thank you confirmation email sent to ${payment_handle}`);
