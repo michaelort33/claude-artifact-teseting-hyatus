@@ -852,6 +852,5 @@ server.listen(PORT, HOST, () => {
     console.log(`Server running at http://${HOST}:${PORT}/`);
     console.log(`Database configured: ${!!process.env.DATABASE_URL}`);
     console.log(`Tasks API configured: ${!!(process.env.TASKS_API_EMAIL && process.env.TASKS_API_PASSWORD)}`);
-    console.log(`SendGrid configured: ${!!process.env.SENDGRID_API_KEY}`);
     console.log(`Admin email configured: ${!!process.env.ADMIN_EMAIL}`);
 });
