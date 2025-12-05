@@ -104,7 +104,11 @@ function parseBody(req) {
 }
 
 function sendJson(res, statusCode, data) {
-    res.writeHead(statusCode, { 'Content-Type': 'application/json' });
+    res.writeHead(statusCode, { 
+        'Content-Type': 'application/json',
+        'Content-Security-Policy': 'upgrade-insecure-requests',
+        'Strict-Transport-Security': 'max-age=31536000; includeSubDomains'
+    });
     res.end(JSON.stringify(data));
 }
 
@@ -747,6 +751,13 @@ function handleEmailHealth(req, res) {
     });
 }
 
+const securityHeaders = {
+    'Content-Security-Policy': "upgrade-insecure-requests",
+    'Strict-Transport-Security': 'max-age=31536000; includeSubDomains',
+    'X-Content-Type-Options': 'nosniff',
+    'X-Frame-Options': 'SAMEORIGIN'
+};
+
 function serveStaticFile(filePath, res) {
     const extname = String(path.extname(filePath)).toLowerCase();
     const contentType = mimeTypes[extname] || 'application/octet-stream';
@@ -754,10 +765,10 @@ function serveStaticFile(filePath, res) {
     fs.readFile(filePath, (error, content) => {
         if (error) {
             if (error.code === 'ENOENT') {
-                res.writeHead(404, { 'Content-Type': 'text/html' });
+                res.writeHead(404, { 'Content-Type': 'text/html', ...securityHeaders });
                 res.end('<h1>404 Not Found</h1>', 'utf-8');
             } else {
-                res.writeHead(500);
+                res.writeHead(500, securityHeaders);
                 res.end('Server Error: ' + error.code, 'utf-8');
             }
         } else {
@@ -765,7 +776,8 @@ function serveStaticFile(filePath, res) {
                 'Content-Type': contentType,
                 'Cache-Control': 'no-cache, no-store, must-revalidate',
                 'Pragma': 'no-cache',
-                'Expires': '0'
+                'Expires': '0',
+                ...securityHeaders
             });
             res.end(content, 'utf-8');
         }
