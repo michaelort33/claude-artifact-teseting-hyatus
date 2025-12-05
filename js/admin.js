@@ -265,7 +265,14 @@ async function loadSubmissions(resetPagination = true) {
     } catch (err) {
         console.error('Error loading submissions:', err.message || err);
         if (tbody) {
-            tbody.innerHTML = `<tr><td colspan="10" style="text-align: center; padding: 40px; color: var(--danger);">Error loading submissions: ${err.message || 'Unknown error'}. Please refresh.</td></tr>`;
+            const tr = document.createElement('tr');
+            const td = document.createElement('td');
+            td.setAttribute('colspan', '10');
+            td.style.cssText = 'text-align: center; padding: 40px; color: var(--danger);';
+            td.textContent = `Error loading submissions: ${err.message || 'Unknown error'}. Please refresh.`;
+            tr.appendChild(td);
+            tbody.innerHTML = '';
+            tbody.appendChild(tr);
         }
     } finally {
         isLoadingSubmissions = false;
