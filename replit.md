@@ -25,10 +25,12 @@ A web application that allows guests to receive thank-you gifts for sharing thei
 - `sessions` - Session management (user_id, token, expires_at)
 - `admins` - Admin email whitelist
 - `review_rewards` - Submission data (payment_method, payment_handle, status, etc.)
+- `referrals` - Referral program submissions (referrer info, company info, contact info, status, reward_paid)
 
 ### Frontend Files
 - `index.html` - Main user-facing page for submitting reward claims
 - `admin.html` - Admin dashboard for managing submissions with analytics
+- `referral.html` - Hyatus Connect Rewards referral program page
 - `js/index.js` - Main application logic, form handling, authentication
 - `js/admin.js` - Admin dashboard logic, submission management
 
@@ -70,6 +72,9 @@ The application uses a Warm Editorial aesthetic inspired by high-end architectur
 - POST `/api/tasks` - Create payment task
 - GET `/api/tasks/health` - Check task API configuration
 
+**Referrals:**
+- POST `/api/referrals` - Submit new referral (with duplicate company check and 5-referral limit)
+
 ## Environment Variables
 - `DATABASE_URL` - PostgreSQL connection string
 - `TASKS_API_EMAIL` - Email for task API authentication
@@ -98,6 +103,13 @@ The application is served via Node.js server on port 5000.
 - **Password resets**: Sent to user's email address
 
 ## Recent Changes
+- **2025-12-22**: Added Hyatus Connect Rewards referral program
+  - Post-feedback success popup now includes referral program CTA link
+  - New referral.html page with program details: $250 per qualifying referral, max $1,000 (5 referrals)
+  - API endpoint with duplicate company protection and per-user referral limit
+  - Admin email notifications for new referral submissions
+  - Dark mode support added to all email templates
+- **2025-12-22**: Fixed XSS vulnerability in admin.js - Replaced innerHTML with safe DOM methods for error messages
 - **2025-12-04**: Added guest thank-you confirmation email - When guests submit the form, they receive a beautifully branded HTML email confirming receipt and explaining the 48-hour processing timeline
 - **2025-12-04**: Fixed modal scroll locking - Admin panel popups now prevent background page scrolling
 - **2025-12-01**: Fixed Task API integration - Corrected token field name (`accessToken` vs `access_token`) and added required fields (name, category, priority, description, external_id, subcategory) for successful task creation on external API
