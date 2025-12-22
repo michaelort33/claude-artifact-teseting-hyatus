@@ -60,6 +60,8 @@ let currentUser = null;
 let selectedMethod = '';
 let uploadedFile = null;
 let mySubmissions = [];
+let myReferrals = [];
+let referralSummary = { total: 0, approved: 0, total_earned: 0, remaining_eligible: 0, max_eligible: 1000 };
 
 const urlParams = new URLSearchParams(window.location.search);
 const rewardParam = urlParams.get('r') || urlParams.get('reward');
@@ -768,6 +770,7 @@ function renderMySubmissions(rows) {
 function renderProfilePopover() {
     if (!currentUser || !profilePopover) return;
     const count = mySubmissions.length;
+    const referralCount = myReferrals.length;
     profilePopover.innerHTML = `
     <div class="profile-header">
       <div style="font-weight:600;">Profile</div>
@@ -778,19 +781,28 @@ function renderProfilePopover() {
         <div>Submissions</div>
         <div style="font-weight:600;">${count}</div>
       </div>
+      <div class="profile-row">
+        <div>Referrals</div>
+        <div style="font-weight:600;">${referralCount}</div>
+      </div>
     </div>
     <div class="profile-actions">
       <button class="btn-primary-small" id="openMySubsBtn">My Submissions</button>
-      <button class="btn-secondary-small" id="signOutBtn">Sign Out</button>
+      <button class="btn-primary-small" id="openMyReferralsBtn" style="margin-top:8px;">My Referrals</button>
+      <button class="btn-secondary-small" id="signOutBtn" style="margin-top:8px;">Sign Out</button>
     </div>
   `;
     const openBtn = document.getElementById('openMySubsBtn');
+    const openReferralsBtn = document.getElementById('openMyReferralsBtn');
     const signOutBtn = document.getElementById('signOutBtn');
     if (openBtn) openBtn.onclick = () => openSubmissionsModal();
+    if (openReferralsBtn) openReferralsBtn.onclick = () => openReferralDashboard();
     if (signOutBtn) signOutBtn.onclick = async () => {
         await fetch('/api/auth/signout', { method: 'POST' });
         currentUser = null;
         mySubmissions = [];
+        myReferrals = [];
+        referralSummary = { total: 0, approved: 0, total_earned: 0, remaining_eligible: 0, max_eligible: 1000 };
         updateAuthUI();
     };
 }
@@ -942,6 +954,202 @@ async function initAuth() {
         console.error('Error checking session:', err);
     }
     updateAuthUI();
+}
+
+// Referral Dashboard Functions
+const referralDashboardModal = document.getElementById('referralDashboard');
+const closeReferralDashboardBtn = document.getElementById('closeReferralDashboard');
+
+async function loadUserReferrals() {
+    if (!currentUser) return;
+    
+    try {
+        const response = await fetch('/api/referrals/my');
+        const result = await response.json();
+        
+        if (response.ok && result.data) {
+            myReferrals = result.data.referrals || [];
+            if (result.data.summary) {
+                referralSummary = {
+                    total: result.data.summary.total || 0,
+                    approved: result.data.summary.approved || 0,
+                    total_earned: result.data.summary.total_earned || 0,
+                    remaining_eligible: result.data.summary.remaining_eligible || 0,
+                    max_eligible: result.data.summary.max_eligible || 1000
+                };
+            }
+        }
+    } catch (err) {
+        console.error('Error loading referrals:', err);
+    }
+    
+    if (profilePopover && profilePopover.classList.contains('active')) renderProfilePopover();
+    if (referralDashboardModal && referralDashboardModal.classList.contains('active')) {
+        renderReferralSummary();
+        renderReferralsList();
+    }
+}
+
+function renderReferralSummary() {
+    const totalEl = document.getElementById('totalReferralsCount');
+    const approvedEl = document.getElementById('approvedReferralsCount');
+    const earnedEl = document.getElementById('totalEarnedAmount');
+    const remainingEl = document.getElementById('remainingEligibleAmount');
+    
+    if (totalEl) totalEl.textContent = String(referralSummary.total);
+    if (approvedEl) approvedEl.textContent = String(referralSummary.approved);
+    if (earnedEl) earnedEl.textContent = '$' + String(referralSummary.total_earned);
+    if (remainingEl) remainingEl.textContent = '$' + String(referralSummary.remaining_eligible) + ' of $' + String(referralSummary.max_eligible);
+}
+
+function renderReferralsList() {
+    const wrapper = document.getElementById('referralDashboardContent');
+    if (!wrapper) return;
+    
+    wrapper.innerHTML = '';
+    
+    if (!myReferrals.length) {
+        const emptyDiv = document.createElement('div');
+        emptyDiv.className = 'referral-empty';
+        
+        const iconDiv = document.createElement('div');
+        iconDiv.className = 'referral-empty-icon';
+        iconDiv.textContent = '🤝';
+        
+        const titleDiv = document.createElement('div');
+        titleDiv.className = 'referral-empty-title';
+        titleDiv.textContent = 'No Referrals Yet';
+        
+        const textDiv = document.createElement('div');
+        textDiv.className = 'referral-empty-text';
+        textDiv.textContent = 'Know a company that could benefit from Hyatus? Submit a referral and earn rewards.';
+        
+        const referBtn = document.createElement('a');
+        referBtn.href = '/referral.html';
+        referBtn.className = 'btn-primary-small';
+        referBtn.style.cssText = 'width: auto; padding: 12px 24px; text-decoration: none; display: inline-block;';
+        referBtn.textContent = 'Refer a Company';
+        
+        emptyDiv.appendChild(iconDiv);
+        emptyDiv.appendChild(titleDiv);
+        emptyDiv.appendChild(textDiv);
+        emptyDiv.appendChild(referBtn);
+        wrapper.appendChild(emptyDiv);
+        return;
+    }
+    
+    const tableWrapper = document.createElement('div');
+    tableWrapper.className = 'subs-table referral-table';
+    
+    const table = document.createElement('table');
+    
+    const thead = document.createElement('thead');
+    const headerRow = document.createElement('tr');
+    const headers = ['Company Name', 'Type', 'Submitted Date', 'Status', 'Reward'];
+    headers.forEach(headerText => {
+        const th = document.createElement('th');
+        th.textContent = headerText;
+        headerRow.appendChild(th);
+    });
+    thead.appendChild(headerRow);
+    table.appendChild(thead);
+    
+    const tbody = document.createElement('tbody');
+    myReferrals.forEach(referral => {
+        const tr = document.createElement('tr');
+        
+        const tdName = document.createElement('td');
+        tdName.textContent = referral.company_name || '';
+        tr.appendChild(tdName);
+        
+        const tdType = document.createElement('td');
+        const typeBadge = document.createElement('span');
+        const typeValue = (referral.type || 'company').toLowerCase();
+        typeBadge.className = 'type-badge ' + typeValue;
+        typeBadge.textContent = typeValue.toUpperCase();
+        tdType.appendChild(typeBadge);
+        tr.appendChild(tdType);
+        
+        const tdDate = document.createElement('td');
+        const dateStr = referral.created_at ? new Date(referral.created_at).toLocaleDateString() : '';
+        tdDate.textContent = dateStr;
+        tr.appendChild(tdDate);
+        
+        const tdStatus = document.createElement('td');
+        const statusChip = document.createElement('span');
+        const statusValue = (referral.status || 'submitted').toLowerCase().replace(' ', '_');
+        statusChip.className = 'status-chip ' + statusValue;
+        statusChip.textContent = statusValue.replace('_', ' ').toUpperCase();
+        tdStatus.appendChild(statusChip);
+        tr.appendChild(tdStatus);
+        
+        const tdReward = document.createElement('td');
+        const rewardAmount = referral.reward_amount || 0;
+        tdReward.textContent = rewardAmount > 0 ? '$' + String(rewardAmount) : '-';
+        tr.appendChild(tdReward);
+        
+        tbody.appendChild(tr);
+    });
+    table.appendChild(tbody);
+    tableWrapper.appendChild(table);
+    wrapper.appendChild(tableWrapper);
+}
+
+async function openReferralDashboard() {
+    if (!referralDashboardModal) return;
+    referralDashboardModal.classList.add('active');
+    closeProfilePopover();
+    
+    const wrapper = document.getElementById('referralDashboardContent');
+    if (!currentUser) {
+        if (wrapper) {
+            wrapper.innerHTML = '';
+            const msgDiv = document.createElement('div');
+            msgDiv.style.cssText = 'padding:18px; color:#6B635B; font-size:14px;';
+            msgDiv.textContent = 'Please sign in to view your referrals.';
+            
+            const signInBtn = document.createElement('button');
+            signInBtn.className = 'btn-primary-small';
+            signInBtn.style.marginTop = '12px';
+            signInBtn.textContent = 'Sign In';
+            signInBtn.onclick = () => {
+                closeReferralDashboard();
+                setAuthMode('signin');
+                openAuthModal();
+            };
+            
+            msgDiv.appendChild(document.createElement('br'));
+            msgDiv.appendChild(signInBtn);
+            wrapper.appendChild(msgDiv);
+        }
+        return;
+    }
+    
+    if (wrapper) {
+        wrapper.innerHTML = '';
+        const loadingDiv = document.createElement('div');
+        loadingDiv.className = 'loading-message';
+        loadingDiv.textContent = 'Loading your referrals...';
+        wrapper.appendChild(loadingDiv);
+    }
+    
+    if (!myReferrals.length) await loadUserReferrals();
+    renderReferralSummary();
+    renderReferralsList();
+}
+
+function closeReferralDashboard() {
+    if (referralDashboardModal) referralDashboardModal.classList.remove('active');
+}
+
+if (closeReferralDashboardBtn) {
+    closeReferralDashboardBtn.addEventListener('click', closeReferralDashboard);
+}
+
+if (referralDashboardModal) {
+    referralDashboardModal.addEventListener('click', (e) => {
+        if (e.target === referralDashboardModal) closeReferralDashboard();
+    });
 }
 
 window.addEventListener('load', () => {

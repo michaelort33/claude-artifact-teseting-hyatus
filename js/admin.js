@@ -871,4 +871,335 @@ document.getElementById('searchHandle')?.addEventListener('input', () => {
     searchTimeout = setTimeout(() => loadSubmissions(), 300);
 });
 
+// Tab switching functionality
+function switchTab(tabName) {
+    const tabs = document.querySelectorAll('.admin-tab');
+    const contents = document.querySelectorAll('.tab-content');
+    
+    tabs.forEach(tab => {
+        if (tab.dataset.tab === tabName) {
+            tab.classList.add('active');
+        } else {
+            tab.classList.remove('active');
+        }
+    });
+    
+    contents.forEach(content => {
+        if (content.id === tabName + 'Section') {
+            content.classList.add('active');
+        } else {
+            content.classList.remove('active');
+        }
+    });
+    
+    if (tabName === 'referrals') {
+        loadReferrals();
+    }
+}
+
+// Referral management
+let referrals = [];
+let currentReferralId = null;
+let isLoadingReferrals = false;
+
+async function loadReferrals(status) {
+    if (isLoadingReferrals) return;
+    isLoadingReferrals = true;
+    
+    const tbody = document.getElementById('referralsBody');
+    if (tbody) {
+        while (tbody.firstChild) {
+            tbody.removeChild(tbody.firstChild);
+        }
+        const loadingRow = document.createElement('tr');
+        const loadingCell = document.createElement('td');
+        loadingCell.setAttribute('colspan', '8');
+        loadingCell.style.cssText = 'text-align: center; padding: 40px; color: var(--warm-gray-dark);';
+        loadingCell.textContent = 'Loading referrals...';
+        loadingRow.appendChild(loadingCell);
+        tbody.appendChild(loadingRow);
+    }
+    
+    try {
+        const statusFilter = status || document.getElementById('referralStatusFilter')?.value || 'all';
+        
+        const params = new URLSearchParams();
+        if (statusFilter !== 'all') {
+            params.append('status', statusFilter);
+        }
+        
+        const response = await fetch(`/api/referrals?${params.toString()}`);
+        const result = await response.json();
+        
+        if (!response.ok) {
+            throw new Error(result.error || 'Failed to load referrals');
+        }
+        
+        referrals = result.data || [];
+        renderReferrals(referrals);
+    } catch (err) {
+        console.error('Error loading referrals:', err);
+        if (tbody) {
+            while (tbody.firstChild) {
+                tbody.removeChild(tbody.firstChild);
+            }
+            const errorRow = document.createElement('tr');
+            const errorCell = document.createElement('td');
+            errorCell.setAttribute('colspan', '8');
+            errorCell.style.cssText = 'text-align: center; padding: 40px; color: var(--danger);';
+            errorCell.textContent = 'Error loading referrals: ' + (err.message || 'Unknown error');
+            errorRow.appendChild(errorCell);
+            tbody.appendChild(errorRow);
+        }
+    } finally {
+        isLoadingReferrals = false;
+    }
+}
+
+function renderReferrals(data) {
+    const tbody = document.getElementById('referralsBody');
+    if (!tbody) return;
+    
+    while (tbody.firstChild) {
+        tbody.removeChild(tbody.firstChild);
+    }
+    
+    if (!data || data.length === 0) {
+        const emptyRow = document.createElement('tr');
+        const emptyCell = document.createElement('td');
+        emptyCell.setAttribute('colspan', '8');
+        emptyCell.style.cssText = 'text-align: center; padding: 40px; color: var(--warm-gray-dark);';
+        emptyCell.textContent = 'No referrals found';
+        emptyRow.appendChild(emptyCell);
+        tbody.appendChild(emptyRow);
+        return;
+    }
+    
+    data.forEach(referral => {
+        const row = document.createElement('tr');
+        
+        // Referrer Name & Email
+        const referrerCell = document.createElement('td');
+        const referrerName = document.createElement('div');
+        referrerName.style.fontWeight = '500';
+        referrerName.textContent = referral.referrer_name || 'N/A';
+        const referrerEmail = document.createElement('div');
+        referrerEmail.style.cssText = 'font-size: 12px; color: var(--warm-gray-dark);';
+        referrerEmail.textContent = referral.referrer_email || '';
+        referrerCell.appendChild(referrerName);
+        referrerCell.appendChild(referrerEmail);
+        row.appendChild(referrerCell);
+        
+        // Company Name
+        const companyCell = document.createElement('td');
+        companyCell.textContent = referral.company_name || 'N/A';
+        row.appendChild(companyCell);
+        
+        // Org Type
+        const orgTypeCell = document.createElement('td');
+        orgTypeCell.textContent = referral.org_type || 'N/A';
+        row.appendChild(orgTypeCell);
+        
+        // Contact Info
+        const contactCell = document.createElement('td');
+        const contactName = document.createElement('div');
+        contactName.style.fontWeight = '500';
+        contactName.textContent = referral.contact_name || 'N/A';
+        const contactEmail = document.createElement('div');
+        contactEmail.style.cssText = 'font-size: 12px; color: var(--warm-gray-dark);';
+        contactEmail.textContent = referral.contact_email || '';
+        const contactRole = document.createElement('div');
+        contactRole.style.cssText = 'font-size: 11px; color: var(--warm-gray-dark);';
+        contactRole.textContent = referral.contact_role || '';
+        contactCell.appendChild(contactName);
+        contactCell.appendChild(contactEmail);
+        if (referral.contact_role) {
+            contactCell.appendChild(contactRole);
+        }
+        row.appendChild(contactCell);
+        
+        // Status
+        const statusCell = document.createElement('td');
+        const statusBadge = document.createElement('span');
+        statusBadge.className = 'status-badge status-' + (referral.status || 'submitted');
+        statusBadge.textContent = (referral.status || 'submitted').replace('_', ' ').toUpperCase();
+        statusCell.appendChild(statusBadge);
+        row.appendChild(statusCell);
+        
+        // Reward Amount
+        const rewardCell = document.createElement('td');
+        const amount = parseFloat(referral.reward_amount) || 0;
+        rewardCell.textContent = '$' + amount.toFixed(2);
+        row.appendChild(rewardCell);
+        
+        // Submitted Date
+        const dateCell = document.createElement('td');
+        dateCell.textContent = referral.created_at ? new Date(referral.created_at).toLocaleDateString() : 'N/A';
+        row.appendChild(dateCell);
+        
+        // Actions
+        const actionsCell = document.createElement('td');
+        const actionButtons = document.createElement('div');
+        actionButtons.className = 'action-buttons';
+        
+        const reviewBtn = document.createElement('button');
+        reviewBtn.className = 'action-btn btn-view';
+        reviewBtn.textContent = 'Review';
+        reviewBtn.addEventListener('click', () => openReferralModal(referral.id));
+        actionButtons.appendChild(reviewBtn);
+        
+        actionsCell.appendChild(actionButtons);
+        row.appendChild(actionsCell);
+        
+        tbody.appendChild(row);
+    });
+}
+
+async function openReferralModal(referralId) {
+    currentReferralId = referralId;
+    
+    try {
+        const response = await fetch(`/api/referrals/${referralId}`);
+        const result = await response.json();
+        
+        if (!response.ok) {
+            throw new Error(result.error || 'Failed to load referral details');
+        }
+        
+        const referral = result.data;
+        const content = document.getElementById('referralDetailContent');
+        
+        while (content.firstChild) {
+            content.removeChild(content.firstChild);
+        }
+        
+        // Referrer info section
+        const referrerSection = document.createElement('div');
+        referrerSection.className = 'referral-detail-section';
+        const referrerTitle = document.createElement('h4');
+        referrerTitle.textContent = 'Referrer Information';
+        referrerSection.appendChild(referrerTitle);
+        
+        const referrerGrid = document.createElement('div');
+        referrerGrid.className = 'detail-grid';
+        
+        const addDetailRow = (grid, label, value) => {
+            const labelDiv = document.createElement('div');
+            labelDiv.className = 'detail-label';
+            labelDiv.textContent = label;
+            const valueDiv = document.createElement('div');
+            valueDiv.className = 'detail-value';
+            valueDiv.textContent = value || 'N/A';
+            grid.appendChild(labelDiv);
+            grid.appendChild(valueDiv);
+        };
+        
+        addDetailRow(referrerGrid, 'Name', referral.referrer_name);
+        addDetailRow(referrerGrid, 'Email', referral.referrer_email);
+        referrerSection.appendChild(referrerGrid);
+        content.appendChild(referrerSection);
+        
+        // Company info section
+        const companySection = document.createElement('div');
+        companySection.className = 'referral-detail-section';
+        const companyTitle = document.createElement('h4');
+        companyTitle.textContent = 'Company Information';
+        companySection.appendChild(companyTitle);
+        
+        const companyGrid = document.createElement('div');
+        companyGrid.className = 'detail-grid';
+        addDetailRow(companyGrid, 'Company Name', referral.company_name);
+        addDetailRow(companyGrid, 'Organization Type', referral.org_type);
+        addDetailRow(companyGrid, 'Website', referral.company_website);
+        addDetailRow(companyGrid, 'Location', referral.company_location);
+        companySection.appendChild(companyGrid);
+        content.appendChild(companySection);
+        
+        // Contact info section
+        const contactSection = document.createElement('div');
+        contactSection.className = 'referral-detail-section';
+        const contactTitle = document.createElement('h4');
+        contactTitle.textContent = 'Contact Information';
+        contactSection.appendChild(contactTitle);
+        
+        const contactGrid = document.createElement('div');
+        contactGrid.className = 'detail-grid';
+        addDetailRow(contactGrid, 'Contact Name', referral.contact_name);
+        addDetailRow(contactGrid, 'Contact Email', referral.contact_email);
+        addDetailRow(contactGrid, 'Contact Phone', referral.contact_phone);
+        addDetailRow(contactGrid, 'Contact Role', referral.contact_role);
+        contactSection.appendChild(contactGrid);
+        content.appendChild(contactSection);
+        
+        // Additional info section
+        if (referral.additional_notes) {
+            const notesSection = document.createElement('div');
+            notesSection.className = 'referral-detail-section';
+            const notesTitle = document.createElement('h4');
+            notesTitle.textContent = 'Additional Notes from Referrer';
+            notesSection.appendChild(notesTitle);
+            const notesText = document.createElement('p');
+            notesText.style.cssText = 'color: var(--charcoal); font-size: 14px; line-height: 1.6;';
+            notesText.textContent = referral.additional_notes;
+            notesSection.appendChild(notesText);
+            content.appendChild(notesSection);
+        }
+        
+        // Populate form fields
+        document.getElementById('referralStatusSelect').value = referral.status || 'submitted';
+        document.getElementById('referralRewardAmount').value = parseFloat(referral.reward_amount) || 0;
+        document.getElementById('referralAdminNotes').value = referral.admin_notes || '';
+        
+        document.getElementById('referralModal').classList.add('active');
+        document.body.classList.add('modal-open');
+    } catch (err) {
+        showToast('Error loading referral: ' + err.message, 'error');
+    }
+}
+
+function closeReferralModal() {
+    document.getElementById('referralModal').classList.remove('active');
+    document.body.classList.remove('modal-open');
+    currentReferralId = null;
+}
+
+async function updateReferral(id, data) {
+    const response = await fetch(`/api/referrals/${id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+    });
+    
+    if (!response.ok) {
+        const result = await response.json();
+        throw new Error(result.error || 'Failed to update referral');
+    }
+    
+    return await response.json();
+}
+
+async function saveReferral() {
+    if (!currentReferralId) return;
+    
+    const status = document.getElementById('referralStatusSelect').value;
+    const rewardAmount = parseFloat(document.getElementById('referralRewardAmount').value) || 0;
+    const adminNotes = document.getElementById('referralAdminNotes').value;
+    
+    try {
+        await updateReferral(currentReferralId, {
+            status: status,
+            reward_amount: rewardAmount,
+            admin_notes: adminNotes
+        });
+        
+        showToast('Referral updated successfully', 'success');
+        closeReferralModal();
+        await loadReferrals();
+    } catch (err) {
+        showToast('Error updating referral: ' + err.message, 'error');
+    }
+}
+
+document.getElementById('referralStatusFilter')?.addEventListener('change', () => loadReferrals());
+
 checkAuth();

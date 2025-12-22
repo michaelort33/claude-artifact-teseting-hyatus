@@ -1393,6 +1393,127 @@
             position: relative;
         }
 
+        /* Referral Dashboard Styles */
+        .referral-summary {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+            padding: 24px;
+            background: var(--alabaster);
+            border-bottom: 1px solid var(--border-light);
+        }
+
+        .referral-stat-card {
+            background: white;
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius-md);
+            padding: 16px;
+            text-align: center;
+        }
+
+        .referral-stat-value {
+            font-family: 'Playfair Display', Georgia, serif;
+            font-size: 24px;
+            font-weight: 500;
+            color: var(--moss);
+            margin-bottom: 4px;
+        }
+
+        .referral-stat-label {
+            font-size: 11px;
+            font-weight: 500;
+            color: var(--warm-gray-dark);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .referral-actions {
+            padding: 16px 24px;
+            background: var(--alabaster);
+            border-bottom: 1px solid var(--border-light);
+            display: flex;
+            justify-content: flex-end;
+        }
+
+        .referral-table .status-chip.submitted {
+            background: var(--bone);
+            color: var(--charcoal-light);
+        }
+
+        .referral-table .status-chip.in_review {
+            background: #FFF8E1;
+            color: #F57F17;
+        }
+
+        .referral-table .status-chip.approved {
+            background: #E8F5E9;
+            color: #2E7D32;
+        }
+
+        .referral-table .status-chip.rejected {
+            background: #FFEBEE;
+            color: #C62828;
+        }
+
+        .referral-table .status-chip.paid {
+            background: #E3F2FD;
+            color: #1565C0;
+        }
+
+        .referral-table .type-badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: var(--radius-sm);
+            font-size: 10px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .referral-table .type-badge.company {
+            background: #E8F5E9;
+            color: #2E7D32;
+        }
+
+        .referral-table .type-badge.hospital {
+            background: #E3F2FD;
+            color: #1565C0;
+        }
+
+        .referral-table .type-badge.university {
+            background: #FBE9E7;
+            color: #BF360C;
+        }
+
+        .referral-empty {
+            padding: 48px 24px;
+            text-align: center;
+        }
+
+        .referral-empty-icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+        }
+
+        .referral-empty-title {
+            font-family: 'Playfair Display', Georgia, serif;
+            font-size: 18px;
+            color: var(--charcoal);
+            margin-bottom: 8px;
+        }
+
+        .referral-empty-text {
+            font-size: 14px;
+            color: var(--warm-gray-dark);
+            margin-bottom: 24px;
+        }
+
+        @media (max-width: 700px) {
+            .referral-summary {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
         @media (max-width: 900px) {
             .editorial-layout {
                 grid-template-columns: 1fr;
@@ -1751,6 +1872,41 @@
             </div>
             <div class="submissions-modal-body" id="mySubmissionsContent">
                 <div class="loading-message">Loading your submissions...</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Referral Dashboard Modal -->
+    <div class="auth-modal" id="referralDashboard">
+        <div class="submissions-modal-content" style="max-width: 850px;">
+            <button class="auth-close" id="closeReferralDashboard">&times;</button>
+            <div class="submissions-modal-header">
+                <h3>My Referrals</h3>
+                <p>Track your company referrals and earnings</p>
+            </div>
+            <div id="referralSummarySection" class="referral-summary">
+                <div class="referral-stat-card">
+                    <div class="referral-stat-value" id="totalReferralsCount">0</div>
+                    <div class="referral-stat-label">Total Submitted</div>
+                </div>
+                <div class="referral-stat-card">
+                    <div class="referral-stat-value" id="approvedReferralsCount">0</div>
+                    <div class="referral-stat-label">Approved</div>
+                </div>
+                <div class="referral-stat-card">
+                    <div class="referral-stat-value" id="totalEarnedAmount">$0</div>
+                    <div class="referral-stat-label">Total Earned</div>
+                </div>
+                <div class="referral-stat-card">
+                    <div class="referral-stat-value" id="remainingEligibleAmount">$0</div>
+                    <div class="referral-stat-label">Remaining Eligible</div>
+                </div>
+            </div>
+            <div class="referral-actions">
+                <a href="/referral.html" class="btn-primary-small" style="width: auto; padding: 12px 24px; text-decoration: none; display: inline-block;">Refer a Company</a>
+            </div>
+            <div class="submissions-modal-body" id="referralDashboardContent">
+                <div class="loading-message">Loading your referrals...</div>
             </div>
         </div>
     </div>

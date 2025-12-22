@@ -964,6 +964,101 @@
             justify-content: center;
         }
 
+        .admin-tabs {
+            display: flex;
+            gap: 0;
+            margin-bottom: 32px;
+            border-bottom: 1px solid var(--border-light);
+        }
+
+        .admin-tab {
+            padding: 14px 24px;
+            background: transparent;
+            border: none;
+            border-bottom: 2px solid transparent;
+            font-size: 14px;
+            font-weight: 500;
+            font-family: 'Inter', sans-serif;
+            color: var(--warm-gray-dark);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .admin-tab:hover {
+            color: var(--charcoal);
+        }
+
+        .admin-tab.active {
+            color: var(--moss);
+            border-bottom-color: var(--moss);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .status-submitted {
+            background: var(--warning-bg);
+            color: var(--warning);
+        }
+
+        .status-in_review {
+            background: var(--info-bg);
+            color: var(--info);
+        }
+
+        .status-approved {
+            background: var(--success-bg);
+            color: var(--success);
+        }
+
+        .referral-detail-section {
+            margin-bottom: 24px;
+        }
+
+        .referral-detail-section h4 {
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--warm-gray-dark);
+            margin-bottom: 12px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid var(--border-light);
+        }
+
+        .referral-modal-form .form-group {
+            margin-bottom: 16px;
+        }
+
+        .referral-modal-form select,
+        .referral-modal-form textarea {
+            width: 100%;
+            padding: 12px 14px;
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius-sm);
+            font-size: 14px;
+            font-family: 'Inter', sans-serif;
+            background: var(--cream);
+            transition: all 0.3s ease;
+        }
+
+        .referral-modal-form select:focus,
+        .referral-modal-form textarea:focus {
+            outline: none;
+            border-color: var(--moss);
+            background: white;
+        }
+
+        .referral-modal-form textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
         @media (max-width: 768px) {
             .header-content {
                 padding: 16px 20px;
@@ -994,6 +1089,16 @@
             .analytics-header {
                 flex-direction: column;
                 align-items: flex-start;
+            }
+
+            .admin-tabs {
+                overflow-x: auto;
+            }
+
+            .admin-tab {
+                padding: 12px 16px;
+                font-size: 13px;
+                white-space: nowrap;
             }
         }
     </style>
@@ -1076,9 +1181,15 @@
     <div id="toastContainer" style="position: fixed; top: 20px; right: 20px; z-index: 10001; display: flex; flex-direction: column; gap: 10px;"></div>
 
     <div id="dashboard" class="dashboard">
-        <h2 class="page-title">Submissions Overview</h2>
-        <p class="page-subtitle">Manage and review all thank you gift submissions</p>
+        <h2 class="page-title">Admin Dashboard</h2>
+        <p class="page-subtitle">Manage submissions and referrals</p>
 
+        <div class="admin-tabs">
+            <button class="admin-tab active" data-tab="submissions" onclick="switchTab('submissions')">Submissions</button>
+            <button class="admin-tab" data-tab="referrals" onclick="switchTab('referrals')">Referrals</button>
+        </div>
+
+        <div id="submissionsSection" class="tab-content active">
         <div class="stats-grid">
             <div class="stat-card">
                 <div class="stat-label">Total</div>
@@ -1203,6 +1314,48 @@
         <div class="load-more-container" id="loadMoreContainer">
             <button class="load-more-btn" id="loadMoreBtn">Load More Submissions</button>
         </div>
+        </div>
+
+        <div id="referralsSection" class="tab-content">
+            <div class="filter-bar">
+                <select id="referralStatusFilter">
+                    <option value="all">All Status</option>
+                    <option value="submitted">Submitted</option>
+                    <option value="in_review">In Review</option>
+                    <option value="approved">Approved</option>
+                    <option value="rejected">Rejected</option>
+                    <option value="paid">Paid</option>
+                </select>
+                <div class="spacer"></div>
+                <button class="icon-btn" onclick="loadReferrals()" title="Refresh">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="23 4 23 10 17 10"></polyline>
+                        <polyline points="1 20 1 14 7 14"></polyline>
+                        <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
+                    </svg>
+                </button>
+            </div>
+
+            <div class="submissions-table" style="overflow-x: auto;">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Referrer</th>
+                            <th>Company Name</th>
+                            <th>Org Type</th>
+                            <th>Contact Info</th>
+                            <th>Status</th>
+                            <th>Reward</th>
+                            <th>Submitted</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="referralsBody">
+                        <tr><td colspan="8" style="text-align: center; padding: 40px; color: var(--warm-gray-dark);">Select the Referrals tab to load data...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
     </div>
 
     <div class="bulk-actions-bar" id="bulkActionsBar">
@@ -1259,6 +1412,45 @@
                     <button class="btn btn-secondary" onclick="skipTask()">Skip</button>
                     <button class="btn btn-primary" onclick="createTask()">Create Task</button>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="referralModal">
+        <div class="modal-content" style="max-width: 600px;">
+            <div class="modal-header">
+                <h3>Referral Details</h3>
+                <button class="modal-close" onclick="closeReferralModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div id="referralDetailContent"></div>
+                <div class="referral-modal-form">
+                    <div class="referral-detail-section">
+                        <h4>Update Referral</h4>
+                        <div class="form-group">
+                            <label for="referralStatusSelect">Status</label>
+                            <select id="referralStatusSelect">
+                                <option value="submitted">Submitted</option>
+                                <option value="in_review">In Review</option>
+                                <option value="approved">Approved</option>
+                                <option value="rejected">Rejected</option>
+                                <option value="paid">Paid</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="referralRewardAmount">Reward Amount ($)</label>
+                            <input type="number" id="referralRewardAmount" step="0.01" min="0" placeholder="0.00">
+                        </div>
+                        <div class="form-group">
+                            <label for="referralAdminNotes">Admin Notes</label>
+                            <textarea id="referralAdminNotes" placeholder="Add notes about this referral..."></textarea>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeReferralModal()">Cancel</button>
+                <button class="btn btn-primary" onclick="saveReferral()">Save Changes</button>
             </div>
         </div>
     </div>

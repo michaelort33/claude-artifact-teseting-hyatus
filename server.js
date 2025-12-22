@@ -793,6 +793,194 @@ async function handleCreateReferral(req, res) {
     }
 }
 
+const DEFAULT_REFERRAL_REWARD = 250;
+const MAX_REFERRAL_EARNINGS = 1000;
+
+async function handleGetMyReferrals(req, res) {
+    try {
+        const user = await getSessionUser(req);
+        if (!user) {
+            return sendJson(res, 401, { error: 'Authentication required' });
+        }
+
+        const referralsResult = await pool.query(
+            `SELECT id, company_name, org_type, status, approved_reward_amount, created_at, approved_at
+             FROM referrals
+             WHERE LOWER(referrer_email) = LOWER($1)
+             ORDER BY created_at DESC`,
+            [user.email]
+        );
+
+        const referrals = referralsResult.rows;
+
+        const totalSubmitted = referrals.length;
+        const approvedReferrals = referrals.filter(r => r.status === 'approved' || r.status === 'paid');
+        const totalApproved = approvedReferrals.length;
+        const totalEarnings = approvedReferrals.reduce((sum, r) => sum + (parseFloat(r.approved_reward_amount) || 0), 0);
+        const remainingEligible = Math.max(0, MAX_REFERRAL_EARNINGS - totalEarnings);
+
+        sendJson(res, 200, {
+            data: {
+                summary: {
+                    total_submitted: totalSubmitted,
+                    total_approved: totalApproved,
+                    total_earnings: totalEarnings,
+                    remaining_eligible: remainingEligible
+                },
+                referrals: referrals
+            }
+        });
+
+    } catch (err) {
+        console.error('Get my referrals error:', err);
+        sendJson(res, 500, { error: 'Server error' });
+    }
+}
+
+async function handleGetReferrals(req, res) {
+    try {
+        const user = await getSessionUser(req);
+        if (!user) {
+            return sendJson(res, 401, { error: 'Authentication required' });
+        }
+
+        const admin = await isAdmin(user.email);
+        if (!admin) {
+            return sendJson(res, 403, { error: 'Admin access required' });
+        }
+
+        const url = new URL(req.url, `http://${req.headers.host}`);
+        const status = url.searchParams.get('status');
+        const limit = parseInt(url.searchParams.get('limit')) || 50;
+        const offset = parseInt(url.searchParams.get('offset')) || 0;
+
+        let query = 'SELECT * FROM referrals';
+        const params = [];
+
+        if (status) {
+            query += ' WHERE status = $1';
+            params.push(status);
+        }
+
+        query += ' ORDER BY created_at DESC';
+        query += ` LIMIT $${params.length + 1} OFFSET $${params.length + 2}`;
+        params.push(limit, offset);
+
+        const result = await pool.query(query, params);
+
+        const countQuery = status 
+            ? 'SELECT COUNT(*) FROM referrals WHERE status = $1'
+            : 'SELECT COUNT(*) FROM referrals';
+        const countParams = status ? [status] : [];
+        const countResult = await pool.query(countQuery, countParams);
+        const total = parseInt(countResult.rows[0].count);
+
+        sendJson(res, 200, {
+            data: result.rows,
+            pagination: {
+                total,
+                limit,
+                offset
+            }
+        });
+
+    } catch (err) {
+        console.error('Get referrals error:', err);
+        sendJson(res, 500, { error: 'Server error' });
+    }
+}
+
+async function handleUpdateReferral(req, res, id) {
+    try {
+        const user = await getSessionUser(req);
+        if (!user) {
+            return sendJson(res, 401, { error: 'Authentication required' });
+        }
+
+        const admin = await isAdmin(user.email);
+        if (!admin) {
+            return sendJson(res, 403, { error: 'Admin access required' });
+        }
+
+        const existingResult = await pool.query('SELECT * FROM referrals WHERE id = $1', [id]);
+        if (existingResult.rows.length === 0) {
+            return sendJson(res, 404, { error: 'Referral not found' });
+        }
+
+        const existing = existingResult.rows[0];
+        const body = await parseBody(req);
+        const { status, approved_reward_amount, admin_notes } = body;
+
+        const updates = ['updated_at = NOW()'];
+        const params = [];
+        let paramCount = 1;
+
+        if (admin_notes !== undefined) {
+            updates.push(`admin_notes = $${paramCount++}`);
+            params.push(admin_notes);
+        }
+
+        if (status !== undefined) {
+            updates.push(`status = $${paramCount++}`);
+            params.push(status);
+
+            if (status === 'approved' && existing.status !== 'approved') {
+                updates.push('approved_at = NOW()');
+
+                const approvedCountResult = await pool.query(
+                    `SELECT COUNT(*) FROM referrals 
+                     WHERE LOWER(referrer_email) = LOWER($1) 
+                     AND status IN ('approved', 'paid')
+                     AND id != $2`,
+                    [existing.referrer_email, id]
+                );
+                const approvedCount = parseInt(approvedCountResult.rows[0].count);
+
+                if (approvedCount >= 4) {
+                    updates.push(`approved_reward_amount = $${paramCount++}`);
+                    params.push(0);
+                    const capNote = 'User has reached the maximum of 4 paid referrals ($1000 cap). No reward for this referral.';
+                    const existingNotes = admin_notes !== undefined ? admin_notes : (existing.admin_notes || '');
+                    const newNotes = existingNotes ? `${existingNotes}\n${capNote}` : capNote;
+                    const noteIndex = updates.findIndex(u => u.startsWith('admin_notes'));
+                    if (noteIndex !== -1) {
+                        params[noteIndex] = newNotes;
+                    } else {
+                        updates.push(`admin_notes = $${paramCount++}`);
+                        params.push(newNotes);
+                    }
+                } else {
+                    const rewardAmount = approved_reward_amount !== undefined ? approved_reward_amount : DEFAULT_REFERRAL_REWARD;
+                    updates.push(`approved_reward_amount = $${paramCount++}`);
+                    params.push(rewardAmount);
+                }
+            } else if (approved_reward_amount !== undefined) {
+                updates.push(`approved_reward_amount = $${paramCount++}`);
+                params.push(approved_reward_amount);
+            }
+
+            if (status === 'paid' && existing.status !== 'paid') {
+                updates.push('paid_at = NOW()');
+            }
+        } else if (approved_reward_amount !== undefined) {
+            updates.push(`approved_reward_amount = $${paramCount++}`);
+            params.push(approved_reward_amount);
+        }
+
+        params.push(id);
+        const result = await pool.query(
+            `UPDATE referrals SET ${updates.join(', ')} WHERE id = $${paramCount} RETURNING *`,
+            params
+        );
+
+        sendJson(res, 200, { data: result.rows[0] });
+
+    } catch (err) {
+        console.error('Update referral error:', err);
+        sendJson(res, 500, { error: 'Server error' });
+    }
+}
+
 async function getTasksApiToken() {
     if (cachedToken && tokenExpiry && Date.now() < tokenExpiry) {
         return cachedToken;
@@ -993,8 +1181,22 @@ const server = http.createServer(async (req, res) => {
         return handleEmailHealth(req, res);
     }
 
+    if (pathname === '/api/referrals/my' && method === 'GET') {
+        return handleGetMyReferrals(req, res);
+    }
+    if (pathname === '/api/referrals' && method === 'GET') {
+        return handleGetReferrals(req, res);
+    }
     if (pathname === '/api/referrals' && method === 'POST') {
         return handleCreateReferral(req, res);
+    }
+
+    const referralMatch = pathname.match(/^\/api\/referrals\/(\d+)$/);
+    if (referralMatch) {
+        const id = referralMatch[1];
+        if (method === 'PATCH') {
+            return handleUpdateReferral(req, res, id);
+        }
     }
 
     let filePath = '.' + pathname;
