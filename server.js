@@ -471,7 +471,7 @@ async function handleCreateSubmission(req, res) {
                     to: process.env.ADMIN_EMAIL,
                     from: { name: 'Hyatus Living', email: 'hello@hyatus.com' },
                     subject: `Guest Appreciation - New ${payment_method || 'Gift'} Request`,
-                    text: `A guest just submitted a thank-you gift request!\n\nGift Choice: ${payment_method || 'N/A'}\nDelivery Email: ${payment_handle || 'N/A'}\nReturning Guest: ${previous_guest ? 'Yes' : 'No'}\nSubmitted: ${new Date().toLocaleString()}\n\nView details: https://feedback.hyatus.com/admin.html`,
+                    text: `A guest just submitted a thank-you gift request!\n\nGift Choice: ${payment_method || 'N/A'}\nDelivery Email: ${payment_handle || 'N/A'}\nReturning Guest: ${previous_guest ? 'Yes' : 'No'}\nSubmitted: ${new Date().toLocaleString()}\n\nView details: https://feedback.hyatus.com/admin`,
                     html: `
                         <!DOCTYPE html>
                         <html>
@@ -505,7 +505,7 @@ async function handleCreateSubmission(req, res) {
                                 </table>
                             </div>
                             <div style="text-align: center;">
-                                <a href="https://feedback.hyatus.com/admin.html" style="display: inline-block; background: #0F2C1F; color: #FDFCF8; padding: 14px 32px; text-decoration: none; border-radius: 8px; font-weight: 500;">View in Dashboard</a>
+                                <a href="https://feedback.hyatus.com/admin" style="display: inline-block; background: #0F2C1F; color: #FDFCF8; padding: 14px 32px; text-decoration: none; border-radius: 8px; font-weight: 500;">View in Dashboard</a>
                             </div>
                         </div>
                         </body>
@@ -1202,6 +1202,20 @@ const server = http.createServer(async (req, res) => {
     let filePath = '.' + pathname;
     if (filePath === './') {
         filePath = './index.html';
+    }
+    
+    // Clean URL routing - serve HTML files without .html extension
+    if (pathname === '/admin') {
+        filePath = './admin.html';
+    } else if (pathname === '/referral') {
+        filePath = './referral.html';
+    }
+    
+    // Redirect .html URLs to clean versions (optional but professional)
+    if (pathname.endsWith('.html') && pathname !== '/index.html') {
+        const cleanPath = pathname.replace('.html', '');
+        res.writeHead(301, { 'Location': cleanPath });
+        return res.end();
     }
     
     serveStaticFile(filePath, res);

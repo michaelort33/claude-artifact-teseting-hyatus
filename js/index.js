@@ -1025,7 +1025,7 @@ function renderReferralsList() {
         textDiv.textContent = 'Know a company that could benefit from Hyatus? Submit a referral and earn rewards.';
         
         const referBtn = document.createElement('a');
-        referBtn.href = '/referral.html';
+        referBtn.href = '/referral';
         referBtn.className = 'btn-primary-small';
         referBtn.style.cssText = 'width: auto; padding: 12px 24px; text-decoration: none; display: inline-block;';
         referBtn.textContent = 'Refer a Company';

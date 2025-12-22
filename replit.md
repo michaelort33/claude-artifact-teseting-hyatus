@@ -94,6 +94,7 @@ The application is served via Node.js server on port 5000.
 2. PostgreSQL database via Replit's built-in database
 3. Session-based authentication with HTTP-only cookies
 4. All secrets stored as Replit secrets
+5. Clean URL routing (`/admin`, `/referral` instead of `.html` extensions)
 
 ## Campaign Control
 - `?g=vip2024` - Enable for returning guests
