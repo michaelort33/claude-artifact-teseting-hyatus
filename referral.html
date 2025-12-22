@@ -1,0 +1,782 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hyatus Connect Rewards | Earn $250 Per Referral</title>
+
+    <meta name="robots" content="noindex, nofollow, noarchive, nosnippet, noimageindex, notranslate">
+    <meta name="googlebot" content="noindex, nofollow, noarchive, nosnippet, noimageindex, notranslate">
+    
+    <link rel="icon" type="image/svg+xml"
+        href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect width='16' height='16' fill='%230F2C1F'/%3E%3Ctext x='8' y='11' text-anchor='middle' font-size='8' fill='%23D96F52'%3E%E2%9C%A6%3C/text%3E%3C/svg%3E">
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --cream: #FDFCF8;
+            --alabaster: #F7F3EA;
+            --bone: #EDE7D9;
+            --terracotta: #D96F52;
+            --terracotta-dark: #C45A3F;
+            --terracotta-light: #E8977F;
+            --moss: #0F2C1F;
+            --moss-light: #1A4030;
+            --moss-soft: #2D4A3E;
+            --charcoal: #2A2A2A;
+            --charcoal-light: #4A4A4A;
+            --warm-gray: #C4C0B8;
+            --warm-gray-dark: #8A8580;
+            --border: #D1CCC4;
+            --border-light: #E8E4DC;
+            --gold: #F59E0B;
+            --gold-light: #FCD34D;
+            --gold-bg: #FFFBEB;
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 16px;
+            --radius-xl: 24px;
+        }
+
+        ::selection {
+            background: var(--moss);
+            color: var(--cream);
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--cream);
+            color: var(--charcoal);
+            min-height: 100vh;
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+            position: relative;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+            opacity: 0.03;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .topbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 60px;
+            background: linear-gradient(180deg, var(--cream) 0%, rgba(253, 252, 248, 0.95) 100%);
+            z-index: 1200;
+            border-bottom: 1px solid var(--border-light);
+            backdrop-filter: blur(8px);
+        }
+
+        .topbar-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 40px;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+        }
+
+        .brand-text {
+            font-family: 'Playfair Display', Georgia, serif;
+            font-size: 24px;
+            color: var(--moss);
+            font-weight: 500;
+        }
+
+        .back-link {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--warm-gray-dark);
+            text-decoration: none;
+            font-size: 14px;
+            transition: color 0.2s ease;
+        }
+
+        .back-link:hover {
+            color: var(--charcoal);
+        }
+
+        .back-link svg {
+            width: 16px;
+            height: 16px;
+        }
+
+        .main-content {
+            padding-top: 100px;
+            padding-bottom: 80px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .container {
+            max-width: 720px;
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+
+        .hero {
+            text-align: center;
+            margin-bottom: 48px;
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: linear-gradient(135deg, var(--gold-bg) 0%, #FEF3C7 100%);
+            border: 1px solid var(--gold-light);
+            border-radius: 100px;
+            padding: 8px 20px;
+            font-size: 13px;
+            font-weight: 600;
+            color: #92400E;
+            margin-bottom: 24px;
+        }
+
+        .hero h1 {
+            font-family: 'Playfair Display', Georgia, serif;
+            font-size: clamp(32px, 5vw, 44px);
+            font-weight: 400;
+            color: var(--charcoal);
+            margin-bottom: 16px;
+            letter-spacing: -0.02em;
+            line-height: 1.2;
+        }
+
+        .hero .subtitle {
+            font-size: 18px;
+            color: var(--warm-gray-dark);
+            max-width: 520px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+
+        .reward-highlight {
+            background: linear-gradient(135deg, var(--moss) 0%, var(--moss-soft) 100%);
+            border-radius: var(--radius-lg);
+            padding: 32px;
+            margin-bottom: 48px;
+            text-align: center;
+            color: var(--cream);
+        }
+
+        .reward-amount {
+            font-family: 'Playfair Display', Georgia, serif;
+            font-size: 64px;
+            font-weight: 500;
+            margin-bottom: 8px;
+            color: var(--gold-light);
+        }
+
+        .reward-label {
+            font-size: 16px;
+            opacity: 0.9;
+            margin-bottom: 16px;
+        }
+
+        .reward-max {
+            font-size: 14px;
+            opacity: 0.7;
+            padding-top: 16px;
+            border-top: 1px solid rgba(255,255,255,0.15);
+        }
+
+        .section {
+            margin-bottom: 40px;
+        }
+
+        .section-title {
+            font-family: 'Playfair Display', Georgia, serif;
+            font-size: 24px;
+            font-weight: 400;
+            color: var(--charcoal);
+            margin-bottom: 16px;
+        }
+
+        .section p {
+            color: var(--charcoal-light);
+            font-size: 15px;
+            line-height: 1.7;
+            margin-bottom: 16px;
+        }
+
+        .steps {
+            display: grid;
+            gap: 16px;
+            margin-bottom: 48px;
+        }
+
+        .step {
+            display: flex;
+            gap: 16px;
+            align-items: flex-start;
+            background: var(--alabaster);
+            border-radius: var(--radius-md);
+            padding: 20px;
+        }
+
+        .step-number {
+            width: 32px;
+            height: 32px;
+            background: var(--moss);
+            color: var(--cream);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: 600;
+            flex-shrink: 0;
+        }
+
+        .step-content h4 {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--charcoal);
+            margin-bottom: 4px;
+        }
+
+        .step-content p {
+            font-size: 14px;
+            color: var(--warm-gray-dark);
+            margin: 0;
+            line-height: 1.5;
+        }
+
+        .qualifications {
+            background: var(--alabaster);
+            border-radius: var(--radius-md);
+            padding: 24px;
+            margin-bottom: 48px;
+        }
+
+        .qualifications h3 {
+            font-family: 'Playfair Display', Georgia, serif;
+            font-size: 20px;
+            font-weight: 400;
+            color: var(--charcoal);
+            margin-bottom: 16px;
+        }
+
+        .qualifications ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .qualifications li {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            font-size: 14px;
+            color: var(--charcoal-light);
+            margin-bottom: 12px;
+            line-height: 1.5;
+        }
+
+        .qualifications li:last-child {
+            margin-bottom: 0;
+        }
+
+        .qualifications li::before {
+            content: '✓';
+            color: var(--moss);
+            font-weight: 600;
+            flex-shrink: 0;
+        }
+
+        .form-card {
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 32px;
+            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.04);
+        }
+
+        .form-card h3 {
+            font-family: 'Playfair Display', Georgia, serif;
+            font-size: 24px;
+            font-weight: 400;
+            color: var(--charcoal);
+            margin-bottom: 8px;
+            text-align: center;
+        }
+
+        .form-card .form-intro {
+            color: var(--warm-gray-dark);
+            font-size: 14px;
+            text-align: center;
+            margin-bottom: 28px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--charcoal);
+            margin-bottom: 8px;
+        }
+
+        .form-group label .required {
+            color: var(--terracotta);
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 14px 16px;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            font-size: 15px;
+            font-family: 'Inter', sans-serif;
+            color: var(--charcoal);
+            background: var(--cream);
+            transition: all 0.2s ease;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--moss);
+            box-shadow: 0 0 0 3px rgba(15, 44, 31, 0.1);
+        }
+
+        .form-group input::placeholder,
+        .form-group textarea::placeholder {
+            color: var(--warm-gray);
+        }
+
+        .form-group textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        @media (max-width: 600px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .submit-button {
+            width: 100%;
+            padding: 16px 32px;
+            background: linear-gradient(135deg, var(--moss) 0%, var(--moss-soft) 100%);
+            color: var(--cream);
+            border: none;
+            border-radius: var(--radius-md);
+            font-size: 14px;
+            font-weight: 500;
+            font-family: 'Inter', sans-serif;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-top: 8px;
+        }
+
+        .submit-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(15, 44, 31, 0.25);
+        }
+
+        .submit-button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .disclaimer {
+            margin-top: 24px;
+            padding-top: 24px;
+            border-top: 1px solid var(--border-light);
+            font-size: 12px;
+            color: var(--warm-gray-dark);
+            text-align: center;
+            line-height: 1.6;
+        }
+
+        .success-message {
+            display: none;
+            text-align: center;
+            padding: 48px 24px;
+        }
+
+        .success-message.show {
+            display: block;
+        }
+
+        .success-icon {
+            width: 64px;
+            height: 64px;
+            background: linear-gradient(135deg, var(--moss) 0%, var(--moss-soft) 100%);
+            border-radius: 50%;
+            margin: 0 auto 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .success-icon svg {
+            width: 28px;
+            height: 28px;
+            color: var(--cream);
+        }
+
+        .success-message h3 {
+            font-family: 'Playfair Display', Georgia, serif;
+            font-size: 28px;
+            font-weight: 400;
+            color: var(--charcoal);
+            margin-bottom: 12px;
+        }
+
+        .success-message p {
+            color: var(--warm-gray-dark);
+            font-size: 15px;
+            line-height: 1.6;
+            max-width: 400px;
+            margin: 0 auto;
+        }
+
+        .error-message {
+            background: linear-gradient(180deg, #FEE2E2 0%, #FECACA 100%);
+            border: 1px solid #F87171;
+            border-radius: var(--radius-sm);
+            color: #991B1B;
+            padding: 12px 16px;
+            margin-bottom: 20px;
+            font-size: 14px;
+            display: none;
+        }
+
+        .error-message.show {
+            display: block;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 32px 24px;
+            color: var(--warm-gray-dark);
+            font-size: 13px;
+        }
+
+        .footer a {
+            color: var(--terracotta);
+            text-decoration: none;
+        }
+
+        .footer a:hover {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 600px) {
+            .topbar-content {
+                padding: 0 20px;
+            }
+
+            .hero h1 {
+                font-size: 28px;
+            }
+
+            .reward-amount {
+                font-size: 48px;
+            }
+
+            .form-card {
+                padding: 24px 20px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <header class="topbar">
+        <div class="topbar-content">
+            <a href="/" class="brand">
+                <span class="brand-text">Hyatus</span>
+            </a>
+            <a href="/" class="back-link">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M19 12H5M12 19l-7-7 7-7"/>
+                </svg>
+                Back to Feedback
+            </a>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <div class="container">
+            <div class="hero">
+                <div class="badge">
+                    <span>💰</span>
+                    <span>Referral Program</span>
+                </div>
+                <h1>Hyatus Connect Rewards</h1>
+                <p class="subtitle">Know someone who books corporate housing? Introduce them to Hyatus and earn cash rewards for every successful connection.</p>
+            </div>
+
+            <div class="reward-highlight">
+                <div class="reward-amount">$250</div>
+                <div class="reward-label">per qualifying company referral</div>
+                <div class="reward-max">Earn up to $1,000 (maximum 5 referrals per person)</div>
+            </div>
+
+            <div class="section">
+                <h2 class="section-title">How It Works</h2>
+                <p>Hyatus partners with companies, hospitals, and universities to provide high-quality furnished housing for business travel, relocations, and extended stays. When you connect us with the right person at an organization, we reward you for making it happen.</p>
+            </div>
+
+            <div class="steps">
+                <div class="step">
+                    <div class="step-number">1</div>
+                    <div class="step-content">
+                        <h4>Submit a Referral</h4>
+                        <p>Fill out the form below with details about the company and your contact there.</p>
+                    </div>
+                </div>
+                <div class="step">
+                    <div class="step-number">2</div>
+                    <div class="step-content">
+                        <h4>We Reach Out</h4>
+                        <p>Our team will follow up with the organization to discuss their housing needs.</p>
+                    </div>
+                </div>
+                <div class="step">
+                    <div class="step-number">3</div>
+                    <div class="step-content">
+                        <h4>Company Signs Up</h4>
+                        <p>Once the company completes their corporate account setup with Hyatus, you earn your reward.</p>
+                    </div>
+                </div>
+                <div class="step">
+                    <div class="step-number">4</div>
+                    <div class="step-content">
+                        <h4>Get Paid</h4>
+                        <p>Receive $250 for each qualifying referral, up to $1,000 total.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="qualifications">
+                <h3>What Qualifies as a Successful Referral?</h3>
+                <ul>
+                    <li>The company or institution must be new to Hyatus (not an existing partner)</li>
+                    <li>Your introduction must be to a decision-maker in travel, housing, or procurement</li>
+                    <li>The organization must complete corporate account setup with Hyatus</li>
+                    <li>Final qualification approval is determined by Hyatus</li>
+                </ul>
+            </div>
+
+            <div class="form-card">
+                <div id="referralForm">
+                    <h3>Submit Your Referral</h3>
+                    <p class="form-intro">Tell us about the company and who to contact.</p>
+
+                    <div id="formError" class="error-message"></div>
+
+                    <form id="referralFormElement">
+                        <div class="form-group">
+                            <label>Your Name <span class="required">*</span></label>
+                            <input type="text" id="referrerName" placeholder="Your full name" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Your Email <span class="required">*</span></label>
+                            <input type="email" id="referrerEmail" placeholder="your@email.com" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Company/Organization Name <span class="required">*</span></label>
+                            <input type="text" id="companyName" placeholder="Company, hospital, or university name" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Organization Type <span class="required">*</span></label>
+                            <select id="orgType" required>
+                                <option value="">Select type...</option>
+                                <option value="company">Company / Corporation</option>
+                                <option value="hospital">Hospital / Healthcare</option>
+                                <option value="university">University / Education</option>
+                                <option value="government">Government Agency</option>
+                                <option value="nonprofit">Non-Profit Organization</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Contact Person's Name <span class="required">*</span></label>
+                                <input type="text" id="contactName" placeholder="Decision maker's name" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Contact Person's Role</label>
+                                <input type="text" id="contactRole" placeholder="e.g., Travel Manager">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Contact Person's Email <span class="required">*</span></label>
+                            <input type="email" id="contactEmail" placeholder="contact@company.com" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Contact Person's Phone</label>
+                            <input type="tel" id="contactPhone" placeholder="(555) 123-4567">
+                        </div>
+
+                        <div class="form-group">
+                            <label>How do you know this contact?</label>
+                            <select id="relationship">
+                                <option value="">Select relationship...</option>
+                                <option value="coworker">Current or former coworker</option>
+                                <option value="friend">Friend or family</option>
+                                <option value="professional">Professional network</option>
+                                <option value="self">This is my own company</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Additional Notes</label>
+                            <textarea id="notes" placeholder="Any additional context about the company or referral..."></textarea>
+                        </div>
+
+                        <button type="submit" class="submit-button" id="submitBtn">Submit Referral</button>
+                    </form>
+
+                    <div class="disclaimer">
+                        By submitting this referral, you confirm that you have the contact's permission to share their information. Hyatus will reach out professionally on your behalf. Rewards are paid after the referred company completes account setup and meets qualifying criteria.
+                    </div>
+                </div>
+
+                <div id="successMessage" class="success-message">
+                    <div class="success-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="20 6 9 17 4 12"></polyline>
+                        </svg>
+                    </div>
+                    <h3>Referral Submitted!</h3>
+                    <p>Thank you for connecting us with a potential partner. Our team will follow up with your referral, and we'll keep you updated on the status. If they sign up, your $250 reward will be on its way!</p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <p>Questions about the program? Contact us at <a href="mailto:hello@hyatus.com">hello@hyatus.com</a></p>
+        <p style="margin-top: 8px;">&copy; 2024 Hyatus. All rights reserved.</p>
+    </footer>
+
+    <script>
+        const form = document.getElementById('referralFormElement');
+        const formContainer = document.getElementById('referralForm');
+        const successMessage = document.getElementById('successMessage');
+        const formError = document.getElementById('formError');
+        const submitBtn = document.getElementById('submitBtn');
+
+        function showError(message) {
+            formError.textContent = message;
+            formError.classList.add('show');
+        }
+
+        function hideError() {
+            formError.classList.remove('show');
+        }
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            hideError();
+
+            const data = {
+                referrer_name: document.getElementById('referrerName').value.trim(),
+                referrer_email: document.getElementById('referrerEmail').value.trim(),
+                company_name: document.getElementById('companyName').value.trim(),
+                org_type: document.getElementById('orgType').value,
+                contact_name: document.getElementById('contactName').value.trim(),
+                contact_role: document.getElementById('contactRole').value.trim(),
+                contact_email: document.getElementById('contactEmail').value.trim(),
+                contact_phone: document.getElementById('contactPhone').value.trim(),
+                relationship: document.getElementById('relationship').value,
+                notes: document.getElementById('notes').value.trim()
+            };
+
+            if (!data.referrer_name || !data.referrer_email || !data.company_name || 
+                !data.org_type || !data.contact_name || !data.contact_email) {
+                showError('Please fill in all required fields.');
+                return;
+            }
+
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Submitting...';
+
+            try {
+                const response = await fetch('/api/referrals', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+
+                const result = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(result.error || 'Failed to submit referral');
+                }
+
+                formContainer.style.display = 'none';
+                successMessage.classList.add('show');
+
+            } catch (err) {
+                console.error('Error:', err);
+                showError(err.message || 'Something went wrong. Please try again.');
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Submit Referral';
+            }
+        });
+    </script>
+</body>
+
+</html>

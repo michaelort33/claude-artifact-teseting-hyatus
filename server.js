@@ -686,6 +686,113 @@ async function handleUpdateSubmission(req, res, id) {
     }
 }
 
+async function handleCreateReferral(req, res) {
+    try {
+        const body = await parseBody(req);
+        const {
+            referrer_name,
+            referrer_email,
+            company_name,
+            org_type,
+            contact_name,
+            contact_role,
+            contact_email,
+            contact_phone,
+            relationship,
+            notes
+        } = body;
+
+        if (!referrer_name || !referrer_email || !company_name || !org_type || !contact_name || !contact_email) {
+            return sendJson(res, 400, { error: 'Missing required fields' });
+        }
+
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(referrer_email) || !emailRegex.test(contact_email)) {
+            return sendJson(res, 400, { error: 'Invalid email format' });
+        }
+
+        const existingReferral = await pool.query(
+            'SELECT id FROM referrals WHERE LOWER(TRIM(company_name)) = LOWER(TRIM($1))',
+            [company_name]
+        );
+
+        if (existingReferral.rows.length > 0) {
+            return sendJson(res, 400, { error: 'This company has already been referred by another user' });
+        }
+
+        const approvedCount = await pool.query(
+            `SELECT COUNT(*) FROM referrals 
+             WHERE LOWER(referrer_email) = LOWER($1) 
+             AND (status = 'approved' OR reward_paid = true)`,
+            [referrer_email]
+        );
+
+        if (parseInt(approvedCount.rows[0].count) >= 5) {
+            return sendJson(res, 400, { error: 'You have reached the maximum of 5 approved referrals' });
+        }
+
+        const result = await pool.query(
+            `INSERT INTO referrals (referrer_name, referrer_email, company_name, org_type, contact_name, contact_role, contact_email, contact_phone, relationship, notes)
+             VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+             RETURNING *`,
+            [referrer_name, referrer_email, company_name, org_type, contact_name, contact_role || null, contact_email, contact_phone || null, relationship || null, notes || null]
+        );
+
+        const referral = result.rows[0];
+
+        if (process.env.SENDGRID_API_KEY && process.env.ADMIN_EMAIL) {
+            try {
+                await sgMail.send({
+                    to: process.env.ADMIN_EMAIL,
+                    from: { name: 'Hyatus Connect', email: 'hello@hyatus.com' },
+                    subject: `New Referral: ${company_name} (${org_type})`,
+                    text: `New referral submitted!\n\nReferrer: ${referrer_name} (${referrer_email})\n\nCompany: ${company_name}\nType: ${org_type}\n\nContact: ${contact_name}\nRole: ${contact_role || 'Not specified'}\nEmail: ${contact_email}\nPhone: ${contact_phone || 'Not provided'}\n\nRelationship: ${relationship || 'Not specified'}\nNotes: ${notes || 'None'}`,
+                    html: `
+                        <!DOCTYPE html>
+                        <html>
+                        <head>
+                            <meta name="color-scheme" content="light dark">
+                            <meta name="supported-color-schemes" content="light dark">
+                        </head>
+                        <body style="margin: 0; padding: 0;">
+                        <div style="font-family: Inter, -apple-system, sans-serif; max-width: 560px; margin: 0 auto; padding: 40px 20px; background: #FDFCF8;">
+                            <div style="text-align: center; margin-bottom: 32px;">
+                                <h1 style="font-family: 'Playfair Display', Georgia, serif; color: #0F2C1F; font-size: 24px; margin: 0;">Hyatus Connect</h1>
+                            </div>
+                            <div style="background: linear-gradient(135deg, #FFFBEB 0%, #FEF3C7 100%); border: 1px solid #FCD34D; border-radius: 12px; padding: 24px; margin-bottom: 24px;">
+                                <p style="color: #92400E; font-size: 18px; font-weight: 600; margin: 0 0 16px 0;">New Referral Received</p>
+                                <table style="width: 100%; border-collapse: collapse;">
+                                    <tr><td style="color: #666; padding: 8px 0;">Company</td><td style="color: #2A2A2A; font-weight: 500; text-align: right;">${company_name}</td></tr>
+                                    <tr><td style="color: #666; padding: 8px 0;">Type</td><td style="color: #2A2A2A; font-weight: 500; text-align: right;">${org_type}</td></tr>
+                                    <tr><td style="color: #666; padding: 8px 0;">Contact</td><td style="color: #2A2A2A; font-weight: 500; text-align: right;">${contact_name}</td></tr>
+                                    <tr><td style="color: #666; padding: 8px 0;">Contact Email</td><td style="color: #2A2A2A; font-weight: 500; text-align: right;">${contact_email}</td></tr>
+                                </table>
+                            </div>
+                            <div style="background: #F7F3EA; border-radius: 12px; padding: 20px; margin-bottom: 24px;">
+                                <p style="color: #0F2C1F; font-size: 14px; font-weight: 600; margin: 0 0 8px 0;">Referred By</p>
+                                <p style="color: #2A2A2A; font-size: 15px; margin: 0;">${referrer_name} (${referrer_email})</p>
+                                ${relationship ? `<p style="color: #666; font-size: 13px; margin: 8px 0 0 0;">Relationship: ${relationship}</p>` : ''}
+                            </div>
+                            ${notes ? `<div style="background: #F7F3EA; border-radius: 12px; padding: 20px; margin-bottom: 24px;"><p style="color: #0F2C1F; font-size: 14px; font-weight: 600; margin: 0 0 8px 0;">Notes</p><p style="color: #2A2A2A; font-size: 14px; margin: 0; line-height: 1.6;">${notes}</p></div>` : ''}
+                        </div>
+                        </body>
+                        </html>
+                    `
+                });
+                console.log('Referral notification email sent');
+            } catch (emailErr) {
+                console.error('Failed to send referral notification:', emailErr.response?.body || emailErr.message || emailErr);
+            }
+        }
+
+        sendJson(res, 201, { data: referral, message: 'Referral submitted successfully' });
+
+    } catch (err) {
+        console.error('Create referral error:', err.message, err.stack);
+        sendJson(res, 500, { error: 'Server error: ' + err.message });
+    }
+}
+
 async function getTasksApiToken() {
     if (cachedToken && tokenExpiry && Date.now() < tokenExpiry) {
         return cachedToken;
@@ -884,6 +991,10 @@ const server = http.createServer(async (req, res) => {
     }
     if (pathname === '/api/email/health' && method === 'GET') {
         return handleEmailHealth(req, res);
+    }
+
+    if (pathname === '/api/referrals' && method === 'POST') {
+        return handleCreateReferral(req, res);
     }
 
     let filePath = '.' + pathname;

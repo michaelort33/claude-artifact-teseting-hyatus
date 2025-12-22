@@ -1,0 +1,50 @@
+Referral Program Name
+Hyatus Connect Rewards
+
+Post-Feedback Pop-Up Requirement
+After a user successfully submits feedback, display a confirmation pop-up that includes:
+	•	A short thank-you message for their feedback
+	•	A clear call to action link labeled: “Earn $250 with Hyatus Connect Rewards”
+	•	The link should route to the new referral program page
+
+The pop-up should only introduce the opportunity briefly. All program details live on the referral page.
+
+New Referral Program Page Overview
+Create a new standalone page dedicated to Hyatus Connect Rewards. This page explains how users can earn referral rewards by connecting Hyatus with companies or institutions that need corporate housing.
+
+Purpose of the Program
+Hyatus Connect Rewards allows individuals to earn cash rewards by referring:
+	•	Their own employer
+	•	Another company
+	•	A hospital, university, or similar institution
+
+Specifically, referrals should be directed toward someone responsible for travel, housing, or corporate accommodations who can set up a corporate account with Hyatus.
+
+Program Explanation Copy
+Hyatus works with companies, hospitals, and universities to provide high-quality furnished housing for business travel, relocations, and extended stays. If you help introduce Hyatus to the right person at an organization, we reward you for making the connection.
+
+When a referred company successfully signs up for a Hyatus corporate account and meets qualifying criteria, you earn $250 per company.
+
+Reward Structure
+	•	$250 earned for each qualifying company that signs up
+	•	Maximum of five qualifying referrals per person
+	•	Maximum total earnings of $1,000 per participant
+
+What Qualifies as a Successful Referral
+	•	The referral must be a new company or institution not already working with Hyatus
+	•	The introduction must be to a decision-maker or travel, housing, or procurement contact
+	•	The company must complete corporate account setup with Hyatus
+
+Final qualification approval is determined by Hyatus.
+
+How Users Participate
+	•	User clicks the referral link from the feedback confirmation pop-up or elsewhere on the site
+	•	User submits referral details on the referral page form
+	•	Hyatus follows up with the referred organization
+	•	Once the company qualifies and signs up, the reward is issued
+
+Developer Notes
+	•	Add referral program link to the feedback submission success pop-up
+	•	Create a new referral program page with the above content and a referral submission form
+	•	Keep pop-up messaging concise and direct users to the referral page for full details
+	•	Track referrals per user to enforce the five-company and $1,000 maximum limits

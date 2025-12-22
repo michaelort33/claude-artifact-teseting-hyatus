@@ -1,0 +1,69 @@
+Backend Referral System Specification
+
+Referral Data Model
+Create a dedicated referrals table to track all referral activity. Each record represents a single referred organization.
+
+Recommended fields:
+	•	id
+	•	referring_user_id
+	•	referring_user_email
+	•	company_name
+	•	company_type (company, hospital, university, other)
+	•	referral_contact_name
+	•	referral_contact_email
+	•	referral_contact_role
+	•	status (submitted, in_review, approved, rejected, paid)
+	•	approved_reward_amount (default 0)
+	•	created_at
+	•	updated_at
+	•	approved_at
+	•	paid_at
+
+Referral Status Flow
+	•	Submitted: referral form completed by the user
+	•	In Review: Hyatus team validating eligibility and outreach
+	•	Approved: company qualifies and corporate account is confirmed
+	•	Rejected: duplicate, ineligible, or non-qualifying referral
+	•	Paid: reward issued to the user
+
+Only referrals marked Approved count toward earnings and caps.
+
+Earnings Logic
+	•	Each approved referral awards $250
+	•	Enforce a hard cap of five approved referrals per user
+	•	Enforce a maximum payout of $1,000 per user
+	•	If a user reaches the cap, additional approved referrals should be flagged but not paid
+
+User Referral Dashboard
+Expose a referral dashboard within the authenticated user experience.
+
+For each user, display:
+	•	List of submitted referrals
+	•	Company name and type
+	•	Submission date
+	•	Current referral status
+	•	Approved reward amount per referral
+
+At the top of the dashboard, display summary metrics:
+	•	Total referrals submitted
+	•	Total referrals approved
+	•	Total earnings to date
+	•	Remaining eligible earnings toward the $1,000 cap
+
+Admin Controls
+Internal admin tooling should allow Hyatus staff to:
+	•	Review new referrals
+	•	Update referral status
+	•	Approve or reject referrals
+	•	Trigger payout status
+	•	Add internal notes per referral
+
+Status changes should automatically recalculate user earnings.
+
+Data Integrity and Validation
+	•	Prevent duplicate referrals for the same company
+	•	Block approval if the user has already reached the referral cap
+	•	Log all status changes for audit purposes
+
+Future-Proofing
+Design reward amounts and caps as configurable values rather than hardcoded, allowing changes without schema rewrites.

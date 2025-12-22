@@ -849,6 +849,89 @@
             box-shadow: 0 4px 12px rgba(42, 42, 42, 0.2);
         }
 
+        .referral-cta {
+            margin: 28px 0;
+            padding: 0 20px;
+        }
+
+        .referral-divider {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+
+        .referral-divider::before,
+        .referral-divider::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: var(--border);
+        }
+
+        .referral-divider span {
+            color: var(--warm-gray-dark);
+            font-size: 13px;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            white-space: nowrap;
+        }
+
+        .referral-link {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            background: linear-gradient(135deg, #FFFBEB 0%, #FEF3C7 100%);
+            border: 1px solid #FCD34D;
+            border-radius: var(--radius-md);
+            padding: 16px 20px;
+            text-decoration: none;
+            transition: all 0.3s ease-out;
+        }
+
+        .referral-link:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(252, 211, 77, 0.3);
+            border-color: #F59E0B;
+        }
+
+        .referral-icon {
+            font-size: 28px;
+            flex-shrink: 0;
+        }
+
+        .referral-text {
+            flex: 1;
+            text-align: left;
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .referral-text strong {
+            color: #92400E;
+            font-size: 15px;
+            font-weight: 600;
+        }
+
+        .referral-text span:last-child {
+            color: #B45309;
+            font-size: 13px;
+        }
+
+        .referral-arrow {
+            width: 20px;
+            height: 20px;
+            color: #92400E;
+            flex-shrink: 0;
+            transition: transform 0.2s ease;
+        }
+
+        .referral-link:hover .referral-arrow {
+            transform: translateX(4px);
+        }
+
         .campaign-paused {
             display: none;
             text-align: center;
@@ -1574,6 +1657,23 @@
                     </div>
                     <h2>Thank You</h2>
                     <p>We truly appreciate you sharing your experience with us. Your <span id="successRewardAmount">$10</span> gift will be on its way within 48 hours.</p>
+                    
+                    <div class="referral-cta">
+                        <div class="referral-divider">
+                            <span>Want to earn more?</span>
+                        </div>
+                        <a href="/referral.html" class="referral-link">
+                            <span class="referral-icon">💰</span>
+                            <span class="referral-text">
+                                <strong>Earn $250 with Hyatus Connect Rewards</strong>
+                                <span>Refer a company and get rewarded</span>
+                            </span>
+                            <svg class="referral-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M5 12h14M12 5l7 7-7 7"/>
+                            </svg>
+                        </a>
+                    </div>
+                    
                     <button class="another-button" onclick="location.reload()">Share More Feedback</button>
                 </div>
             </div>
