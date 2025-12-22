@@ -73,7 +73,10 @@ The application uses a Warm Editorial aesthetic inspired by high-end architectur
 - GET `/api/tasks/health` - Check task API configuration
 
 **Referrals:**
+- GET `/api/referrals/my` - Get authenticated user's referrals with summary metrics
+- GET `/api/referrals` - List all referrals (admin only, with status filter and pagination)
 - POST `/api/referrals` - Submit new referral (with duplicate company check and 5-referral limit)
+- PATCH `/api/referrals/:id` - Update referral status/reward/notes (admin only)
 
 ## Environment Variables
 - `DATABASE_URL` - PostgreSQL connection string
