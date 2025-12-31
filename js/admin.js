@@ -795,7 +795,8 @@ async function createTask() {
                 priority: 'medium',
                 description: `Guest appreciation gift - ${giftType} $${amount}\nRecipient: ${submission.payment_handle}\nSubmission ID: ${submission.id}`,
                 external_id: `reward-${submission.id}`,
-                subcategory: 'gift_card'
+                subcategory: 'gift_card',
+                tags: ['Giftly']
             })
         });
 
