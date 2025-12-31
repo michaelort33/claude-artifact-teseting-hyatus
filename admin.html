@@ -1016,6 +1016,44 @@
             color: var(--success);
         }
 
+        .status-success {
+            background: var(--success-bg);
+            color: var(--success);
+        }
+
+        .status-error {
+            background: var(--danger-bg);
+            color: var(--danger);
+        }
+
+        .status-duplicate {
+            background: var(--warning-bg);
+            color: var(--warning);
+        }
+
+        .json-display {
+            background: var(--alabaster);
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius-sm);
+            padding: 12px;
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            font-size: 12px;
+            line-height: 1.5;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            max-height: 200px;
+            overflow-y: auto;
+            color: var(--charcoal);
+        }
+
+        .error-text-truncated {
+            max-width: 200px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            cursor: help;
+        }
+
         .referral-detail-section {
             margin-bottom: 24px;
         }
@@ -1187,6 +1225,7 @@
         <div class="admin-tabs">
             <button class="admin-tab active" data-tab="submissions" onclick="switchTab('submissions')">Submissions</button>
             <button class="admin-tab" data-tab="referrals" onclick="switchTab('referrals')">Referrals</button>
+            <button class="admin-tab" data-tab="taskLogs" onclick="switchTab('taskLogs')">Task Logs</button>
         </div>
 
         <div id="submissionsSection" class="tab-content active">
@@ -1356,6 +1395,44 @@
                 </table>
             </div>
         </div>
+
+        <div id="taskLogsSection" class="tab-content">
+            <div class="filter-bar">
+                <select id="taskLogStatusFilter">
+                    <option value="all">All Status</option>
+                    <option value="success">Success</option>
+                    <option value="error">Error</option>
+                    <option value="duplicate">Duplicate</option>
+                </select>
+                <div class="spacer"></div>
+                <button class="icon-btn" onclick="loadTaskLogs()" title="Refresh">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="23 4 23 10 17 10"></polyline>
+                        <polyline points="1 20 1 14 7 14"></polyline>
+                        <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
+                    </svg>
+                </button>
+            </div>
+
+            <div class="submissions-table" style="overflow-x: auto;">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Date/Time</th>
+                            <th>Submission ID</th>
+                            <th>Recipient</th>
+                            <th>Status</th>
+                            <th>HTTP Status</th>
+                            <th>Error Message</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="taskLogsBody">
+                        <tr><td colspan="7" style="text-align: center; padding: 40px; color: var(--warm-gray-dark);">Select the Task Logs tab to load data...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
     </div>
 
     <div class="bulk-actions-bar" id="bulkActionsBar">
@@ -1451,6 +1528,19 @@
             <div class="modal-footer">
                 <button class="btn btn-secondary" onclick="closeReferralModal()">Cancel</button>
                 <button class="btn btn-primary" onclick="saveReferral()">Save Changes</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="taskLogModal">
+        <div class="modal-content" style="max-width: 700px;">
+            <div class="modal-header">
+                <h3>Task Log Details</h3>
+                <button class="modal-close" onclick="closeTaskLogModal()">&times;</button>
+            </div>
+            <div class="modal-body" id="taskLogDetailContent"></div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeTaskLogModal()">Close</button>
             </div>
         </div>
     </div>

@@ -894,6 +894,8 @@ function switchTab(tabName) {
     
     if (tabName === 'referrals') {
         loadReferrals();
+    } else if (tabName === 'taskLogs') {
+        loadTaskLogs();
     }
 }
 
@@ -1201,5 +1203,273 @@ async function saveReferral() {
 }
 
 document.getElementById('referralStatusFilter')?.addEventListener('change', () => loadReferrals());
+
+// Task Logs management
+let taskLogs = [];
+let currentTaskLogId = null;
+let isLoadingTaskLogs = false;
+
+async function loadTaskLogs(status) {
+    if (isLoadingTaskLogs) return;
+    isLoadingTaskLogs = true;
+    
+    const tbody = document.getElementById('taskLogsBody');
+    if (tbody) {
+        while (tbody.firstChild) {
+            tbody.removeChild(tbody.firstChild);
+        }
+        const loadingRow = document.createElement('tr');
+        const loadingCell = document.createElement('td');
+        loadingCell.setAttribute('colspan', '7');
+        loadingCell.style.cssText = 'text-align: center; padding: 40px; color: var(--warm-gray-dark);';
+        loadingCell.textContent = 'Loading task logs...';
+        loadingRow.appendChild(loadingCell);
+        tbody.appendChild(loadingRow);
+    }
+    
+    try {
+        const statusFilter = status || document.getElementById('taskLogStatusFilter')?.value || 'all';
+        
+        const params = new URLSearchParams();
+        if (statusFilter !== 'all') {
+            params.append('status', statusFilter);
+        }
+        
+        const response = await fetch(`/api/task-logs?${params.toString()}`);
+        const result = await response.json();
+        
+        if (!response.ok) {
+            throw new Error(result.error || 'Failed to load task logs');
+        }
+        
+        taskLogs = result.data || [];
+        renderTaskLogs(taskLogs);
+    } catch (err) {
+        console.error('Error loading task logs:', err);
+        if (tbody) {
+            while (tbody.firstChild) {
+                tbody.removeChild(tbody.firstChild);
+            }
+            const errorRow = document.createElement('tr');
+            const errorCell = document.createElement('td');
+            errorCell.setAttribute('colspan', '7');
+            errorCell.style.cssText = 'text-align: center; padding: 40px; color: var(--danger);';
+            errorCell.textContent = 'Error loading task logs: ' + (err.message || 'Unknown error');
+            errorRow.appendChild(errorCell);
+            tbody.appendChild(errorRow);
+        }
+    } finally {
+        isLoadingTaskLogs = false;
+    }
+}
+
+function renderTaskLogs(data) {
+    const tbody = document.getElementById('taskLogsBody');
+    if (!tbody) return;
+    
+    while (tbody.firstChild) {
+        tbody.removeChild(tbody.firstChild);
+    }
+    
+    if (!data || data.length === 0) {
+        const emptyRow = document.createElement('tr');
+        const emptyCell = document.createElement('td');
+        emptyCell.setAttribute('colspan', '7');
+        emptyCell.style.cssText = 'text-align: center; padding: 40px; color: var(--warm-gray-dark);';
+        emptyCell.textContent = 'No task logs found';
+        emptyRow.appendChild(emptyCell);
+        tbody.appendChild(emptyRow);
+        return;
+    }
+    
+    data.forEach(log => {
+        const row = document.createElement('tr');
+        
+        // Date/Time
+        const dateCell = document.createElement('td');
+        const logDate = log.created_at ? new Date(log.created_at) : new Date();
+        dateCell.textContent = logDate.toLocaleString('en-US', {
+            year: 'numeric',
+            month: 'short',
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+        });
+        row.appendChild(dateCell);
+        
+        // Submission ID
+        const submissionCell = document.createElement('td');
+        submissionCell.textContent = log.submission_id ? '#' + log.submission_id : 'N/A';
+        row.appendChild(submissionCell);
+        
+        // Recipient (payment_handle)
+        const recipientCell = document.createElement('td');
+        recipientCell.textContent = log.payment_handle || 'N/A';
+        row.appendChild(recipientCell);
+        
+        // Status badge
+        const statusCell = document.createElement('td');
+        const statusBadge = document.createElement('span');
+        const status = (log.status || 'unknown').toLowerCase();
+        statusBadge.className = 'status-badge status-' + status;
+        statusBadge.textContent = status.toUpperCase();
+        statusCell.appendChild(statusBadge);
+        row.appendChild(statusCell);
+        
+        // HTTP Status
+        const httpStatusCell = document.createElement('td');
+        httpStatusCell.textContent = log.http_status || 'N/A';
+        row.appendChild(httpStatusCell);
+        
+        // Error Message (truncated)
+        const errorCell = document.createElement('td');
+        const errorText = log.error_message || '';
+        if (errorText) {
+            const truncatedDiv = document.createElement('div');
+            truncatedDiv.className = 'error-text-truncated';
+            truncatedDiv.textContent = errorText;
+            truncatedDiv.title = errorText;
+            errorCell.appendChild(truncatedDiv);
+        } else {
+            errorCell.textContent = '-';
+        }
+        row.appendChild(errorCell);
+        
+        // Actions
+        const actionsCell = document.createElement('td');
+        const actionButtons = document.createElement('div');
+        actionButtons.className = 'action-buttons';
+        
+        const viewBtn = document.createElement('button');
+        viewBtn.className = 'action-btn btn-view';
+        viewBtn.textContent = 'View Details';
+        viewBtn.addEventListener('click', () => openTaskLogModal(log.id));
+        actionButtons.appendChild(viewBtn);
+        
+        actionsCell.appendChild(actionButtons);
+        row.appendChild(actionsCell);
+        
+        tbody.appendChild(row);
+    });
+}
+
+async function openTaskLogModal(logId) {
+    currentTaskLogId = logId;
+    
+    try {
+        const response = await fetch(`/api/task-logs/${logId}`);
+        const result = await response.json();
+        
+        if (!response.ok) {
+            throw new Error(result.error || 'Failed to load task log details');
+        }
+        
+        const log = result.data;
+        const content = document.getElementById('taskLogDetailContent');
+        
+        while (content.firstChild) {
+            content.removeChild(content.firstChild);
+        }
+        
+        // Basic Info Section
+        const infoSection = document.createElement('div');
+        infoSection.className = 'referral-detail-section';
+        const infoTitle = document.createElement('h4');
+        infoTitle.textContent = 'Log Information';
+        infoSection.appendChild(infoTitle);
+        
+        const infoGrid = document.createElement('div');
+        infoGrid.className = 'detail-grid';
+        
+        const addDetailRow = (grid, label, value) => {
+            const labelDiv = document.createElement('div');
+            labelDiv.className = 'detail-label';
+            labelDiv.textContent = label;
+            const valueDiv = document.createElement('div');
+            valueDiv.className = 'detail-value';
+            valueDiv.textContent = value || 'N/A';
+            grid.appendChild(labelDiv);
+            grid.appendChild(valueDiv);
+        };
+        
+        const logDate = log.created_at ? new Date(log.created_at).toLocaleString() : 'N/A';
+        addDetailRow(infoGrid, 'Date/Time', logDate);
+        addDetailRow(infoGrid, 'Submission ID', log.submission_id ? '#' + log.submission_id : 'N/A');
+        addDetailRow(infoGrid, 'Recipient', log.payment_handle || 'N/A');
+        addDetailRow(infoGrid, 'Status', (log.status || 'unknown').toUpperCase());
+        addDetailRow(infoGrid, 'HTTP Status', log.http_status || 'N/A');
+        
+        infoSection.appendChild(infoGrid);
+        content.appendChild(infoSection);
+        
+        // Error Message Section (if exists)
+        if (log.error_message) {
+            const errorSection = document.createElement('div');
+            errorSection.className = 'referral-detail-section';
+            const errorTitle = document.createElement('h4');
+            errorTitle.textContent = 'Error Message';
+            errorSection.appendChild(errorTitle);
+            
+            const errorPre = document.createElement('pre');
+            errorPre.className = 'json-display';
+            errorPre.textContent = log.error_message;
+            errorSection.appendChild(errorPre);
+            content.appendChild(errorSection);
+        }
+        
+        // Request Payload Section
+        const requestSection = document.createElement('div');
+        requestSection.className = 'referral-detail-section';
+        const requestTitle = document.createElement('h4');
+        requestTitle.textContent = 'Request Payload';
+        requestSection.appendChild(requestTitle);
+        
+        const requestPre = document.createElement('pre');
+        requestPre.className = 'json-display';
+        try {
+            const requestData = typeof log.request_payload === 'string' 
+                ? JSON.parse(log.request_payload) 
+                : log.request_payload;
+            requestPre.textContent = requestData ? JSON.stringify(requestData, null, 2) : 'No request data';
+        } catch (e) {
+            requestPre.textContent = log.request_payload || 'No request data';
+        }
+        requestSection.appendChild(requestPre);
+        content.appendChild(requestSection);
+        
+        // Response Payload Section
+        const responseSection = document.createElement('div');
+        responseSection.className = 'referral-detail-section';
+        const responseTitle = document.createElement('h4');
+        responseTitle.textContent = 'Response Payload';
+        responseSection.appendChild(responseTitle);
+        
+        const responsePre = document.createElement('pre');
+        responsePre.className = 'json-display';
+        try {
+            const responseData = typeof log.response_payload === 'string' 
+                ? JSON.parse(log.response_payload) 
+                : log.response_payload;
+            responsePre.textContent = responseData ? JSON.stringify(responseData, null, 2) : 'No response data';
+        } catch (e) {
+            responsePre.textContent = log.response_payload || 'No response data';
+        }
+        responseSection.appendChild(responsePre);
+        content.appendChild(responseSection);
+        
+        document.getElementById('taskLogModal').classList.add('active');
+        document.body.classList.add('modal-open');
+    } catch (err) {
+        showToast('Error loading task log: ' + err.message, 'error');
+    }
+}
+
+function closeTaskLogModal() {
+    document.getElementById('taskLogModal').classList.remove('active');
+    document.body.classList.remove('modal-open');
+    currentTaskLogId = null;
+}
+
+document.getElementById('taskLogStatusFilter')?.addEventListener('change', () => loadTaskLogs());
 
 checkAuth();

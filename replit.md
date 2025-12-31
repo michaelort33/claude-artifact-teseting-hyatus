@@ -26,6 +26,7 @@ A web application that allows guests to receive thank-you gifts for sharing thei
 - `admins` - Admin email whitelist
 - `review_rewards` - Submission data (payment_method, payment_handle, status, etc.)
 - `referrals` - Referral program submissions (referrer info, company info, contact info, status, reward_paid)
+- `task_logs` - Task API audit logs (request/response payloads, status, timestamps)
 
 ### Frontend Files
 - `index.html` - Main user-facing page for submitting reward claims
