@@ -796,7 +796,8 @@ async function createTask() {
                 description: `Guest appreciation gift - ${giftType} $${amount}\nRecipient: ${submission.payment_handle}\nSubmission ID: ${submission.id}`,
                 external_id: `reward-${submission.id}`,
                 subcategory: 'gift_card',
-                tags: ['Giftly']
+                tags: ['Giftly'],
+                due_date: new Date().toISOString()
             })
         });
 
