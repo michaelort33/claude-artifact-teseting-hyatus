@@ -85,6 +85,7 @@ The application uses a Warm Editorial aesthetic inspired by high-end architectur
 - `TASKS_API_PASSWORD` - Password for task API authentication
 - `SENDGRID_API_KEY` - SendGrid API key for sending emails
 - `ADMIN_EMAIL` - Admin email address for notifications
+- `GUEST_PORTAL_API_KEY` - API key for looking up reservation IDs by guest email
 
 ## Setup in Replit
 
@@ -108,6 +109,11 @@ The application is served via Node.js server on port 5000.
 - **Password resets**: Sent to user's email address
 
 ## Recent Changes
+- **2026-01-07**: Added reservation lookup integration for task creation
+  - Tasks now use `task_parent: "reservation"` with actual reservation ID (looked up by guest email)
+  - Falls back to `task_parent: "company"` with "Hyatus" if no reservation found
+  - New API endpoint: POST `/api/reservations/lookup-by-email`
+  - Tasks include `tags: ["Giftly"]` and `due_date` (ISO 8601 timestamp)
 - **2025-12-22**: Added Hyatus Connect Rewards referral program
   - Post-feedback success popup now includes referral program CTA link
   - New referral.html page with program details: $250 per qualifying referral, max $1,000 (5 referrals)

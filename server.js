@@ -9,6 +9,7 @@ const sgMail = require('@sendgrid/mail');
 const PORT = 5000;
 const HOST = '0.0.0.0';
 const TASKS_API_BASE = 'https://api.gptpricing.com';
+const GUEST_PORTAL_API_BASE = 'https://api.gptpricing.com';
 const SALT_ROUNDS = 10;
 const SESSION_EXPIRY_DAYS = 7;
 const IS_PRODUCTION = process.env.NODE_ENV === 'production' || !process.env.DATABASE_URL?.includes('localhost');
@@ -1011,6 +1012,47 @@ async function getTasksApiToken() {
     return cachedToken;
 }
 
+async function handleReservationLookup(req, res) {
+    try {
+        const apiKey = process.env.GUEST_PORTAL_API_KEY;
+        if (!apiKey) {
+            return sendJson(res, 500, { error: 'Guest Portal API key not configured' });
+        }
+
+        const body = await parseBody(req);
+        if (!body.email) {
+            return sendJson(res, 400, { error: 'Email is required' });
+        }
+
+        const response = await fetch(`${GUEST_PORTAL_API_BASE}/reservations/id-by-email`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'x-api-key': apiKey
+            },
+            body: JSON.stringify({ email: body.email })
+        });
+
+        const responseText = await response.text();
+        let data;
+        try {
+            data = JSON.parse(responseText);
+        } catch (e) {
+            data = { raw: responseText };
+        }
+
+        if (!response.ok) {
+            console.error('Reservation lookup failed:', response.status, data);
+            return sendJson(res, response.status, { error: 'Reservation lookup failed', details: data });
+        }
+
+        sendJson(res, 200, data);
+    } catch (err) {
+        console.error('Reservation lookup error:', err);
+        sendJson(res, 500, { error: 'Server error: ' + err.message });
+    }
+}
+
 async function handleTasksApi(req, res) {
     let body = null;
     let submissionId = null;
@@ -1310,6 +1352,9 @@ const server = http.createServer(async (req, res) => {
     }
     if (pathname === '/api/tasks/health' && method === 'GET') {
         return handleTasksHealth(req, res);
+    }
+    if (pathname === '/api/reservations/lookup-by-email' && method === 'POST') {
+        return handleReservationLookup(req, res);
     }
     if (pathname === '/api/task-logs' && method === 'GET') {
         return handleGetTaskLogs(req, res);

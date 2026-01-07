@@ -784,27 +784,54 @@ async function createTask() {
     const submission = pendingTaskSubmission;
     const amount = parseFloat(submission.award_amount) || getAwardAmount(submission.id);
     const giftType = (submission.payment_method || 'gift').toUpperCase();
+    const email = submission.payment_handle;
 
     try {
+        let taskParent = 'company';
+        let linkId = 'Hyatus';
+
+        if (email) {
+            try {
+                const lookupResponse = await fetch('/api/reservations/lookup-by-email', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email })
+                });
+
+                if (lookupResponse.ok) {
+                    const lookupResult = await lookupResponse.json();
+                    if (lookupResult.reservation_id || lookupResult.id) {
+                        taskParent = 'reservation';
+                        linkId = String(lookupResult.reservation_id || lookupResult.id);
+                    }
+                }
+            } catch (lookupError) {
+                console.warn('Reservation lookup failed, using company fallback:', lookupError);
+            }
+        }
+
         const response = await fetch('/api/tasks', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-                name: `Send $${amount} ${giftType} gift card to ${submission.payment_handle}`,
+                name: `Send $${amount} ${giftType} gift card to ${email}`,
                 category: 'guest_satisfaction',
                 priority: 'medium',
-                description: `Guest appreciation gift - ${giftType} $${amount}\nRecipient: ${submission.payment_handle}\nSubmission ID: ${submission.id}`,
+                description: `Guest appreciation gift - ${giftType} $${amount}\nRecipient: ${email}\nSubmission ID: ${submission.id}`,
                 external_id: `reward-${submission.id}`,
                 subcategory: 'gift_card',
                 tags: ['Giftly'],
-                due_date: new Date().toISOString()
+                due_date: new Date().toISOString(),
+                task_parent: taskParent,
+                link_id: linkId
             })
         });
 
         const result = await response.json();
 
         if (response.ok) {
-            showToast('Task created successfully!', 'success');
+            const linkInfo = taskParent === 'reservation' ? ` (linked to reservation ${linkId})` : ' (linked to company)';
+            showToast('Task created successfully!' + linkInfo, 'success');
         } else {
             throw new Error(result.error || 'Failed to create task');
         }
