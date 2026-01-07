@@ -9,7 +9,7 @@ const sgMail = require('@sendgrid/mail');
 const PORT = 5000;
 const HOST = '0.0.0.0';
 const TASKS_API_BASE = 'https://api.gptpricing.com';
-const GUEST_PORTAL_API_BASE = 'https://api.gptpricing.com';
+const GUEST_PORTAL_API_BASE = 'https://8us502v406.execute-api.us-east-1.amazonaws.com/dev';
 const SALT_ROUNDS = 10;
 const SESSION_EXPIRY_DAYS = 7;
 const IS_PRODUCTION = process.env.NODE_ENV === 'production' || !process.env.DATABASE_URL?.includes('localhost');
