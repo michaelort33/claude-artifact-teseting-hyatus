@@ -1046,7 +1046,9 @@ async function handleReservationLookup(req, res) {
             return sendJson(res, response.status, { error: 'Reservation lookup failed', details: data });
         }
 
-        sendJson(res, 200, data);
+        // API returns string | null directly
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(responseText);
     } catch (err) {
         console.error('Reservation lookup error:', err);
         sendJson(res, 500, { error: 'Server error: ' + err.message });

@@ -799,10 +799,10 @@ async function createTask() {
                 });
 
                 if (lookupResponse.ok) {
-                    const lookupResult = await lookupResponse.json();
-                    if (lookupResult.reservation_id || lookupResult.id) {
+                    const reservationId = await lookupResponse.json();
+                    if (reservationId) {
                         taskParent = 'reservation';
-                        linkId = String(lookupResult.reservation_id || lookupResult.id);
+                        linkId = String(reservationId);
                     }
                 }
             } catch (lookupError) {
