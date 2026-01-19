@@ -5,6 +5,7 @@ const { Pool } = require('pg');
 const bcrypt = require('bcryptjs');
 const crypto = require('crypto');
 const sgMail = require('@sendgrid/mail');
+const { Translate } = require('@google-cloud/translate').v2;
 
 const PORT = 5000;
 const HOST = '0.0.0.0';
@@ -14,6 +15,18 @@ const SALT_ROUNDS = 10;
 const SESSION_EXPIRY_DAYS = 7;
 const IS_PRODUCTION = process.env.NODE_ENV === 'production' || !process.env.DATABASE_URL?.includes('localhost');
 const COOKIE_SECURE = IS_PRODUCTION ? '; Secure' : '';
+
+const translateClient = process.env.GOOGLE_TRANSLATE 
+    ? new Translate({ key: process.env.GOOGLE_TRANSLATE })
+    : null;
+
+const translationCache = new Map();
+const translateRateLimit = new Map();
+const TRANSLATE_RATE_LIMIT = 30;
+const TRANSLATE_RATE_WINDOW = 60000;
+const TRANSLATION_CACHE_MAX_SIZE = 5000;
+const TRANSLATION_CACHE_TTL = 24 * 60 * 60 * 1000;
+const MAX_TEXT_LENGTH = 1000;
 
 const dbUrl = process.env.DATABASE_URL;
 const dbHost = dbUrl ? new URL(dbUrl).hostname : 'unknown';
@@ -1274,6 +1287,142 @@ function handleEmailHealth(req, res) {
     });
 }
 
+function getClientIP(req) {
+    const xForwardedFor = req.headers['x-forwarded-for'];
+    if (xForwardedFor) {
+        return xForwardedFor.split(',')[0].trim();
+    }
+    return req.socket?.remoteAddress || 'unknown';
+}
+
+function cleanupRateLimitMap() {
+    const now = Date.now();
+    const windowStart = now - TRANSLATE_RATE_WINDOW;
+    for (const [ip, requests] of translateRateLimit.entries()) {
+        const validRequests = requests.filter(t => t > windowStart);
+        if (validRequests.length === 0) {
+            translateRateLimit.delete(ip);
+        } else {
+            translateRateLimit.set(ip, validRequests);
+        }
+    }
+}
+
+setInterval(cleanupRateLimitMap, TRANSLATE_RATE_WINDOW);
+
+function checkTranslateRateLimit(ip) {
+    const now = Date.now();
+    const windowStart = now - TRANSLATE_RATE_WINDOW;
+    
+    if (!translateRateLimit.has(ip)) {
+        translateRateLimit.set(ip, []);
+    }
+    
+    const requests = translateRateLimit.get(ip).filter(t => t > windowStart);
+    translateRateLimit.set(ip, requests);
+    
+    if (requests.length >= TRANSLATE_RATE_LIMIT) {
+        return false;
+    }
+    
+    requests.push(now);
+    return true;
+}
+
+function evictOldCacheEntries() {
+    if (translationCache.size > TRANSLATION_CACHE_MAX_SIZE) {
+        const entriesToDelete = translationCache.size - Math.floor(TRANSLATION_CACHE_MAX_SIZE * 0.8);
+        let deleted = 0;
+        for (const key of translationCache.keys()) {
+            if (deleted >= entriesToDelete) break;
+            translationCache.delete(key);
+            deleted++;
+        }
+    }
+}
+
+async function handleTranslate(req, res) {
+    try {
+        if (!translateClient) {
+            return sendJson(res, 500, { error: 'Translation service not configured' });
+        }
+
+        const clientIP = getClientIP(req);
+        if (!checkTranslateRateLimit(clientIP)) {
+            return sendJson(res, 429, { error: 'Rate limit exceeded. Please try again later.' });
+        }
+
+        const { texts, targetLang, sourceLang } = await parseBody(req);
+        
+        if (!texts || !Array.isArray(texts) || texts.length === 0) {
+            return sendJson(res, 400, { error: 'texts array is required' });
+        }
+        if (!targetLang) {
+            return sendJson(res, 400, { error: 'targetLang is required' });
+        }
+        if (texts.length > 100) {
+            return sendJson(res, 400, { error: 'Maximum 100 texts per request' });
+        }
+        
+        for (const text of texts) {
+            if (typeof text !== 'string' || text.length > MAX_TEXT_LENGTH) {
+                return sendJson(res, 400, { error: `Each text must be a string under ${MAX_TEXT_LENGTH} characters` });
+            }
+        }
+
+        const results = [];
+        const textsToTranslate = [];
+        const textsToTranslateIndices = [];
+
+        for (let i = 0; i < texts.length; i++) {
+            const text = texts[i];
+            const cacheKey = `${sourceLang || 'auto'}:${targetLang}:${text}`;
+            
+            if (translationCache.has(cacheKey)) {
+                results[i] = translationCache.get(cacheKey);
+            } else {
+                textsToTranslate.push(text);
+                textsToTranslateIndices.push(i);
+            }
+        }
+
+        if (textsToTranslate.length > 0) {
+            const options = sourceLang 
+                ? { from: sourceLang, to: targetLang }
+                : targetLang;
+            
+            const [translations] = await translateClient.translate(textsToTranslate, options);
+            const translatedArray = Array.isArray(translations) ? translations : [translations];
+            
+            for (let j = 0; j < translatedArray.length; j++) {
+                const originalIndex = textsToTranslateIndices[j];
+                const originalText = textsToTranslate[j];
+                const translatedText = translatedArray[j];
+                const cacheKey = `${sourceLang || 'auto'}:${targetLang}:${originalText}`;
+                
+                translationCache.set(cacheKey, translatedText);
+                results[originalIndex] = translatedText;
+            }
+            
+            evictOldCacheEntries();
+        }
+
+        sendJson(res, 200, { translations: results });
+        
+    } catch (err) {
+        console.error('Translation error:', err);
+        sendJson(res, 500, { error: 'Translation failed', details: err.message });
+    }
+}
+
+function handleTranslateHealth(req, res) {
+    sendJson(res, 200, { 
+        status: 'ok', 
+        configured: !!translateClient,
+        cacheSize: translationCache.size
+    });
+}
+
 const securityHeaders = {
     'Content-Security-Policy': "upgrade-insecure-requests",
     'Strict-Transport-Security': 'max-age=31536000; includeSubDomains',
@@ -1374,6 +1523,13 @@ const server = http.createServer(async (req, res) => {
         return handleEmailHealth(req, res);
     }
 
+    if (pathname === '/api/translate' && method === 'POST') {
+        return handleTranslate(req, res);
+    }
+    if (pathname === '/api/translate/health' && method === 'GET') {
+        return handleTranslateHealth(req, res);
+    }
+
     if (pathname === '/api/referrals/my' && method === 'GET') {
         return handleGetMyReferrals(req, res);
     }
@@ -1419,4 +1575,5 @@ server.listen(PORT, HOST, () => {
     console.log(`Database configured: ${!!process.env.DATABASE_URL}`);
     console.log(`Tasks API configured: ${!!(process.env.TASKS_API_EMAIL && process.env.TASKS_API_PASSWORD)}`);
     console.log(`Admin email configured: ${!!process.env.ADMIN_EMAIL}`);
+    console.log(`Translation API configured: ${!!translateClient}`);
 });

@@ -6,6 +6,7 @@
     "build": "echo 'No build step required'"
   },
   "dependencies": {
+    "@google-cloud/translate": "^9.3.0",
     "@sendgrid/mail": "^8.1.6",
     "bcryptjs": "^3.0.3",
     "crypto": "^1.0.1",

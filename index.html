@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" dir="ltr">
 
 <head>
     <meta charset="UTF-8">
@@ -27,7 +27,7 @@
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400&family=Inter:wght@400;500&family=Noto+Sans+Arabic:wght@400;500;600&display=swap" rel="stylesheet">
     
     <style>
         * {
@@ -75,6 +75,94 @@
             line-height: 1.6;
             -webkit-font-smoothing: antialiased;
             position: relative;
+        }
+
+        html[dir="rtl"] body {
+            font-family: 'Noto Sans Arabic', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            direction: rtl;
+        }
+
+        html[dir="rtl"] input[type="text"],
+        html[dir="rtl"] input[type="email"],
+        html[dir="rtl"] input[type="url"],
+        html[dir="rtl"] input[type="password"],
+        html[dir="rtl"] select,
+        html[dir="rtl"] textarea {
+            text-align: right;
+            font-family: 'Noto Sans Arabic', 'Inter', sans-serif;
+        }
+
+        html[dir="rtl"] .topbar-actions {
+            flex-direction: row-reverse;
+        }
+
+        html[dir="rtl"] .feature-list li {
+            flex-direction: row-reverse;
+        }
+
+        html[dir="rtl"] .section-header {
+            flex-direction: row-reverse;
+        }
+
+        html[dir="rtl"] .main-headline {
+            font-family: 'Noto Sans Arabic', Georgia, serif;
+            letter-spacing: 0;
+        }
+
+        html[dir="rtl"] .section-title {
+            font-family: 'Noto Sans Arabic', Georgia, serif;
+        }
+
+        html[dir="rtl"] .card-header h1 {
+            font-family: 'Noto Sans Arabic', Georgia, serif;
+        }
+
+        html[dir="rtl"] .submit-button {
+            font-family: 'Noto Sans Arabic', 'Inter', sans-serif;
+            letter-spacing: 0;
+        }
+
+        html[dir="rtl"] .referral-arrow {
+            transform: rotate(180deg);
+        }
+
+        .lang-selector {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            background: var(--alabaster);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            padding: 6px 8px;
+            font-size: 13px;
+        }
+
+        .lang-btn {
+            padding: 4px 10px;
+            border: none;
+            background: transparent;
+            color: var(--warm-gray-dark);
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: all 0.2s ease;
+            font-family: inherit;
+        }
+
+        .lang-btn.active {
+            background: var(--moss);
+            color: var(--cream);
+        }
+
+        .lang-btn:hover:not(.active) {
+            background: var(--bone);
+            color: var(--charcoal);
+        }
+
+        .lang-loading {
+            opacity: 0.6;
+            pointer-events: none;
         }
 
         body::before {
@@ -1592,13 +1680,17 @@
                 <img src="attached_assets/Hyatus-01-1_1764487238079.webp" alt="Hyatus Living" class="brand-logo">
             </div>
             <div class="topbar-actions">
+                <div class="lang-selector">
+                    <button class="lang-btn active" data-lang="en">EN</button>
+                    <button class="lang-btn" data-lang="ar">عربي</button>
+                </div>
                 <div class="topbar-auth-container">
                     <button class="auth-button" id="userAuthLink">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
                             <circle cx="12" cy="7" r="4"></circle>
                         </svg>
-                        <span class="auth-button-text">Sign In</span>
+                        <span class="auth-button-text" data-i18n="signIn">Sign In</span>
                     </button>
                     <div class="user-profile-dropdown" id="userProfileDropdown"></div>
                 </div>
@@ -1609,34 +1701,34 @@
     <div class="page-wrapper">
         <div class="editorial-layout">
             <div class="editorial-left">
-                <div class="eyebrow">A Note of Gratitude</div>
-                <h2 class="main-headline">Thank you for sharing your <em>experience</em></h2>
-                <p class="intro-text">Your feedback means everything to us. As a small token of our appreciation, we'd love to send you a gift.</p>
+                <div class="eyebrow" data-i18n="eyebrow">A Note of Gratitude</div>
+                <h2 class="main-headline" data-i18n="mainHeadline">Thank you for sharing your <em>experience</em></h2>
+                <p class="intro-text" data-i18n="introText">Your feedback means everything to us. As a small token of our appreciation, we'd love to send you a gift.</p>
                 <div class="horizontal-rule"></div>
                 <ul class="feature-list">
-                    <li>Choose how you'd like to receive your gift</li>
-                    <li>Share your feedback with our team</li>
-                    <li>Help us continue to improve</li>
-                    <li>Receive your thank-you gift within 48 hours</li>
+                    <li data-i18n="feature1">Choose how you'd like to receive your gift</li>
+                    <li data-i18n="feature2">Share your feedback with our team</li>
+                    <li data-i18n="feature3">Help us continue to improve</li>
+                    <li data-i18n="feature4">Receive your thank-you gift within 48 hours</li>
                 </ul>
             </div>
 
             <div class="card">
                 <div class="card-header">
-                    <div class="header-eyebrow">With Gratitude</div>
-                    <h1>Accept a <span id="rewardAmount">$10</span> gift from us</h1>
-                    <p>A small thank you for taking the time to share your thoughts</p>
+                    <div class="header-eyebrow" data-i18n="headerEyebrow">With Gratitude</div>
+                    <h1 data-i18n="cardTitle">Accept a <span id="rewardAmount">$10</span> gift from us</h1>
+                    <p data-i18n="cardSubtitle">A small thank you for taking the time to share your thoughts</p>
                 </div>
 
                 <div id="campaignPausedMessage" class="campaign-paused">
-                    <h2>Thank You</h2>
-                    <p>Our guest appreciation program is currently reserved for returning guests. We hope to welcome you back soon.</p>
+                    <h2 data-i18n="pausedTitle">Thank You</h2>
+                    <p data-i18n="pausedMessage">Our guest appreciation program is currently reserved for returning guests. We hope to welcome you back soon.</p>
                 </div>
 
                 <div id="formContainer" class="form-container">
                     <div id="accountRequirementsWarning" class="account-warning" style="display: none;">
-                        <strong>A Quick Note</strong>
-                        <p>To help us verify your feedback, please share from an established Google account when possible.</p>
+                        <strong data-i18n="warningTitle">A Quick Note</strong>
+                        <p data-i18n="warningMessage">To help us verify your feedback, please share from an established Google account when possible.</p>
                     </div>
 
                     <div id="errorMessage" class="error-message"></div>
@@ -1644,7 +1736,7 @@
                     <div class="section">
                         <div class="section-header">
                             <div class="step-indicator">1</div>
-                            <h3 class="section-title">Choose Your Gift</h3>
+                            <h3 class="section-title" data-i18n="chooseGiftTitle">Choose Your Gift</h3>
                         </div>
 
                         <div class="gift-options">
@@ -1655,7 +1747,7 @@
                                         <path fill="#37474F" d="M36.9,29.8c-1-1.3-2-2.4-2-4.9v-8.3c0-3.5,0-6.6-2.5-9c-2-1.9-5.3-2.6-7.9-2.6C19,5,14.2,7.2,13,13.4c-0.1,0.7,0.4,1,0.8,1.1l5.1,0.6c0.5,0,0.8-0.5,0.9-1c0.4-2.1,2.1-3.1,4.1-3.1c1.1,0,3.2,0.6,3.2,3v3c-3.2,0-6.6,0-9.4,1.2c-3.3,1.4-5.6,4.3-5.6,8.6c0,5.5,3.4,8.2,7.8,8.2c3.7,0,5.9-0.9,8.8-3.8c0.9,1.4,1.3,2.2,3,3.7c0.4,0.2,0.9,0.2,1.2-0.1l0,0c1-0.9,2.9-2.6,4-3.5C37.4,30.9,37.3,30.3,36.9,29.8z M27,26.5c-0.9,1.7-2.4,2.7-4,2.7c-2.2,0-3.5-1.7-3.5-4.3c0-4.1,2.6-6.1,7.4-6.1L27,26.5z"/>
                                     </svg>
                                 </div>
-                                <div class="gift-label">Amazon</div>
+                                <div class="gift-label" data-i18n="giftAmazon">Amazon</div>
                             </div>
                             <div class="gift-option" data-method="starbucks">
                                 <div class="gift-icon">
@@ -1680,7 +1772,7 @@
                                         <path fill="none" stroke="#00704A" stroke-width="1" stroke-linecap="round" opacity="0.5" d="M28,5 Q29,3 28,1"/>
                                     </svg>
                                 </div>
-                                <div class="gift-label">Starbucks</div>
+                                <div class="gift-label" data-i18n="giftStarbucks">Starbucks</div>
                             </div>
                             <div class="gift-option" data-method="surprise">
                                 <div class="gift-icon">
@@ -1694,30 +1786,30 @@
                                         <text x="24" y="36" text-anchor="middle" font-size="10" fill="#FDFCF8">?</text>
                                     </svg>
                                 </div>
-                                <div class="gift-label">Surprise Me</div>
+                                <div class="gift-label" data-i18n="giftSurprise">Surprise Me</div>
                             </div>
                         </div>
 
                         <div class="form-group">
-                            <label for="paymentHandle">Delivery Email</label>
-                            <input type="email" id="paymentHandle" placeholder="email@example.com">
+                            <label for="paymentHandle" data-i18n="deliveryEmailLabel">Delivery Email</label>
+                            <input type="email" id="paymentHandle" placeholder="email@example.com" data-i18n-placeholder="emailPlaceholder">
                         </div>
                     </div>
 
-                    <div class="divider">Your Feedback</div>
+                    <div class="divider" data-i18n="yourFeedbackDivider">Your Feedback</div>
 
                     <div class="section">
                         <div class="section-header">
                             <div class="step-indicator">2</div>
-                            <h3 class="section-title">Share Your Feedback</h3>
+                            <h3 class="section-title" data-i18n="shareFeedbackTitle">Share Your Feedback</h3>
                         </div>
 
-                        <button class="help-toggle" type="button">
+                        <button class="help-toggle" type="button" data-i18n="helpToggle">
                             How do I find my feedback?
                         </button>
 
                         <div class="help-content" id="helpContent">
-                            <div class="help-title">Finding Your Feedback</div>
+                            <div class="help-title" data-i18n="helpTitle">Finding Your Feedback</div>
                             <div class="demo-window">
                                 <div class="demo-bar">
                                     <div class="demo-dot"></div>
@@ -1726,16 +1818,16 @@
                                 </div>
                                 <div class="demo-body">
                                     <div class="demo-step">
-                                        <strong>Step 1:</strong> Go to Google Maps
-                                        <div class="demo-card">Find your feedback on our listing</div>
+                                        <strong data-i18n="demoStep1Title">Step 1:</strong> <span data-i18n="demoStep1Text">Go to Google Maps</span>
+                                        <div class="demo-card" data-i18n="demoStep1Card">Find your feedback on our listing</div>
                                     </div>
                                     <div class="demo-step">
-                                        <strong>Step 2:</strong> Locate your comments
-                                        <div class="demo-card">Click on "Reviews" to find yours</div>
+                                        <strong data-i18n="demoStep2Title">Step 2:</strong> <span data-i18n="demoStep2Text">Locate your comments</span>
+                                        <div class="demo-card" data-i18n="demoStep2Card">Click on "Reviews" to find yours</div>
                                     </div>
                                     <div class="demo-step">
-                                        <strong>Step 3:</strong> Share with us
-                                        <div class="demo-btn">Share → Copy Link</div>
+                                        <strong data-i18n="demoStep3Title">Step 3:</strong> <span data-i18n="demoStep3Text">Share with us</span>
+                                        <div class="demo-btn" data-i18n="demoStep3Btn">Share → Copy Link</div>
                                     </div>
                                 </div>
                             </div>
@@ -1743,12 +1835,12 @@
 
                         <div class="feedback-options">
                             <div class="form-group">
-                                <label for="reviewLink">Link to Your Feedback</label>
-                                <input type="url" id="reviewLink" placeholder="Paste the link to your feedback here">
+                                <label for="reviewLink" data-i18n="reviewLinkLabel">Link to Your Feedback</label>
+                                <input type="url" id="reviewLink" placeholder="Paste the link to your feedback here" data-i18n-placeholder="reviewLinkPlaceholder">
                             </div>
 
                             <div class="or-divider">
-                                <span>or</span>
+                                <span data-i18n="orDivider">or</span>
                             </div>
 
                             <div class="upload-zone" id="uploadZone">
@@ -1759,15 +1851,15 @@
                                         <polyline points="17 8 12 3 7 8"></polyline>
                                         <line x1="12" y1="3" x2="12" y2="15"></line>
                                     </svg>
-                                    <div class="upload-title">Upload a Screenshot</div>
-                                    <div class="upload-hint">Share a photo of your feedback</div>
+                                    <div class="upload-title" data-i18n="uploadTitle">Upload a Screenshot</div>
+                                    <div class="upload-hint" data-i18n="uploadHint">Share a photo of your feedback</div>
                                 </div>
                                 <div class="upload-success" id="fileName"></div>
                             </div>
                         </div>
                     </div>
 
-                    <button class="submit-button" id="submitButton">Send to Hyatus</button>
+                    <button class="submit-button" id="submitButton" data-i18n="submitButton">Send to Hyatus</button>
                 </div>
 
                 <div id="successMessage" class="success-message">
@@ -1776,18 +1868,18 @@
                             <polyline points="20 6 9 17 4 12"></polyline>
                         </svg>
                     </div>
-                    <h2>Thank You</h2>
-                    <p>We truly appreciate you sharing your experience with us. Your <span id="successRewardAmount">$10</span> gift will be on its way within 48 hours.</p>
+                    <h2 data-i18n="successTitle">Thank You</h2>
+                    <p data-i18n="successMessage">We truly appreciate you sharing your experience with us. Your <span id="successRewardAmount">$10</span> gift will be on its way within 48 hours.</p>
                     
                     <div class="referral-cta">
                         <div class="referral-divider">
-                            <span>Want to earn more?</span>
+                            <span data-i18n="wantToEarnMore">Want to earn more?</span>
                         </div>
                         <a href="/referral" class="referral-link">
                             <span class="referral-icon">💰</span>
                             <span class="referral-text">
-                                <strong>Earn $250 with Hyatus Connect Rewards</strong>
-                                <span>Refer a company and get rewarded</span>
+                                <strong data-i18n="referralCtaTitle">Earn $250 with Hyatus Connect Rewards</strong>
+                                <span data-i18n="referralCtaSubtitle">Refer a company and get rewarded</span>
                             </span>
                             <svg class="referral-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <path d="M5 12h14M12 5l7 7-7 7"/>
@@ -1795,7 +1887,7 @@
                         </a>
                     </div>
                     
-                    <button class="another-button" onclick="location.reload()">Share More Feedback</button>
+                    <button class="another-button" onclick="location.reload()" data-i18n="shareMoreFeedback">Share More Feedback</button>
                 </div>
             </div>
         </div>
@@ -1805,41 +1897,41 @@
         <div class="auth-modal-content">
             <button class="auth-close" id="authClose">&times;</button>
             <div class="auth-modal-header">
-                <h3>Welcome</h3>
+                <h3 data-i18n="welcomeTitle">Welcome</h3>
             </div>
             <div class="auth-modal-body">
                 <div class="auth-tabs">
-                    <button class="auth-tab active" data-tab="login">Sign In</button>
-                    <button class="auth-tab" data-tab="signup">Create Account</button>
+                    <button class="auth-tab active" data-tab="login" data-i18n="signIn">Sign In</button>
+                    <button class="auth-tab" data-tab="signup" data-i18n="createAccount">Create Account</button>
                 </div>
                 <div id="authError" class="auth-error"></div>
                 <form id="authForm">
                     <div class="form-group">
-                        <label for="authEmail">Email</label>
-                        <input type="email" id="authEmail" placeholder="email@example.com" required autocomplete="email">
+                        <label for="authEmail" data-i18n="emailLabel">Email</label>
+                        <input type="email" id="authEmail" placeholder="email@example.com" required autocomplete="email" data-i18n-placeholder="emailPlaceholder">
                     </div>
                     <div class="form-group">
-                        <label for="authPassword">Password</label>
-                        <input type="password" id="authPassword" placeholder="Enter password" required autocomplete="current-password">
+                        <label for="authPassword" data-i18n="passwordLabel">Password</label>
+                        <input type="password" id="authPassword" placeholder="Enter password" required autocomplete="current-password" data-i18n-placeholder="passwordPlaceholder">
                         <div class="password-requirements" id="passwordRequirements" style="display: none; margin-top: 8px; font-size: 12px;">
                             <div class="requirement" id="reqLength" style="display: flex; align-items: center; gap: 6px; margin-bottom: 4px; color: var(--warm-gray-dark);">
                                 <span class="req-icon" style="width: 14px; height: 14px; border-radius: 50%; border: 1.5px solid var(--warm-gray); display: inline-flex; align-items: center; justify-content: center; font-size: 10px;"></span>
-                                <span>At least 8 characters</span>
+                                <span data-i18n="passwordReq">At least 8 characters</span>
                             </div>
                         </div>
                     </div>
                     <div class="form-group" id="confirmPasswordGroup" style="display: none;">
-                        <label for="authConfirmPassword">Confirm Password</label>
-                        <input type="password" id="authConfirmPassword" placeholder="Confirm password" autocomplete="new-password">
+                        <label for="authConfirmPassword" data-i18n="confirmPasswordLabel">Confirm Password</label>
+                        <input type="password" id="authConfirmPassword" placeholder="Confirm password" autocomplete="new-password" data-i18n-placeholder="confirmPasswordPlaceholder">
                         <div class="password-match" id="passwordMatch" style="margin-top: 6px; font-size: 12px; display: flex; align-items: center; gap: 6px;">
                             <span class="match-icon" id="matchIcon" style="width: 14px; height: 14px; border-radius: 50%; border: 1.5px solid var(--warm-gray); display: inline-flex; align-items: center; justify-content: center; font-size: 10px;"></span>
-                            <span id="matchText" style="color: var(--warm-gray-dark);">Passwords must match</span>
+                            <span id="matchText" style="color: var(--warm-gray-dark);" data-i18n="passwordsMustMatch">Passwords must match</span>
                         </div>
                     </div>
-                    <button type="submit" class="auth-submit" id="authSubmitBtn">Sign In</button>
+                    <button type="submit" class="auth-submit" id="authSubmitBtn" data-i18n="signIn">Sign In</button>
                 </form>
                 <div class="forgot-password">
-                    <button type="button" id="forgotPasswordBtn">Forgot password?</button>
+                    <button type="button" id="forgotPasswordBtn" data-i18n="forgotPassword">Forgot password?</button>
                 </div>
                 
                 <!-- Forgot Password Form (hidden by default) -->
@@ -1948,6 +2040,190 @@
                 if (helpContent) helpContent.classList.toggle('show');
             });
         });
+
+        // Language Support
+        const translations = {
+            en: {
+                signIn: 'Sign In',
+                eyebrow: 'A Note of Gratitude',
+                mainHeadline: 'Thank you for sharing your <em>experience</em>',
+                introText: "Your feedback means everything to us. As a small token of our appreciation, we'd love to send you a gift.",
+                feature1: "Choose how you'd like to receive your gift",
+                feature2: 'Share your feedback with our team',
+                feature3: 'Help us continue to improve',
+                feature4: 'Receive your thank-you gift within 48 hours',
+                headerEyebrow: 'With Gratitude',
+                cardTitle: 'Accept a <span id="rewardAmount">$10</span> gift from us',
+                cardSubtitle: 'A small thank you for taking the time to share your thoughts',
+                pausedTitle: 'Thank You',
+                pausedMessage: 'Our guest appreciation program is currently reserved for returning guests. We hope to welcome you back soon.',
+                warningTitle: 'A Quick Note',
+                warningMessage: 'To help us verify your feedback, please share from an established Google account when possible.',
+                chooseGiftTitle: 'Choose Your Gift',
+                giftAmazon: 'Amazon',
+                giftStarbucks: 'Starbucks',
+                giftSurprise: 'Surprise Me',
+                deliveryEmailLabel: 'Delivery Email',
+                emailPlaceholder: 'email@example.com',
+                yourFeedbackDivider: 'Your Feedback',
+                shareFeedbackTitle: 'Share Your Feedback',
+                helpToggle: 'How do I find my feedback?',
+                helpTitle: 'Finding Your Feedback',
+                demoStep1Title: 'Step 1:',
+                demoStep1Text: 'Go to Google Maps',
+                demoStep1Card: 'Find your feedback on our listing',
+                demoStep2Title: 'Step 2:',
+                demoStep2Text: 'Locate your comments',
+                demoStep2Card: 'Click on "Reviews" to find yours',
+                demoStep3Title: 'Step 3:',
+                demoStep3Text: 'Share with us',
+                demoStep3Btn: 'Share → Copy Link',
+                reviewLinkLabel: 'Link to Your Feedback',
+                reviewLinkPlaceholder: 'Paste the link to your feedback here',
+                orDivider: 'or',
+                uploadTitle: 'Upload a Screenshot',
+                uploadHint: 'Share a photo of your feedback',
+                submitButton: 'Send to Hyatus',
+                successTitle: 'Thank You',
+                successMessage: 'We truly appreciate you sharing your experience with us. Your <span id="successRewardAmount">$10</span> gift will be on its way within 48 hours.',
+                wantToEarnMore: 'Want to earn more?',
+                referralCtaTitle: 'Earn $250 with Hyatus Connect Rewards',
+                referralCtaSubtitle: 'Refer a company and get rewarded',
+                shareMoreFeedback: 'Share More Feedback',
+                welcomeTitle: 'Welcome',
+                createAccount: 'Create Account',
+                emailLabel: 'Email',
+                passwordLabel: 'Password',
+                passwordPlaceholder: 'Enter password',
+                passwordReq: 'At least 8 characters',
+                confirmPasswordLabel: 'Confirm Password',
+                confirmPasswordPlaceholder: 'Confirm password',
+                passwordsMustMatch: 'Passwords must match',
+                forgotPassword: 'Forgot password?'
+            }
+        };
+
+        let currentTranslations = translations.en;
+
+        async function setLanguage(lang) {
+            const html = document.documentElement;
+            const langSelector = document.querySelector('.lang-selector');
+            
+            // Update active button
+            document.querySelectorAll('.lang-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.lang === lang);
+            });
+
+            if (lang === 'en') {
+                html.setAttribute('lang', 'en');
+                html.setAttribute('dir', 'ltr');
+                currentTranslations = translations.en;
+                applyTranslations(currentTranslations);
+            } else if (lang === 'ar') {
+                html.setAttribute('lang', 'ar');
+                html.setAttribute('dir', 'rtl');
+                
+                // Check localStorage cache first
+                const cacheKey = 'translations_ar_feedback';
+                const cached = localStorage.getItem(cacheKey);
+                
+                if (cached) {
+                    try {
+                        currentTranslations = JSON.parse(cached);
+                        applyTranslations(currentTranslations);
+                        return;
+                    } catch (e) {
+                        console.error('Failed to parse cached translations:', e);
+                    }
+                }
+                
+                // Show loading state
+                if (langSelector) langSelector.classList.add('lang-loading');
+                
+                try {
+                    const textsToTranslate = Object.values(translations.en);
+                    const keys = Object.keys(translations.en);
+                    
+                    const response = await fetch('/api/translate', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            texts: textsToTranslate,
+                            targetLang: 'ar',
+                            sourceLang: 'en'
+                        })
+                    });
+                    
+                    if (!response.ok) throw new Error('Translation API failed');
+                    
+                    const data = await response.json();
+                    
+                    // Build Arabic translations object
+                    const arTranslations = {};
+                    keys.forEach((key, index) => {
+                        arTranslations[key] = data.translations[index] || translations.en[key];
+                    });
+                    
+                    // Cache translations
+                    localStorage.setItem(cacheKey, JSON.stringify(arTranslations));
+                    
+                    currentTranslations = arTranslations;
+                    applyTranslations(currentTranslations);
+                } catch (error) {
+                    console.error('Translation error:', error);
+                    // Fallback to English if translation fails
+                    currentTranslations = translations.en;
+                    applyTranslations(currentTranslations);
+                } finally {
+                    if (langSelector) langSelector.classList.remove('lang-loading');
+                }
+            }
+        }
+
+        function applyTranslations(trans) {
+            // Update elements with data-i18n attribute
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.dataset.i18n;
+                if (trans[key]) {
+                    // Use innerHTML for elements that may contain HTML (like spans)
+                    if (trans[key].includes('<') && trans[key].includes('>')) {
+                        el.innerHTML = trans[key];
+                    } else {
+                        el.textContent = trans[key];
+                    }
+                }
+            });
+            
+            // Update placeholders
+            document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+                const key = el.dataset.i18nPlaceholder;
+                if (trans[key]) {
+                    el.placeholder = trans[key];
+                }
+            });
+        }
+
+        function initLanguage() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const lang = urlParams.get('lang');
+            
+            if (lang === 'ar') {
+                setLanguage('ar');
+            } else {
+                setLanguage('en');
+            }
+        }
+
+        // Language selector click handlers
+        document.querySelectorAll('.lang-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const lang = btn.dataset.lang;
+                setLanguage(lang);
+            });
+        });
+
+        // Initialize language on page load
+        initLanguage();
     </script>
 </body>
 
