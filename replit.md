@@ -19,6 +19,7 @@ A web application that allows guests to receive thank-you gifts for sharing thei
   - Submissions CRUD API
   - Task API proxy
   - Email API (SendGrid)
+  - Translation API (Google Cloud Translate)
 
 ### Database Tables
 - `users` - User accounts (id, email, password_hash, reset_token, etc.)
@@ -79,6 +80,10 @@ The application uses a Warm Editorial aesthetic inspired by high-end architectur
 - POST `/api/referrals` - Submit new referral (with duplicate company check and 5-referral limit)
 - PATCH `/api/referrals/:id` - Update referral status/reward/notes (admin only)
 
+**Translation:**
+- POST `/api/translate` - Translate texts to target language (rate limited: 30 req/min per IP)
+- GET `/api/translate/health` - Check translation API configuration
+
 ## Environment Variables
 - `DATABASE_URL` - PostgreSQL connection string
 - `TASKS_API_EMAIL` - Email for task API authentication
@@ -86,6 +91,7 @@ The application uses a Warm Editorial aesthetic inspired by high-end architectur
 - `SENDGRID_API_KEY` - SendGrid API key for sending emails
 - `ADMIN_EMAIL` - Admin email address for notifications
 - `GUEST_PORTAL_API_KEY` - API key for looking up reservation IDs by guest email
+- `GOOGLE_TRANSLATE` - Google Cloud Translation API key for multilingual support
 
 ## Setup in Replit
 
@@ -109,6 +115,12 @@ The application is served via Node.js server on port 5000.
 - **Password resets**: Sent to user's email address
 
 ## Recent Changes
+- **2026-01-19**: Added multilingual support (English/Arabic)
+  - Google Cloud Translation API integration with server-side caching and rate limiting (30 req/min per IP)
+  - Language selector (EN/عربي) on feedback page and referral page
+  - RTL layout support for Arabic with Noto Sans Arabic font
+  - URL parameter support: `?lang=ar` to open pages in Arabic
+  - Client-side translation caching in localStorage to minimize API calls
 - **2026-01-07**: Added reservation lookup integration for task creation
   - Tasks now use `task_parent: "reservation"` with actual reservation ID (looked up by guest email)
   - Falls back to `task_parent: "company"` with "Hyatus" if no reservation found
