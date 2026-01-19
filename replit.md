@@ -115,11 +115,11 @@ The application is served via Node.js server on port 5000.
 - **Password resets**: Sent to user's email address
 
 ## Recent Changes
-- **2026-01-19**: Added multilingual support (English/Arabic)
+- **2026-01-19**: Added multilingual support
   - Google Cloud Translation API integration with server-side caching and rate limiting (30 req/min per IP)
-  - Language selector (EN/عربي) on feedback page and referral page
+  - Language dropdown with 9 languages: English, Arabic, Portuguese, Chinese, Japanese, Korean, Spanish, Russian, German
   - RTL layout support for Arabic with Noto Sans Arabic font
-  - URL parameter support: `?lang=ar` to open pages in Arabic
+  - URL parameter support: `?lang=xx` to open pages in specific language
   - Client-side translation caching in localStorage to minimize API calls
 - **2026-01-07**: Added reservation lookup integration for task creation
   - Tasks now use `task_parent: "reservation"` with actual reservation ID (looked up by guest email)

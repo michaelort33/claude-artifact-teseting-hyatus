@@ -230,53 +230,6 @@
             font-weight: 500;
         }
 
-        .add-lang-section {
-            border-top: 1px solid var(--border-light);
-        }
-
-        .add-lang-btn {
-            color: var(--warm-gray-dark);
-            font-size: 12px;
-        }
-
-        .add-lang-input-wrapper {
-            padding: 8px 14px 12px;
-            display: flex;
-            gap: 6px;
-        }
-
-        .add-lang-input-wrapper input {
-            flex: 1;
-            padding: 6px 10px;
-            font-size: 12px;
-            border: 1px solid var(--border);
-            border-radius: 4px;
-            background: white;
-            font-family: inherit;
-        }
-
-        .add-lang-input-wrapper input:focus {
-            outline: none;
-            border-color: var(--moss);
-        }
-
-        .add-lang-input-wrapper button {
-            padding: 6px 12px;
-            background: var(--moss);
-            color: var(--cream);
-            border: none;
-            border-radius: 4px;
-            font-size: 11px;
-            font-weight: 500;
-            cursor: pointer;
-            font-family: inherit;
-            transition: background 0.2s ease;
-        }
-
-        .add-lang-input-wrapper button:hover {
-            background: var(--moss-light);
-        }
-
         .lang-loading {
             opacity: 0.6;
             pointer-events: none;
@@ -753,15 +706,7 @@
                             <path d="M3 4.5L6 7.5L9 4.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
                         </svg>
                     </button>
-                    <div class="lang-dropdown-menu" id="langDropdownMenu">
-                        <div class="add-lang-section" id="addLangSection">
-                            <button class="lang-option add-lang-btn" id="addLangBtn">+ Add language...</button>
-                            <div class="add-lang-input-wrapper" id="addLangInputWrapper" style="display: none;">
-                                <input type="text" class="add-lang-input" id="addLangInput" placeholder="e.g., fr, it, nl" maxlength="5">
-                                <button id="addLangConfirm">Add</button>
-                            </div>
-                        </div>
-                    </div>
+                    <div class="lang-dropdown-menu" id="langDropdownMenu"></div>
                 </div>
             </div>
         </div>
@@ -1018,9 +963,7 @@
 
         function populateLanguageDropdown() {
             const menu = document.getElementById('langDropdownMenu');
-            const addLangSection = document.getElementById('addLangSection');
-            
-            menu.querySelectorAll('.lang-option:not(.add-lang-btn)').forEach(el => el.remove());
+            menu.innerHTML = '';
             
             Object.entries(supportedLanguages).forEach(([code, lang]) => {
                 const option = document.createElement('button');
@@ -1028,7 +971,7 @@
                 option.dataset.lang = code;
                 option.textContent = lang.name;
                 option.addEventListener('click', () => selectLanguage(code));
-                menu.insertBefore(option, addLangSection);
+                menu.appendChild(option);
             });
         }
 
@@ -1066,8 +1009,6 @@
         function closeDropdown() {
             document.getElementById('langDropdownBtn').classList.remove('open');
             document.getElementById('langDropdownMenu').classList.remove('open');
-            document.getElementById('addLangInputWrapper').style.display = 'none';
-            document.getElementById('addLangBtn').style.display = 'block';
         }
 
         async function setLanguage(lang) {
@@ -1179,33 +1120,6 @@
             const dropdown = document.querySelector('.lang-dropdown');
             if (!dropdown.contains(e.target)) {
                 closeDropdown();
-            }
-        });
-
-        document.getElementById('addLangBtn').addEventListener('click', (e) => {
-            e.stopPropagation();
-            document.getElementById('addLangBtn').style.display = 'none';
-            document.getElementById('addLangInputWrapper').style.display = 'flex';
-            document.getElementById('addLangInput').focus();
-        });
-
-        document.getElementById('addLangConfirm').addEventListener('click', () => {
-            const input = document.getElementById('addLangInput');
-            const code = input.value.trim().toLowerCase();
-            
-            if (code && /^[a-z]{2,5}$/.test(code) && !supportedLanguages[code]) {
-                supportedLanguages[code] = { name: code.toUpperCase(), dir: 'ltr' };
-                input.value = '';
-                document.getElementById('addLangInputWrapper').style.display = 'none';
-                document.getElementById('addLangBtn').style.display = 'block';
-                populateLanguageDropdown();
-                selectLanguage(code);
-            }
-        });
-
-        document.getElementById('addLangInput').addEventListener('keydown', (e) => {
-            if (e.key === 'Enter') {
-                document.getElementById('addLangConfirm').click();
             }
         });
 
