@@ -1,5 +1,19 @@
 const ADMIN_EMAILS = ['admin@example.com', 'michaelort@hyatus.com', 'aahim7406@gmail.com'];
 
+let savedScrollPosition = 0;
+
+function openModal() {
+    savedScrollPosition = window.scrollY;
+    document.body.style.top = `-${savedScrollPosition}px`;
+    document.body.classList.add('modal-open');
+}
+
+function closeModal() {
+    document.body.classList.remove('modal-open');
+    document.body.style.top = '';
+    window.scrollTo(0, savedScrollPosition);
+}
+
 function isAdminEmail(email) {
     const e = (email || '').toLowerCase();
     if (!e) return false;
@@ -658,7 +672,7 @@ async function viewDetails(id) {
         `;
 
         document.getElementById('detailModal').classList.add('active');
-        document.body.classList.add('modal-open');
+        openModal();
     } catch (err) {
         showToast('Error loading details: ' + err.message, 'error');
     }
@@ -666,7 +680,7 @@ async function viewDetails(id) {
 
 function closeDetailModal() {
     document.getElementById('detailModal').classList.remove('active');
-    document.body.classList.remove('modal-open');
+    closeModal();
 }
 
 let currentEditSubmissionId = null;
@@ -677,12 +691,12 @@ function editAward(id) {
     const amount = parseFloat(submission?.award_amount) || getAwardAmount(id);
     document.getElementById('editAwardAmount').value = Number(amount).toFixed(2);
     document.getElementById('editAwardModal').classList.add('active');
-    document.body.classList.add('modal-open');
+    openModal();
 }
 
 function closeEditAwardModal() {
     document.getElementById('editAwardModal').classList.remove('active');
-    document.body.classList.remove('modal-open');
+    closeModal();
     currentEditSubmissionId = null;
 }
 
@@ -769,12 +783,12 @@ function showTaskModal(submission) {
         </div>
     `;
     document.getElementById('taskModal').classList.add('active');
-    document.body.classList.add('modal-open');
+    openModal();
 }
 
 async function skipTask() {
     document.getElementById('taskModal').classList.remove('active');
-    document.body.classList.remove('modal-open');
+    closeModal();
     pendingTaskSubmission = null;
 }
 
@@ -841,7 +855,7 @@ async function createTask() {
     }
 
     document.getElementById('taskModal').classList.remove('active');
-    document.body.classList.remove('modal-open');
+    closeModal();
     pendingTaskSubmission = null;
 }
 
@@ -1182,7 +1196,7 @@ async function openReferralModal(referralId) {
         document.getElementById('referralAdminNotes').value = referral.admin_notes || '';
         
         document.getElementById('referralModal').classList.add('active');
-        document.body.classList.add('modal-open');
+        openModal();
     } catch (err) {
         showToast('Error loading referral: ' + err.message, 'error');
     }
@@ -1190,7 +1204,7 @@ async function openReferralModal(referralId) {
 
 function closeReferralModal() {
     document.getElementById('referralModal').classList.remove('active');
-    document.body.classList.remove('modal-open');
+    closeModal();
     currentReferralId = null;
 }
 
@@ -1487,7 +1501,7 @@ async function openTaskLogModal(logId) {
         content.appendChild(responseSection);
         
         document.getElementById('taskLogModal').classList.add('active');
-        document.body.classList.add('modal-open');
+        openModal();
     } catch (err) {
         showToast('Error loading task log: ' + err.message, 'error');
     }
@@ -1495,7 +1509,7 @@ async function openTaskLogModal(logId) {
 
 function closeTaskLogModal() {
     document.getElementById('taskLogModal').classList.remove('active');
-    document.body.classList.remove('modal-open');
+    closeModal();
     currentTaskLogId = null;
 }
 
