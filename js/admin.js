@@ -800,6 +800,18 @@ async function createTask() {
     const giftType = (submission.payment_method || 'gift').toUpperCase();
     const email = submission.payment_handle;
 
+    const createBtn = document.querySelector('#taskModal .btn-primary');
+    const skipBtn = document.querySelector('#taskModal .btn-secondary');
+    const originalText = createBtn ? createBtn.textContent : 'Create Task';
+
+    if (createBtn) {
+        createBtn.textContent = 'Creating...';
+        createBtn.disabled = true;
+    }
+    if (skipBtn) {
+        skipBtn.disabled = true;
+    }
+
     try {
         let taskParent = 'company';
         let linkId = 'Hyatus';
@@ -852,6 +864,14 @@ async function createTask() {
     } catch (error) {
         console.error('Error creating task:', error);
         showToast('Error creating task: ' + error.message, 'error');
+    } finally {
+        if (createBtn) {
+            createBtn.textContent = originalText;
+            createBtn.disabled = false;
+        }
+        if (skipBtn) {
+            skipBtn.disabled = false;
+        }
     }
 
     document.getElementById('taskModal').classList.remove('active');
