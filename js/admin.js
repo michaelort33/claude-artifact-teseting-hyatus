@@ -92,15 +92,19 @@ async function checkAuth() {
         
         if (result.user) {
             if (!result.user.is_admin && !isAdminEmail(result.user.email)) {
+                document.getElementById('loginSection').style.display = 'flex';
                 showLoginError('You do not have admin access.');
                 await fetch('/api/auth/signout', { method: 'POST' });
                 return;
             }
             currentUser = result.user;
             showDashboard();
+        } else {
+            document.getElementById('loginSection').style.display = 'flex';
         }
     } catch (err) {
         console.error('Error checking auth:', err);
+        document.getElementById('loginSection').style.display = 'flex';
     }
 }
 
