@@ -438,6 +438,142 @@
             flex-shrink: 0;
         }
 
+        .my-referrals-section {
+            margin-top: 48px;
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 32px;
+            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.04);
+            display: none;
+        }
+
+        .my-referrals-section.show {
+            display: block;
+        }
+
+        .my-referrals-section h3 {
+            font-family: 'Playfair Display', Georgia, serif;
+            font-size: 22px;
+            font-weight: 400;
+            color: var(--charcoal);
+            margin-bottom: 8px;
+        }
+
+        .my-referrals-summary {
+            display: flex;
+            gap: 24px;
+            margin-bottom: 24px;
+            padding: 16px;
+            background: var(--alabaster);
+            border-radius: var(--radius-sm);
+        }
+
+        .summary-stat {
+            text-align: center;
+            flex: 1;
+        }
+
+        .summary-stat .stat-value {
+            font-size: 28px;
+            font-weight: 600;
+            color: var(--moss);
+        }
+
+        .summary-stat .stat-label {
+            font-size: 12px;
+            color: var(--warm-gray-dark);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .referral-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .referral-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px;
+            background: var(--cream);
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius-sm);
+            gap: 16px;
+        }
+
+        .referral-item-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .referral-item-company {
+            font-weight: 500;
+            color: var(--charcoal);
+            margin-bottom: 4px;
+        }
+
+        .referral-item-date {
+            font-size: 12px;
+            color: var(--warm-gray-dark);
+        }
+
+        .referral-item-status {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+            white-space: nowrap;
+        }
+
+        .referral-item-status.submitted { background: #E3F2FD; color: #1565C0; }
+        .referral-item-status.in_review { background: #FFF3E0; color: #EF6C00; }
+        .referral-item-status.approved { background: #E8F5E9; color: #2E7D32; }
+        .referral-item-status.rejected { background: #FFEBEE; color: #C62828; }
+        .referral-item-status.paid { background: var(--moss); color: white; }
+
+        .referral-item-reward {
+            font-weight: 600;
+            color: var(--moss);
+            white-space: nowrap;
+        }
+
+        .no-referrals {
+            text-align: center;
+            padding: 32px;
+            color: var(--warm-gray-dark);
+        }
+
+        .my-referrals-loading {
+            text-align: center;
+            padding: 32px;
+            color: var(--warm-gray-dark);
+        }
+
+        @media (max-width: 600px) {
+            .my-referrals-summary {
+                flex-direction: column;
+                gap: 16px;
+            }
+
+            .referral-item {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 12px;
+            }
+
+            .referral-item-right {
+                display: flex;
+                gap: 12px;
+                width: 100%;
+                justify-content: space-between;
+            }
+        }
+
         .form-card {
             background: white;
             border: 1px solid var(--border);
@@ -865,6 +1001,34 @@
                     <p data-i18n="successText">Thank you for connecting us with a potential partner. Our team will follow up with your referral, and we'll keep you updated on the status. If they sign up, your $250 reward will be on its way!</p>
                 </div>
             </div>
+
+            <div class="my-referrals-section" id="myReferralsSection">
+                <h3 data-i18n="myReferralsTitle">My Referrals</h3>
+                <p style="color: var(--warm-gray-dark); font-size: 14px; margin-bottom: 20px;" data-i18n="myReferralsSubtitle">Track the status of your referrals and rewards.</p>
+                
+                <div class="my-referrals-summary" id="referralsSummary">
+                    <div class="summary-stat">
+                        <div class="stat-value" id="totalReferrals">0</div>
+                        <div class="stat-label" data-i18n="totalReferrals">Total Referrals</div>
+                    </div>
+                    <div class="summary-stat">
+                        <div class="stat-value" id="approvedCount">0</div>
+                        <div class="stat-label" data-i18n="approvedReferrals">Approved</div>
+                    </div>
+                    <div class="summary-stat">
+                        <div class="stat-value" id="totalEarned">$0</div>
+                        <div class="stat-label" data-i18n="totalEarned">Total Earned</div>
+                    </div>
+                    <div class="summary-stat">
+                        <div class="stat-value" id="remainingSlots">5</div>
+                        <div class="stat-label" data-i18n="remainingSlots">Slots Left</div>
+                    </div>
+                </div>
+
+                <div class="referral-list" id="referralList">
+                    <div class="my-referrals-loading" data-i18n="loadingReferrals">Loading your referrals...</div>
+                </div>
+            </div>
         </div>
     </main>
 
@@ -1179,6 +1343,7 @@
 
                 formContainer.style.display = 'none';
                 successMessage.classList.add('show');
+                loadMyReferrals();
 
             } catch (err) {
                 console.error('Error:', err);
@@ -1187,6 +1352,88 @@
                 submitBtn.textContent = currentTranslations.submitButton;
             }
         });
+
+        async function checkAuthAndLoadReferrals() {
+            try {
+                const response = await fetch('/api/auth/session');
+                const data = await response.json();
+                
+                if (response.ok && data.user) {
+                    document.getElementById('myReferralsSection').classList.add('show');
+                    loadMyReferrals();
+                }
+            } catch (err) {
+                console.log('Not authenticated');
+            }
+        }
+
+        async function loadMyReferrals() {
+            const listEl = document.getElementById('referralList');
+            
+            try {
+                const response = await fetch('/api/referrals/my');
+                const result = await response.json();
+                
+                if (!response.ok) {
+                    throw new Error(result.error || 'Failed to load referrals');
+                }
+                
+                const referrals = result.data || [];
+                const summary = result.summary || {};
+                
+                document.getElementById('totalReferrals').textContent = summary.total || referrals.length;
+                document.getElementById('approvedCount').textContent = summary.approved || 0;
+                document.getElementById('totalEarned').textContent = '$' + (summary.total_earned || 0);
+                document.getElementById('remainingSlots').textContent = Math.max(0, 5 - referrals.length);
+                
+                if (referrals.length === 0) {
+                    listEl.innerHTML = '<div class="no-referrals">' + (currentTranslations.noReferrals || 'You haven\'t submitted any referrals yet.') + '</div>';
+                    return;
+                }
+                
+                listEl.innerHTML = '';
+                referrals.forEach(ref => {
+                    const item = document.createElement('div');
+                    item.className = 'referral-item';
+                    
+                    const statusLabels = {
+                        submitted: currentTranslations.statusSubmitted || 'Submitted',
+                        in_review: currentTranslations.statusInReview || 'In Review',
+                        approved: currentTranslations.statusApproved || 'Approved',
+                        rejected: currentTranslations.statusRejected || 'Rejected',
+                        paid: currentTranslations.statusPaid || 'Paid'
+                    };
+                    
+                    const date = new Date(ref.created_at).toLocaleDateString();
+                    const reward = ref.reward_amount ? '$' + parseFloat(ref.reward_amount).toFixed(0) : '-';
+                    
+                    item.innerHTML = `
+                        <div class="referral-item-info">
+                            <div class="referral-item-company">${escapeHtml(ref.company_name)}</div>
+                            <div class="referral-item-date">${date}</div>
+                        </div>
+                        <div class="referral-item-right" style="display: flex; gap: 12px; align-items: center;">
+                            <span class="referral-item-status ${ref.status}">${statusLabels[ref.status] || ref.status}</span>
+                            <span class="referral-item-reward">${reward}</span>
+                        </div>
+                    `;
+                    
+                    listEl.appendChild(item);
+                });
+                
+            } catch (err) {
+                console.error('Error loading referrals:', err);
+                listEl.innerHTML = '<div class="no-referrals">Unable to load referrals</div>';
+            }
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        checkAuthAndLoadReferrals();
     </script>
 </body>
 
