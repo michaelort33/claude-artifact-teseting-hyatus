@@ -1123,6 +1123,127 @@
             color: var(--moss);
         }
 
+        .shareable-links-section {
+            margin-top: 40px;
+            background: white;
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius-md);
+            padding: 24px;
+        }
+
+        .shareable-links-title {
+            font-family: 'Playfair Display', Georgia, serif;
+            font-size: 20px;
+            font-weight: 500;
+            color: var(--charcoal);
+            margin: 0 0 8px 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .shareable-links-title svg {
+            color: var(--moss);
+        }
+
+        .shareable-links-subtitle {
+            font-size: 14px;
+            color: var(--warm-gray-dark);
+            margin: 0 0 24px 0;
+        }
+
+        .links-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 24px;
+        }
+
+        .link-category h4 {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--moss);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin: 0 0 16px 0;
+            padding-bottom: 8px;
+            border-bottom: 1px solid var(--border-light);
+        }
+
+        .link-item {
+            background: var(--alabaster);
+            border-radius: var(--radius-sm);
+            padding: 16px;
+            margin-bottom: 12px;
+        }
+
+        .link-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .link-info {
+            margin-bottom: 12px;
+        }
+
+        .link-label {
+            display: block;
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--charcoal);
+            margin-bottom: 4px;
+        }
+
+        .link-description {
+            font-size: 12px;
+            color: var(--warm-gray-dark);
+        }
+
+        .link-url-row {
+            display: flex;
+            gap: 8px;
+            align-items: stretch;
+        }
+
+        .link-url {
+            flex: 1;
+            background: white;
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius-sm);
+            padding: 10px 12px;
+            font-size: 12px;
+            font-family: 'SF Mono', Monaco, monospace;
+            color: var(--charcoal);
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .copy-btn {
+            background: var(--moss);
+            color: white;
+            border: none;
+            border-radius: var(--radius-sm);
+            padding: 10px 16px;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background 0.2s ease;
+            white-space: nowrap;
+        }
+
+        .copy-btn:hover {
+            background: var(--moss-light);
+        }
+
+        .copy-btn.copied {
+            background: var(--success);
+        }
+
+        @media (max-width: 768px) {
+            .links-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
         .status-submitted {
             background: var(--warning-bg);
             color: var(--warning);
@@ -1456,6 +1577,67 @@
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <path d="M9 5l7 7-7 7"/>
                         </svg>
+                    </div>
+                </div>
+            </div>
+
+            <div class="shareable-links-section">
+                <h3 class="shareable-links-title">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/>
+                        <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>
+                    </svg>
+                    Shareable Links
+                </h3>
+                <p class="shareable-links-subtitle">Copy these links to share with guests and partners</p>
+                
+                <div class="links-grid">
+                    <div class="link-category">
+                        <h4>Feedback Forms</h4>
+                        <div class="link-item">
+                            <div class="link-info">
+                                <span class="link-label">Returning Guest Feedback ($10)</span>
+                                <span class="link-description">For past guests submitting feedback</span>
+                            </div>
+                            <div class="link-url-row">
+                                <code class="link-url" id="linkReturningGuest10"></code>
+                                <button class="copy-btn" onclick="copyLink('linkReturningGuest10')">Copy</button>
+                            </div>
+                        </div>
+                        <div class="link-item">
+                            <div class="link-info">
+                                <span class="link-label">Returning Guest Feedback ($20)</span>
+                                <span class="link-description">VIP guests with higher reward</span>
+                            </div>
+                            <div class="link-url-row">
+                                <code class="link-url" id="linkReturningGuest20"></code>
+                                <button class="copy-btn" onclick="copyLink('linkReturningGuest20')">Copy</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="link-category">
+                        <h4>Referral Programs</h4>
+                        <div class="link-item">
+                            <div class="link-info">
+                                <span class="link-label">Company Referrals</span>
+                                <span class="link-description">Hyatus Connect Rewards ($250/referral)</span>
+                            </div>
+                            <div class="link-url-row">
+                                <code class="link-url" id="linkCompanyReferral"></code>
+                                <button class="copy-btn" onclick="copyLink('linkCompanyReferral')">Copy</button>
+                            </div>
+                        </div>
+                        <div class="link-item">
+                            <div class="link-info">
+                                <span class="link-label">Friends & Family Referrals</span>
+                                <span class="link-description">Guest referral program ($50/referral)</span>
+                            </div>
+                            <div class="link-url-row">
+                                <code class="link-url" id="linkGuestReferral"></code>
+                                <button class="copy-btn" onclick="copyLink('linkGuestReferral')">Copy</button>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>

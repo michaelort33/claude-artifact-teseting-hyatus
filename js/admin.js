@@ -1119,9 +1119,56 @@ async function loadOverviewStats() {
             const logs = data.data?.logs || [];
             document.getElementById('overviewTasksRecent').textContent = logs.length;
         }
+
+        populateShareableLinks();
     } catch (err) {
         console.error('Error loading overview stats:', err);
     }
+}
+
+function populateShareableLinks() {
+    const baseUrl = window.location.origin;
+    
+    const linkReturningGuest10 = document.getElementById('linkReturningGuest10');
+    const linkReturningGuest20 = document.getElementById('linkReturningGuest20');
+    const linkCompanyReferral = document.getElementById('linkCompanyReferral');
+    const linkGuestReferral = document.getElementById('linkGuestReferral');
+    
+    if (linkReturningGuest10) {
+        linkReturningGuest10.textContent = `${baseUrl}/?g=vip2024`;
+    }
+    if (linkReturningGuest20) {
+        linkReturningGuest20.textContent = `${baseUrl}/?g=vip2024&r=h24p`;
+    }
+    if (linkCompanyReferral) {
+        linkCompanyReferral.textContent = `${baseUrl}/referral`;
+    }
+    if (linkGuestReferral) {
+        linkGuestReferral.textContent = `${baseUrl}/guest-referral`;
+    }
+}
+
+function copyLink(elementId) {
+    const element = document.getElementById(elementId);
+    if (!element) return;
+    
+    const url = element.textContent;
+    navigator.clipboard.writeText(url).then(() => {
+        const btn = element.parentElement.querySelector('.copy-btn');
+        if (btn) {
+            const originalText = btn.textContent;
+            btn.textContent = 'Copied!';
+            btn.classList.add('copied');
+            setTimeout(() => {
+                btn.textContent = originalText;
+                btn.classList.remove('copied');
+            }, 2000);
+        }
+        showToast('Link copied to clipboard', 'success');
+    }).catch(err => {
+        console.error('Failed to copy:', err);
+        showToast('Failed to copy link', 'error');
+    });
 }
 
 async function loadGuestReferrals() {
