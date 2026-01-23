@@ -995,6 +995,277 @@ async function handleUpdateReferral(req, res, id) {
     }
 }
 
+async function handleGetSettings(req, res) {
+    try {
+        const user = await getSessionUser(req);
+        if (!user) {
+            return sendJson(res, 401, { error: 'Authentication required' });
+        }
+
+        const admin = await isAdmin(user.email);
+        if (!admin) {
+            return sendJson(res, 403, { error: 'Admin access required' });
+        }
+
+        const result = await pool.query('SELECT key, value, description FROM settings ORDER BY key');
+        const settings = {};
+        result.rows.forEach(row => {
+            settings[row.key] = { value: row.value, description: row.description };
+        });
+        
+        sendJson(res, 200, { data: settings });
+    } catch (err) {
+        console.error('Get settings error:', err);
+        sendJson(res, 500, { error: 'Server error' });
+    }
+}
+
+async function handleUpdateSettings(req, res) {
+    try {
+        const user = await getSessionUser(req);
+        if (!user) {
+            return sendJson(res, 401, { error: 'Authentication required' });
+        }
+
+        const admin = await isAdmin(user.email);
+        if (!admin) {
+            return sendJson(res, 403, { error: 'Admin access required' });
+        }
+
+        const body = await parseBody(req);
+        const updates = [];
+        
+        for (const [key, value] of Object.entries(body)) {
+            await pool.query(
+                'UPDATE settings SET value = $1, updated_at = NOW() WHERE key = $2',
+                [String(value), key]
+            );
+            updates.push(key);
+        }
+        
+        sendJson(res, 200, { success: true, updated: updates });
+    } catch (err) {
+        console.error('Update settings error:', err);
+        sendJson(res, 500, { error: 'Server error' });
+    }
+}
+
+async function handleGetPublicSettings(req, res) {
+    try {
+        const result = await pool.query(
+            "SELECT key, value FROM settings WHERE key IN ('company_referral_reward', 'company_referral_max', 'guest_referral_reward', 'guest_referral_max')"
+        );
+        const settings = {};
+        result.rows.forEach(row => {
+            settings[row.key] = row.value;
+        });
+        
+        sendJson(res, 200, settings);
+    } catch (err) {
+        console.error('Get public settings error:', err);
+        sendJson(res, 200, {
+            company_referral_reward: '250',
+            company_referral_max: '5',
+            guest_referral_reward: '50',
+            guest_referral_max: '10'
+        });
+    }
+}
+
+async function handleGetMyGuestReferrals(req, res) {
+    try {
+        const user = await getSessionUser(req);
+        if (!user) {
+            return sendJson(res, 401, { error: 'Authentication required' });
+        }
+
+        const result = await pool.query(
+            `SELECT * FROM guest_referrals WHERE LOWER(referrer_email) = LOWER($1) ORDER BY created_at DESC`,
+            [user.email]
+        );
+
+        const referrals = result.rows;
+        const approved = referrals.filter(r => r.status === 'approved' || r.status === 'paid').length;
+        const totalEarned = referrals.reduce((sum, r) => {
+            if ((r.status === 'approved' || r.status === 'paid') && r.approved_reward_amount) {
+                return sum + parseFloat(r.approved_reward_amount);
+            }
+            return sum;
+        }, 0);
+
+        sendJson(res, 200, {
+            data: referrals,
+            summary: {
+                total: referrals.length,
+                approved,
+                total_earned: totalEarned
+            }
+        });
+    } catch (err) {
+        console.error('Get my guest referrals error:', err);
+        sendJson(res, 500, { error: 'Server error' });
+    }
+}
+
+async function handleGetGuestReferrals(req, res) {
+    try {
+        const user = await getSessionUser(req);
+        if (!user) {
+            return sendJson(res, 401, { error: 'Authentication required' });
+        }
+
+        const admin = await isAdmin(user.email);
+        if (!admin) {
+            return sendJson(res, 403, { error: 'Admin access required' });
+        }
+
+        const url = new URL(req.url, `http://${req.headers.host}`);
+        const status = url.searchParams.get('status');
+        
+        let query = 'SELECT * FROM guest_referrals';
+        const params = [];
+        
+        if (status && status !== 'all') {
+            query += ' WHERE status = $1';
+            params.push(status);
+        }
+        
+        query += ' ORDER BY created_at DESC';
+        
+        const result = await pool.query(query, params);
+        sendJson(res, 200, { data: result.rows });
+    } catch (err) {
+        console.error('Get guest referrals error:', err);
+        sendJson(res, 500, { error: 'Server error' });
+    }
+}
+
+async function handleCreateGuestReferral(req, res) {
+    try {
+        const body = await parseBody(req);
+        const { referrer_name, referrer_email, friend_name, friend_email, friend_phone, city, timeframe, notes } = body;
+
+        if (!referrer_name || !referrer_email || !friend_name || !friend_email) {
+            return sendJson(res, 400, { error: 'Missing required fields' });
+        }
+
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(referrer_email) || !emailRegex.test(friend_email)) {
+            return sendJson(res, 400, { error: 'Invalid email format' });
+        }
+
+        const existingReferral = await pool.query(
+            'SELECT id FROM guest_referrals WHERE LOWER(TRIM(friend_email)) = LOWER(TRIM($1))',
+            [friend_email]
+        );
+
+        if (existingReferral.rows.length > 0) {
+            return sendJson(res, 400, { error: 'This person has already been referred' });
+        }
+
+        const maxResult = await pool.query("SELECT value FROM settings WHERE key = 'guest_referral_max'");
+        const maxReferrals = parseInt(maxResult.rows[0]?.value || '10');
+
+        const countResult = await pool.query(
+            'SELECT COUNT(*) FROM guest_referrals WHERE LOWER(referrer_email) = LOWER($1)',
+            [referrer_email]
+        );
+
+        if (parseInt(countResult.rows[0].count) >= maxReferrals) {
+            return sendJson(res, 400, { error: `You have reached the maximum of ${maxReferrals} referrals` });
+        }
+
+        const result = await pool.query(
+            `INSERT INTO guest_referrals (referrer_name, referrer_email, friend_name, friend_email, friend_phone, city, timeframe, notes)
+             VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *`,
+            [referrer_name, referrer_email, friend_name, friend_email, friend_phone || null, city || null, timeframe || null, notes || null]
+        );
+
+        if (process.env.SENDGRID_API_KEY && process.env.ADMIN_EMAIL) {
+            try {
+                await sgMail.send({
+                    to: process.env.ADMIN_EMAIL,
+                    from: { name: 'Hyatus Referrals', email: 'hello@hyatus.com' },
+                    subject: `New Guest Referral: ${friend_name}`,
+                    text: `New guest referral submitted!\n\nReferrer: ${referrer_name} (${referrer_email})\n\nFriend: ${friend_name}\nEmail: ${friend_email}\nPhone: ${friend_phone || 'Not provided'}\nCity: ${city || 'Not specified'}\nTimeframe: ${timeframe || 'Not specified'}\n\nNotes: ${notes || 'None'}`
+                });
+            } catch (emailErr) {
+                console.error('Failed to send admin notification:', emailErr);
+            }
+        }
+
+        sendJson(res, 201, { data: result.rows[0] });
+    } catch (err) {
+        console.error('Create guest referral error:', err);
+        sendJson(res, 500, { error: 'Server error' });
+    }
+}
+
+async function handleUpdateGuestReferral(req, res, id) {
+    try {
+        const user = await getSessionUser(req);
+        if (!user) {
+            return sendJson(res, 401, { error: 'Authentication required' });
+        }
+
+        const admin = await isAdmin(user.email);
+        if (!admin) {
+            return sendJson(res, 403, { error: 'Admin access required' });
+        }
+
+        const existingResult = await pool.query('SELECT * FROM guest_referrals WHERE id = $1', [id]);
+        if (existingResult.rows.length === 0) {
+            return sendJson(res, 404, { error: 'Referral not found' });
+        }
+
+        const existing = existingResult.rows[0];
+        const body = await parseBody(req);
+        const { status, approved_reward_amount, admin_notes } = body;
+
+        const updates = ['updated_at = NOW()'];
+        const params = [];
+        let paramCount = 1;
+
+        if (admin_notes !== undefined) {
+            updates.push(`admin_notes = $${paramCount++}`);
+            params.push(admin_notes);
+        }
+
+        if (status !== undefined) {
+            updates.push(`status = $${paramCount++}`);
+            params.push(status);
+
+            if (status === 'approved' && existing.status !== 'approved') {
+                const rewardResult = await pool.query("SELECT value FROM settings WHERE key = 'guest_referral_reward'");
+                const rewardAmount = approved_reward_amount !== undefined ? approved_reward_amount : parseFloat(rewardResult.rows[0]?.value || '50');
+                updates.push(`approved_reward_amount = $${paramCount++}`);
+                params.push(rewardAmount);
+            } else if (approved_reward_amount !== undefined) {
+                updates.push(`approved_reward_amount = $${paramCount++}`);
+                params.push(approved_reward_amount);
+            }
+
+            if (status === 'paid' && existing.status !== 'paid') {
+                updates.push('paid_at = NOW()');
+            }
+        } else if (approved_reward_amount !== undefined) {
+            updates.push(`approved_reward_amount = $${paramCount++}`);
+            params.push(approved_reward_amount);
+        }
+
+        params.push(id);
+        const result = await pool.query(
+            `UPDATE guest_referrals SET ${updates.join(', ')} WHERE id = $${paramCount} RETURNING *`,
+            params
+        );
+
+        sendJson(res, 200, { data: result.rows[0] });
+    } catch (err) {
+        console.error('Update guest referral error:', err);
+        sendJson(res, 500, { error: 'Server error' });
+    }
+}
+
 async function getTasksApiToken() {
     if (cachedToken && tokenExpiry && Date.now() < tokenExpiry) {
         return cachedToken;
@@ -1576,6 +1847,33 @@ const server = http.createServer(async (req, res) => {
         }
     }
 
+    if (pathname === '/api/settings' && method === 'GET') {
+        return handleGetSettings(req, res);
+    }
+    if (pathname === '/api/settings' && method === 'PATCH') {
+        return handleUpdateSettings(req, res);
+    }
+    if (pathname === '/api/settings/public' && method === 'GET') {
+        return handleGetPublicSettings(req, res);
+    }
+
+    if (pathname === '/api/guest-referrals/my' && method === 'GET') {
+        return handleGetMyGuestReferrals(req, res);
+    }
+    if (pathname === '/api/guest-referrals' && method === 'GET') {
+        return handleGetGuestReferrals(req, res);
+    }
+    if (pathname === '/api/guest-referrals' && method === 'POST') {
+        return handleCreateGuestReferral(req, res);
+    }
+    const guestReferralMatch = pathname.match(/^\/api\/guest-referrals\/(\d+)$/);
+    if (guestReferralMatch) {
+        const id = guestReferralMatch[1];
+        if (method === 'PATCH') {
+            return handleUpdateGuestReferral(req, res, id);
+        }
+    }
+
     let filePath = '.' + pathname;
     if (filePath === './') {
         filePath = './index.html';
@@ -1586,6 +1884,8 @@ const server = http.createServer(async (req, res) => {
         filePath = './admin.html';
     } else if (pathname === '/referral') {
         filePath = './referral.html';
+    } else if (pathname === '/guest-referral') {
+        filePath = './guest-referral.html';
     }
     
     // Redirect .html URLs to clean versions (optional but professional)

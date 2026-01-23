@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hyatus Connect Rewards | Earn $250 Per Referral</title>
+    <title>Refer Friends & Family | Earn $50 Per Referral</title>
 
     <meta name="robots" content="noindex, nofollow, noarchive, nosnippet, noimageindex, notranslate">
     <meta name="googlebot" content="noindex, nofollow, noarchive, nosnippet, noimageindex, notranslate">
@@ -150,6 +150,31 @@
 
         html[dir="rtl"] .back-link svg {
             transform: rotate(180deg);
+        }
+
+        .referral-switch {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 12px;
+            background: var(--alabaster);
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius-sm);
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--charcoal);
+            transition: all 0.2s ease;
+        }
+
+        .referral-switch:hover {
+            background: var(--bone);
+            border-color: var(--border);
+        }
+
+        .referral-switch svg {
+            width: 14px;
+            height: 14px;
         }
 
         .lang-dropdown {
@@ -509,7 +534,7 @@
             min-width: 0;
         }
 
-        .referral-item-company {
+        .referral-item-name {
             font-weight: 500;
             color: var(--charcoal);
             margin-bottom: 4px;
@@ -790,31 +815,6 @@
             text-decoration: underline;
         }
 
-        .referral-switch {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            padding: 6px 12px;
-            background: var(--alabaster);
-            border: 1px solid var(--border-light);
-            border-radius: var(--radius-sm);
-            text-decoration: none;
-            font-size: 13px;
-            font-weight: 500;
-            color: var(--charcoal);
-            transition: all 0.2s ease;
-        }
-
-        .referral-switch:hover {
-            background: var(--bone);
-            border-color: var(--border);
-        }
-
-        .referral-switch svg {
-            width: 14px;
-            height: 14px;
-        }
-
         @media (max-width: 600px) {
             .topbar-content {
                 padding: 0 20px;
@@ -862,14 +862,11 @@
                 </a>
             </div>
             <div class="topbar-right">
-                <a href="/guest-referral" class="referral-switch" data-i18n-title="switchToGuest">
+                <a href="/referral" class="referral-switch" data-i18n-title="switchToCompany">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
-                        <circle cx="9" cy="7" r="4"/>
-                        <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
-                        <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                        <path d="M19 21V5a2 2 0 0 0-2-2H7a2 2 0 0 0-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v5m-4 0h4"/>
                     </svg>
-                    <span data-i18n="guestReferrals">Friends & Family</span>
+                    <span data-i18n="companyReferrals">Company Referrals</span>
                 </a>
                 <div class="lang-dropdown">
                     <button class="lang-dropdown-btn" id="langDropdownBtn">
@@ -889,21 +886,21 @@
             <div class="hero">
                 <div class="badge">
                     <span>💰</span>
-                    <span data-i18n="badgeText">Referral Program</span>
+                    <span data-i18n="badgeText">Friends & Family Referral</span>
                 </div>
-                <h1 data-i18n="heroTitle">Hyatus Connect Rewards</h1>
-                <p class="subtitle" data-i18n="heroSubtitle">Know someone who books corporate housing? Introduce them to Hyatus and earn cash rewards for every successful connection.</p>
+                <h1 data-i18n="heroTitle">Refer Friends & Family</h1>
+                <p class="subtitle" data-i18n="heroSubtitle">Know someone looking for furnished housing? Refer them to Hyatus and earn rewards!</p>
             </div>
 
             <div class="reward-highlight">
-                <div class="reward-amount">$250</div>
-                <div class="reward-label" data-i18n="rewardLabel">per qualifying company referral</div>
-                <div class="reward-max" data-i18n="rewardMax">Earn up to $1,000 (maximum 5 referrals per person)</div>
+                <div class="reward-amount" id="rewardAmount">$50</div>
+                <div class="reward-label" data-i18n="rewardLabel">per qualifying guest referral</div>
+                <div class="reward-max" id="rewardMaxText" data-i18n="rewardMax">Earn up to $500 (maximum 10 referrals per person)</div>
             </div>
 
             <div class="section">
                 <h2 class="section-title" data-i18n="howItWorksTitle">How It Works</h2>
-                <p data-i18n="howItWorksText">Hyatus partners with companies, hospitals, and universities to provide high-quality furnished housing for business travel, relocations, and extended stays. When you connect us with the right person at an organization, we reward you for making it happen.</p>
+                <p data-i18n="howItWorksText">Know someone who needs furnished housing for work, relocation, or an extended stay? Refer them to Hyatus, and when they book, you'll earn a reward for helping them find their perfect home away from home.</p>
             </div>
 
             <div class="steps">
@@ -911,28 +908,28 @@
                     <div class="step-number">1</div>
                     <div class="step-content">
                         <h4 data-i18n="step1Title">Submit a Referral</h4>
-                        <p data-i18n="step1Text">Fill out the form below with details about the company and your contact there.</p>
+                        <p data-i18n="step1Text">Fill out the form below with your friend's contact information.</p>
                     </div>
                 </div>
                 <div class="step">
                     <div class="step-number">2</div>
                     <div class="step-content">
                         <h4 data-i18n="step2Title">We Reach Out</h4>
-                        <p data-i18n="step2Text">Our team will follow up with the organization to discuss their housing needs.</p>
+                        <p data-i18n="step2Text">Our team will contact your friend about their housing needs.</p>
                     </div>
                 </div>
                 <div class="step">
                     <div class="step-number">3</div>
                     <div class="step-content">
-                        <h4 data-i18n="step3Title">Company Books First Stay</h4>
-                        <p data-i18n="step3Text">Once the company completes their first booking with Hyatus, you earn your reward.</p>
+                        <h4 data-i18n="step3Title">Friend Books a Stay</h4>
+                        <p data-i18n="step3Text">When your friend completes their first booking, you earn your reward.</p>
                     </div>
                 </div>
                 <div class="step">
                     <div class="step-number">4</div>
                     <div class="step-content">
                         <h4 data-i18n="step4Title">Get Paid</h4>
-                        <p data-i18n="step4Text">Receive $250 for each qualifying referral, up to $1,000 total.</p>
+                        <p data-i18n="step4Text">Receive $50 for each qualifying referral, up to $500 total.</p>
                     </div>
                 </div>
             </div>
@@ -940,92 +937,74 @@
             <div class="qualifications">
                 <h3 data-i18n="qualificationsTitle">What Qualifies as a Successful Referral?</h3>
                 <ul>
-                    <li data-i18n="qual1">The company or institution must be new to Hyatus (not an existing partner)</li>
-                    <li data-i18n="qual2">Your introduction must be to a decision-maker in travel, housing, or procurement</li>
-                    <li data-i18n="qual3">The organization must complete their first stay with Hyatus</li>
-                    <li data-i18n="qual4">Final qualification approval is determined by Hyatus</li>
+                    <li data-i18n="qual1">The guest must be new to Hyatus (not an existing guest)</li>
+                    <li data-i18n="qual2">Your friend must complete a qualifying stay (minimum 30 nights)</li>
+                    <li data-i18n="qual3">Final qualification approval is determined by Hyatus</li>
                 </ul>
             </div>
 
             <div class="form-card">
                 <div id="referralForm">
-                    <h3 data-i18n="formTitle">Submit Your Referral</h3>
-                    <p class="form-intro" data-i18n="formIntro">Tell us about the company and who to contact.</p>
+                    <h3 data-i18n="formTitle">Refer a Friend</h3>
+                    <p class="form-intro" data-i18n="formIntro">Tell us about your friend who needs furnished housing.</p>
 
                     <div id="formError" class="error-message"></div>
 
                     <form id="referralFormElement">
-                        <div class="form-group">
-                            <label data-i18n="labelYourName">Your Name <span class="required">*</span></label>
-                            <input type="text" id="referrerName" data-i18n-placeholder="placeholderYourName" placeholder="Your full name" required>
-                        </div>
-
-                        <div class="form-group">
-                            <label data-i18n="labelYourEmail">Your Email <span class="required">*</span></label>
-                            <input type="email" id="referrerEmail" data-i18n-placeholder="placeholderYourEmail" placeholder="your@email.com" required>
-                        </div>
-
-                        <div class="form-group">
-                            <label data-i18n="labelCompanyName">Company/Organization Name <span class="required">*</span></label>
-                            <input type="text" id="companyName" data-i18n-placeholder="placeholderCompanyName" placeholder="Company, hospital, or university name" required>
-                        </div>
-
-                        <div class="form-group">
-                            <label data-i18n="labelOrgType">Organization Type <span class="required">*</span></label>
-                            <select id="orgType" required>
-                                <option value="" data-i18n="optionSelectType">Select type...</option>
-                                <option value="company" data-i18n="optionCompany">Company / Corporation</option>
-                                <option value="hospital" data-i18n="optionHospital">Hospital / Healthcare</option>
-                                <option value="university" data-i18n="optionUniversity">University / Education</option>
-                                <option value="government" data-i18n="optionGovernment">Government Agency</option>
-                                <option value="nonprofit" data-i18n="optionNonprofit">Non-Profit Organization</option>
-                                <option value="other" data-i18n="optionOther">Other</option>
-                            </select>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label data-i18n="labelYourName">Your Name <span class="required">*</span></label>
+                                <input type="text" id="referrerName" data-i18n-placeholder="placeholderYourName" placeholder="Your full name" required>
+                            </div>
+                            <div class="form-group">
+                                <label data-i18n="labelYourEmail">Your Email <span class="required">*</span></label>
+                                <input type="email" id="referrerEmail" data-i18n-placeholder="placeholderYourEmail" placeholder="your@email.com" required>
+                            </div>
                         </div>
 
                         <div class="form-row">
                             <div class="form-group">
-                                <label data-i18n="labelContactName">Contact Person's Name <span class="required">*</span></label>
-                                <input type="text" id="contactName" data-i18n-placeholder="placeholderContactName" placeholder="Decision maker's name" required>
+                                <label data-i18n="labelFriendName">Friend's Name <span class="required">*</span></label>
+                                <input type="text" id="friendName" data-i18n-placeholder="placeholderFriendName" placeholder="Your friend's full name" required>
                             </div>
                             <div class="form-group">
-                                <label data-i18n="labelContactRole">Contact Person's Role</label>
-                                <input type="text" id="contactRole" data-i18n-placeholder="placeholderContactRole" placeholder="e.g., Travel Manager">
+                                <label data-i18n="labelFriendEmail">Friend's Email <span class="required">*</span></label>
+                                <input type="email" id="friendEmail" data-i18n-placeholder="placeholderFriendEmail" placeholder="friend@email.com" required>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label data-i18n="labelFriendPhone">Friend's Phone</label>
+                                <input type="tel" id="friendPhone" data-i18n-placeholder="placeholderFriendPhone" placeholder="(555) 123-4567">
+                            </div>
+                            <div class="form-group">
+                                <label data-i18n="labelCity">City They're Looking For</label>
+                                <input type="text" id="city" data-i18n-placeholder="placeholderCity" placeholder="e.g., Austin, TX">
                             </div>
                         </div>
 
                         <div class="form-group">
-                            <label data-i18n="labelContactEmail">Contact Person's Email <span class="required">*</span></label>
-                            <input type="email" id="contactEmail" data-i18n-placeholder="placeholderContactEmail" placeholder="contact@company.com" required>
-                        </div>
-
-                        <div class="form-group">
-                            <label data-i18n="labelContactPhone">Contact Person's Phone</label>
-                            <input type="tel" id="contactPhone" data-i18n-placeholder="placeholderContactPhone" placeholder="(555) 123-4567">
-                        </div>
-
-                        <div class="form-group">
-                            <label data-i18n="labelRelationship">How do you know this contact?</label>
-                            <select id="relationship">
-                                <option value="" data-i18n="optionSelectRelationship">Select relationship...</option>
-                                <option value="coworker" data-i18n="optionCoworker">Current or former coworker</option>
-                                <option value="friend" data-i18n="optionFriend">Friend or family</option>
-                                <option value="professional" data-i18n="optionProfessional">Professional network</option>
-                                <option value="self" data-i18n="optionSelf">This is my own company</option>
-                                <option value="other" data-i18n="optionOtherRelation">Other</option>
+                            <label data-i18n="labelMoveInTimeframe">Expected Move-in Timeframe</label>
+                            <select id="moveInTimeframe">
+                                <option value="" data-i18n="optionSelectTimeframe">Select timeframe...</option>
+                                <option value="within_30_days" data-i18n="optionWithin30Days">Within 30 days</option>
+                                <option value="1_3_months" data-i18n="option1to3Months">1-3 months</option>
+                                <option value="3_6_months" data-i18n="option3to6Months">3-6 months</option>
+                                <option value="not_sure" data-i18n="optionNotSure">Not sure</option>
                             </select>
                         </div>
 
                         <div class="form-group">
                             <label data-i18n="labelNotes">Additional Notes</label>
-                            <textarea id="notes" data-i18n-placeholder="placeholderNotes" placeholder="Any additional context about the company or referral..."></textarea>
+                            <textarea id="notes" data-i18n-placeholder="placeholderNotes" placeholder="Any additional context about your friend's housing needs..."></textarea>
                         </div>
 
                         <button type="submit" class="submit-button" id="submitBtn" data-i18n="submitButton">Submit Referral</button>
                     </form>
 
                     <div class="disclaimer" data-i18n="disclaimer">
-                        By submitting this referral, you confirm that you have the contact's permission to share their information. Hyatus will reach out professionally on your behalf. Rewards are paid after the referred company completes account setup and meets qualifying criteria.
+                        By submitting this referral, you confirm that you have your friend's permission to share their information. Hyatus will reach out professionally on your behalf. Rewards are paid after the referred guest completes a qualifying stay.
                     </div>
                 </div>
 
@@ -1036,13 +1015,13 @@
                         </svg>
                     </div>
                     <h3 data-i18n="successTitle">Referral Submitted!</h3>
-                    <p data-i18n="successText">Thank you for connecting us with a potential partner. Our team will follow up with your referral, and we'll keep you updated on the status. If they sign up, your $250 reward will be on its way!</p>
+                    <p data-i18n="successText">Thank you for referring a friend! Our team will reach out to them about their housing needs. We'll keep you updated on the status, and if they book a qualifying stay, your $50 reward will be on its way!</p>
                 </div>
             </div>
 
             <div class="my-referrals-section" id="myReferralsSection">
-                <h3 data-i18n="myReferralsTitle">My Referrals</h3>
-                <p style="color: var(--warm-gray-dark); font-size: 14px; margin-bottom: 20px;" data-i18n="myReferralsSubtitle">Track the status of your referrals and rewards.</p>
+                <h3 data-i18n="myReferralsTitle">My Guest Referrals</h3>
+                <p style="color: var(--warm-gray-dark); font-size: 14px; margin-bottom: 20px;" data-i18n="myReferralsSubtitle">Track the status of your guest referrals and rewards.</p>
                 
                 <div class="my-referrals-summary" id="referralsSummary">
                     <div class="summary-stat">
@@ -1058,7 +1037,7 @@
                         <div class="stat-label" data-i18n="totalEarned">Total Earned</div>
                     </div>
                     <div class="summary-stat">
-                        <div class="stat-value" id="remainingSlots">5</div>
+                        <div class="stat-value" id="remainingSlots">10</div>
                         <div class="stat-label" data-i18n="remainingSlots">Slots Left</div>
                     </div>
                 </div>
@@ -1078,73 +1057,105 @@
     <script>
         document.getElementById('copyrightYear').textContent = new Date().getFullYear();
 
+        let guestReferralReward = 50;
+        let guestReferralMax = 10;
+
+        async function loadSettings() {
+            try {
+                const response = await fetch('/api/settings/public');
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.guest_referral_reward) {
+                        guestReferralReward = parseFloat(data.guest_referral_reward);
+                        document.getElementById('rewardAmount').textContent = '$' + guestReferralReward;
+                    }
+                    if (data.guest_referral_max) {
+                        guestReferralMax = parseInt(data.guest_referral_max);
+                        document.getElementById('remainingSlots').textContent = guestReferralMax;
+                    }
+                    updateRewardTexts();
+                }
+            } catch (err) {
+                console.log('Using default settings');
+            }
+        }
+
+        function updateRewardTexts() {
+            const maxEarnings = guestReferralReward * guestReferralMax;
+            const rewardMaxEl = document.getElementById('rewardMaxText');
+            if (rewardMaxEl && currentLang === 'en') {
+                rewardMaxEl.textContent = `Earn up to $${maxEarnings} (maximum ${guestReferralMax} referrals per person)`;
+            }
+        }
+
         const translations = {
             en: {
                 backToFeedback: "Back to Feedback",
-                guestReferrals: "Friends & Family",
-                switchToGuest: "Switch to guest referrals",
-                badgeText: "Referral Program",
-                heroTitle: "Hyatus Connect Rewards",
-                heroSubtitle: "Know someone who books corporate housing? Introduce them to Hyatus and earn cash rewards for every successful connection.",
-                rewardLabel: "per qualifying company referral",
-                rewardMax: "Earn up to $1,000 (maximum 5 referrals per person)",
+                companyReferrals: "Company Referrals",
+                switchToCompany: "Switch to company referrals",
+                badgeText: "Friends & Family Referral",
+                heroTitle: "Refer Friends & Family",
+                heroSubtitle: "Know someone looking for furnished housing? Refer them to Hyatus and earn rewards!",
+                rewardLabel: "per qualifying guest referral",
+                rewardMax: "Earn up to $500 (maximum 10 referrals per person)",
                 howItWorksTitle: "How It Works",
-                howItWorksText: "Hyatus partners with companies, hospitals, and universities to provide high-quality furnished housing for business travel, relocations, and extended stays. When you connect us with the right person at an organization, we reward you for making it happen.",
+                howItWorksText: "Know someone who needs furnished housing for work, relocation, or an extended stay? Refer them to Hyatus, and when they book, you'll earn a reward for helping them find their perfect home away from home.",
                 step1Title: "Submit a Referral",
-                step1Text: "Fill out the form below with details about the company and your contact there.",
+                step1Text: "Fill out the form below with your friend's contact information.",
                 step2Title: "We Reach Out",
-                step2Text: "Our team will follow up with the organization to discuss their housing needs.",
-                step3Title: "Company Books First Stay",
-                step3Text: "Once the company completes their first booking with Hyatus, you earn your reward.",
+                step2Text: "Our team will contact your friend about their housing needs.",
+                step3Title: "Friend Books a Stay",
+                step3Text: "When your friend completes their first booking, you earn your reward.",
                 step4Title: "Get Paid",
-                step4Text: "Receive $250 for each qualifying referral, up to $1,000 total.",
+                step4Text: "Receive $50 for each qualifying referral, up to $500 total.",
                 qualificationsTitle: "What Qualifies as a Successful Referral?",
-                qual1: "The company or institution must be new to Hyatus (not an existing partner)",
-                qual2: "Your introduction must be to a decision-maker in travel, housing, or procurement",
-                qual3: "The organization must complete their first stay with Hyatus",
-                qual4: "Final qualification approval is determined by Hyatus",
-                formTitle: "Submit Your Referral",
-                formIntro: "Tell us about the company and who to contact.",
+                qual1: "The guest must be new to Hyatus (not an existing guest)",
+                qual2: "Your friend must complete a qualifying stay (minimum 30 nights)",
+                qual3: "Final qualification approval is determined by Hyatus",
+                formTitle: "Refer a Friend",
+                formIntro: "Tell us about your friend who needs furnished housing.",
                 labelYourName: "Your Name <span class=\"required\">*</span>",
                 labelYourEmail: "Your Email <span class=\"required\">*</span>",
-                labelCompanyName: "Company/Organization Name <span class=\"required\">*</span>",
-                labelOrgType: "Organization Type <span class=\"required\">*</span>",
-                labelContactName: "Contact Person's Name <span class=\"required\">*</span>",
-                labelContactRole: "Contact Person's Role",
-                labelContactEmail: "Contact Person's Email <span class=\"required\">*</span>",
-                labelContactPhone: "Contact Person's Phone",
-                labelRelationship: "How do you know this contact?",
+                labelFriendName: "Friend's Name <span class=\"required\">*</span>",
+                labelFriendEmail: "Friend's Email <span class=\"required\">*</span>",
+                labelFriendPhone: "Friend's Phone",
+                labelCity: "City They're Looking For",
+                labelMoveInTimeframe: "Expected Move-in Timeframe",
                 labelNotes: "Additional Notes",
                 placeholderYourName: "Your full name",
                 placeholderYourEmail: "your@email.com",
-                placeholderCompanyName: "Company, hospital, or university name",
-                placeholderContactName: "Decision maker's name",
-                placeholderContactRole: "e.g., Travel Manager",
-                placeholderContactEmail: "contact@company.com",
-                placeholderContactPhone: "(555) 123-4567",
-                placeholderNotes: "Any additional context about the company or referral...",
-                optionSelectType: "Select type...",
-                optionCompany: "Company / Corporation",
-                optionHospital: "Hospital / Healthcare",
-                optionUniversity: "University / Education",
-                optionGovernment: "Government Agency",
-                optionNonprofit: "Non-Profit Organization",
-                optionOther: "Other",
-                optionSelectRelationship: "Select relationship...",
-                optionCoworker: "Current or former coworker",
-                optionFriend: "Friend or family",
-                optionProfessional: "Professional network",
-                optionSelf: "This is my own company",
-                optionOtherRelation: "Other",
+                placeholderFriendName: "Your friend's full name",
+                placeholderFriendEmail: "friend@email.com",
+                placeholderFriendPhone: "(555) 123-4567",
+                placeholderCity: "e.g., Austin, TX",
+                placeholderNotes: "Any additional context about your friend's housing needs...",
+                optionSelectTimeframe: "Select timeframe...",
+                optionWithin30Days: "Within 30 days",
+                option1to3Months: "1-3 months",
+                option3to6Months: "3-6 months",
+                optionNotSure: "Not sure",
                 submitButton: "Submit Referral",
                 submitting: "Submitting...",
-                disclaimer: "By submitting this referral, you confirm that you have the contact's permission to share their information. Hyatus will reach out professionally on your behalf. Rewards are paid after the referred company completes account setup and meets qualifying criteria.",
+                disclaimer: "By submitting this referral, you confirm that you have your friend's permission to share their information. Hyatus will reach out professionally on your behalf. Rewards are paid after the referred guest completes a qualifying stay.",
                 successTitle: "Referral Submitted!",
-                successText: "Thank you for connecting us with a potential partner. Our team will follow up with your referral, and we'll keep you updated on the status. If they sign up, your $250 reward will be on its way!",
+                successText: "Thank you for referring a friend! Our team will reach out to them about their housing needs. We'll keep you updated on the status, and if they book a qualifying stay, your $50 reward will be on its way!",
                 footerContact: "Questions about the program? Contact us at",
                 footerRights: "All rights reserved.",
                 errorRequired: "Please fill in all required fields.",
-                errorGeneric: "Something went wrong. Please try again."
+                errorGeneric: "Something went wrong. Please try again.",
+                myReferralsTitle: "My Guest Referrals",
+                myReferralsSubtitle: "Track the status of your guest referrals and rewards.",
+                totalReferrals: "Total Referrals",
+                approvedReferrals: "Approved",
+                totalEarned: "Total Earned",
+                remainingSlots: "Slots Left",
+                loadingReferrals: "Loading your referrals...",
+                noReferrals: "You haven't submitted any guest referrals yet.",
+                statusSubmitted: "Submitted",
+                statusInReview: "In Review",
+                statusApproved: "Approved",
+                statusRejected: "Rejected",
+                statusPaid: "Paid"
             }
         };
 
@@ -1227,7 +1238,7 @@
                 return;
             }
             
-            const cacheKey = `translations_${lang}_referral`;
+            const cacheKey = `translations_${lang}_guest_referral`;
             const cached = localStorage.getItem(cacheKey);
             
             if (cached) {
@@ -1332,6 +1343,7 @@
             }
         });
 
+        loadSettings();
         initLanguage();
 
         const form = document.getElementById('referralFormElement');
@@ -1356,18 +1368,15 @@
             const data = {
                 referrer_name: document.getElementById('referrerName').value.trim(),
                 referrer_email: document.getElementById('referrerEmail').value.trim(),
-                company_name: document.getElementById('companyName').value.trim(),
-                org_type: document.getElementById('orgType').value,
-                contact_name: document.getElementById('contactName').value.trim(),
-                contact_role: document.getElementById('contactRole').value.trim(),
-                contact_email: document.getElementById('contactEmail').value.trim(),
-                contact_phone: document.getElementById('contactPhone').value.trim(),
-                relationship: document.getElementById('relationship').value,
+                friend_name: document.getElementById('friendName').value.trim(),
+                friend_email: document.getElementById('friendEmail').value.trim(),
+                friend_phone: document.getElementById('friendPhone').value.trim(),
+                city: document.getElementById('city').value.trim(),
+                move_in_timeframe: document.getElementById('moveInTimeframe').value,
                 notes: document.getElementById('notes').value.trim()
             };
 
-            if (!data.referrer_name || !data.referrer_email || !data.company_name || 
-                !data.org_type || !data.contact_name || !data.contact_email) {
+            if (!data.referrer_name || !data.referrer_email || !data.friend_name || !data.friend_email) {
                 showError(currentTranslations.errorRequired);
                 return;
             }
@@ -1376,7 +1385,7 @@
             submitBtn.textContent = currentTranslations.submitting;
 
             try {
-                const response = await fetch('/api/referrals', {
+                const response = await fetch('/api/guest-referrals', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(data)
@@ -1418,7 +1427,7 @@
             const listEl = document.getElementById('referralList');
             
             try {
-                const response = await fetch('/api/referrals/my');
+                const response = await fetch('/api/guest-referrals/my');
                 const result = await response.json();
                 
                 if (!response.ok) {
@@ -1431,10 +1440,10 @@
                 document.getElementById('totalReferrals').textContent = summary.total || referrals.length;
                 document.getElementById('approvedCount').textContent = summary.approved || 0;
                 document.getElementById('totalEarned').textContent = '$' + (summary.total_earned || 0);
-                document.getElementById('remainingSlots').textContent = Math.max(0, 5 - referrals.length);
+                document.getElementById('remainingSlots').textContent = Math.max(0, guestReferralMax - referrals.length);
                 
                 if (referrals.length === 0) {
-                    listEl.innerHTML = '<div class="no-referrals">' + (currentTranslations.noReferrals || 'You haven\'t submitted any referrals yet.') + '</div>';
+                    listEl.innerHTML = '<div class="no-referrals">' + (currentTranslations.noReferrals || 'You haven\'t submitted any guest referrals yet.') + '</div>';
                     return;
                 }
                 
@@ -1456,7 +1465,7 @@
                     
                     item.innerHTML = `
                         <div class="referral-item-info">
-                            <div class="referral-item-company">${escapeHtml(ref.company_name)}</div>
+                            <div class="referral-item-name">${escapeHtml(ref.friend_name)}</div>
                             <div class="referral-item-date">${date}</div>
                         </div>
                         <div class="referral-item-right" style="display: flex; gap: 12px; align-items: center;">

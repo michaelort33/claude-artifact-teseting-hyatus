@@ -1072,8 +1072,65 @@ function switchTab(tabName) {
         loadReferrals();
     } else if (tabName === 'taskLogs') {
         loadTaskLogs();
+    } else if (tabName === 'settings') {
+        loadSettings();
     }
 }
+
+// Settings management
+async function loadSettings() {
+    try {
+        const response = await fetch('/api/settings');
+        const result = await response.json();
+        
+        if (!response.ok) {
+            throw new Error(result.error || 'Failed to load settings');
+        }
+        
+        const settings = result.data || {};
+        
+        document.getElementById('companyReferralRewardAmount').value = settings.company_referral_reward?.value ?? '';
+        document.getElementById('companyReferralMaxPerPerson').value = settings.company_referral_max?.value ?? '';
+        document.getElementById('guestReferralRewardAmount').value = settings.guest_referral_reward?.value ?? '';
+        document.getElementById('guestReferralMaxPerPerson').value = settings.guest_referral_max?.value ?? '';
+    } catch (err) {
+        console.error('Error loading settings:', err);
+        showToast('Error loading settings: ' + err.message, 'error');
+    }
+}
+
+async function saveSettings() {
+    try {
+        const data = {
+            company_referral_reward: document.getElementById('companyReferralRewardAmount').value || '250',
+            company_referral_max: document.getElementById('companyReferralMaxPerPerson').value || '5',
+            guest_referral_reward: document.getElementById('guestReferralRewardAmount').value || '50',
+            guest_referral_max: document.getElementById('guestReferralMaxPerPerson').value || '10'
+        };
+        
+        const response = await fetch('/api/settings', {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+        });
+        
+        const result = await response.json();
+        
+        if (!response.ok) {
+            throw new Error(result.error || 'Failed to save settings');
+        }
+        
+        showToast('Settings saved successfully', 'success');
+    } catch (err) {
+        console.error('Error saving settings:', err);
+        showToast('Error saving settings: ' + err.message, 'error');
+    }
+}
+
+document.getElementById('settingsForm')?.addEventListener('submit', (e) => {
+    e.preventDefault();
+    saveSettings();
+});
 
 // Referral management
 let referrals = [];
