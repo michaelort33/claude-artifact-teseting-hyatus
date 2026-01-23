@@ -1116,7 +1116,7 @@ async function loadOverviewStats() {
 
         if (taskLogsRes.ok) {
             const data = await taskLogsRes.json();
-            const logs = data.data || [];
+            const logs = data.data?.logs || [];
             document.getElementById('overviewTasksRecent').textContent = logs.length;
         }
     } catch (err) {
@@ -1603,7 +1603,7 @@ async function loadTaskLogs(status) {
             throw new Error(result.error || 'Failed to load task logs');
         }
         
-        taskLogs = result.data || [];
+        taskLogs = result.data?.logs || [];
         renderTaskLogs(taskLogs);
     } catch (err) {
         console.error('Error loading task logs:', err);
