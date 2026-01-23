@@ -1253,7 +1253,7 @@ async function handleTasksOptions(req, res) {
     try {
         const token = await getTasksApiToken();
         
-        const response = await fetch(`${TASKS_API_BASE}/users/all-users`, {
+        const response = await fetch(`${TASKS_API_BASE}/tasks/options/dropdown`, {
             method: 'GET',
             headers: {
                 'Authorization': `Bearer ${token}`,
@@ -1266,8 +1266,8 @@ async function handleTasksOptions(req, res) {
             return sendJson(res, response.status, { error: `Tasks API error: ${response.status}`, details: errorText });
         }
 
-        const users = await response.json();
-        sendJson(res, 200, { userOptions: users });
+        const options = await response.json();
+        sendJson(res, 200, options);
     } catch (err) {
         console.error('Tasks options error:', err);
         sendJson(res, 500, { error: err.message });

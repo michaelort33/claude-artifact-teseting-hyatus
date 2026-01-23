@@ -1,0 +1,117 @@
+{
+  "linkIdOptions": [
+    {
+      "value": "Hyatus",
+      "label": "Hyatus (Company)",
+      "type": "company",
+      "context": "Company-wide tasks"
+    },
+    {
+      "value": "4137626",
+      "label": "[4137626] Luxurious 2BR Apartments at The Andi - The Andi (boston)",
+      "type": "multiunit",
+      "context": "boston - The Andi"
+    },
+    {
+      "value": "BLKMF0QL7MPFTIQBE",
+      "label": " block block BLKMF0QL7MPFTIQBE(2027-05-01-2027-05-14)",
+      "type": "reservation",
+      "context": "new-haven - Pierpont"
+    }
+  ],
+  "taskParentOptions": [
+    {
+      "value": "company",
+      "label": "Company Task",
+      "description": "Tasks not linked to a specific location (Hyatus company-wide)"
+    },
+    {
+      "value": "reservation",
+      "label": "Reservation Task",
+      "description": "Tasks associated with specific reservations"
+    }
+  ],
+  "userOptions": [
+    {
+      "value": "67696a0a465147b0832acb84",
+      "id": "67696a0a465147b0832acb84",
+      "label": "gptpricing@gmail.com",
+      "email": "gptpricing@gmail.com",
+      "breezeway_user_id": ""
+    },
+    {
+      "value": "67cecc3a04ee12b19971f8f5",
+      "id": "67cecc3a04ee12b19971f8f5",
+      "label": "rayhan@hyatus.com",
+      "role": "super_admin",
+      "email": "rayhan@hyatus.com",
+      "breezeway_user_id": "322995"
+    }
+  ],
+  "priorityOptions": [
+    {
+      "value": "urgent",
+      "label": "Urgent",
+      "color": "#FF0000",
+      "icon": "🔺",
+      "count": "2868"
+    },
+    {
+      "value": "high",
+      "label": "High",
+      "color": "#FF8C00",
+      "icon": "🔶",
+      "count": "1464"
+    }
+  ],
+  "statusOptions": [
+    {
+      "value": "todo",
+      "label": "To Do",
+      "color": "#E3F2FD",
+      "count": "15151"
+    },
+    {
+      "value": "done",
+      "label": "Done",
+      "color": "#E8F5E8",
+      "count": "13393"
+    }
+  ],
+  "categoryOptions": [
+    {
+      "value": "general",
+      "label": "General",
+      "count": "10980"
+    },
+    {
+      "value": "maintenance",
+      "label": "Maintenance",
+      "count": "9794"
+    }
+  ],
+  "subcategoryOptions": [
+    {
+      "value": "additional_guests",
+      "label": "additional_guests",
+      "count": "7013"
+    },
+    {
+      "value": "breezeway_cleaning",
+      "label": "breezeway_cleaning",
+      "count": "6186"
+    }
+  ],
+  "tagOptions": [
+    {
+      "value": "Guest Arriving Today",
+      "label": "Guest Arriving Today",
+      "count": "2182"
+    },
+    {
+      "value": "Guest Checking Out Today",
+      "label": "Guest Checking Out Today",
+      "count": "2181"
+    }
+  ]
+}
