@@ -224,7 +224,7 @@ function showDashboard() {
     document.getElementById('loginSection').style.display = 'none';
     document.getElementById('logoutBtn').style.display = 'block';
     document.getElementById('dashboard').classList.add('active');
-    loadSubmissions();
+    loadOverviewStats();
 }
 
 let isLoadingSubmissions = false;
@@ -1068,12 +1068,140 @@ function switchTab(tabName) {
         }
     });
     
-    if (tabName === 'referrals') {
+    if (tabName === 'overview') {
+        loadOverviewStats();
+    } else if (tabName === 'referrals') {
         loadReferrals();
+    } else if (tabName === 'guestReferrals') {
+        loadGuestReferrals();
     } else if (tabName === 'taskLogs') {
         loadTaskLogs();
     } else if (tabName === 'settings') {
         loadSettings();
+    }
+}
+
+async function loadOverviewStats() {
+    try {
+        const [submissionsRes, referralsRes, guestReferralsRes, taskLogsRes] = await Promise.all([
+            fetch('/api/submissions'),
+            fetch('/api/referrals'),
+            fetch('/api/guest-referrals'),
+            fetch('/api/task-logs?limit=10')
+        ]);
+
+        if (submissionsRes.ok) {
+            const data = await submissionsRes.json();
+            const submissions = data.data || [];
+            const pending = submissions.filter(s => s.status === 'submitted' || s.status === 'in_review').length;
+            document.getElementById('overviewPending').textContent = pending;
+            document.getElementById('overviewTotal').textContent = submissions.length;
+        }
+
+        if (referralsRes.ok) {
+            const data = await referralsRes.json();
+            const referrals = data.data || [];
+            const pending = referrals.filter(r => r.status === 'pending').length;
+            document.getElementById('overviewCompanyPending').textContent = pending;
+            document.getElementById('overviewCompanyTotal').textContent = referrals.length;
+        }
+
+        if (guestReferralsRes.ok) {
+            const data = await guestReferralsRes.json();
+            const referrals = data.data || [];
+            const pending = referrals.filter(r => r.status === 'pending').length;
+            document.getElementById('overviewGuestPending').textContent = pending;
+            document.getElementById('overviewGuestTotal').textContent = referrals.length;
+        }
+
+        if (taskLogsRes.ok) {
+            const data = await taskLogsRes.json();
+            const logs = data.data || [];
+            document.getElementById('overviewTasksRecent').textContent = logs.length;
+        }
+    } catch (err) {
+        console.error('Error loading overview stats:', err);
+    }
+}
+
+async function loadGuestReferrals() {
+    try {
+        const status = document.getElementById('guestReferralStatusFilter')?.value || 'all';
+        const response = await fetch(`/api/guest-referrals?status=${status}`);
+        const result = await response.json();
+
+        if (!response.ok) {
+            throw new Error(result.error || 'Failed to load guest referrals');
+        }
+
+        const referrals = result.data || [];
+        
+        const pending = referrals.filter(r => r.status === 'pending').length;
+        const approved = referrals.filter(r => r.status === 'approved').length;
+        const paid = referrals.filter(r => r.status === 'paid').length;
+        
+        document.getElementById('guestReferralTotal').textContent = referrals.length;
+        document.getElementById('guestReferralPending').textContent = pending;
+        document.getElementById('guestReferralApproved').textContent = approved;
+        document.getElementById('guestReferralPaid').textContent = paid;
+
+        const tbody = document.getElementById('guestReferralsList');
+        if (referrals.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; padding: 40px; color: var(--warm-gray-dark);">No guest referrals found</td></tr>';
+            return;
+        }
+
+        tbody.innerHTML = referrals.map(r => `
+            <tr>
+                <td>${new Date(r.created_at).toLocaleDateString()}</td>
+                <td>
+                    <div style="font-weight: 500;">${escapeHtml(r.referrer_name)}</div>
+                    <div style="font-size: 12px; color: var(--warm-gray-dark);">${escapeHtml(r.referrer_email)}</div>
+                </td>
+                <td>
+                    <div style="font-weight: 500;">${escapeHtml(r.friend_name)}</div>
+                    <div style="font-size: 12px; color: var(--warm-gray-dark);">${escapeHtml(r.friend_email)}</div>
+                    ${r.friend_phone ? `<div style="font-size: 12px; color: var(--warm-gray-dark);">${escapeHtml(r.friend_phone)}</div>` : ''}
+                </td>
+                <td>${r.city ? escapeHtml(r.city) : '-'}</td>
+                <td><span class="status-badge status-${r.status}">${r.status}</span></td>
+                <td>${r.approved_reward_amount ? '$' + parseFloat(r.approved_reward_amount).toFixed(0) : '-'}</td>
+                <td>
+                    <select onchange="updateGuestReferralStatus(${r.id}, this.value)" style="padding: 6px 10px; border: 1px solid var(--border-light); border-radius: var(--radius-sm); font-size: 13px;">
+                        <option value="pending" ${r.status === 'pending' ? 'selected' : ''}>Pending</option>
+                        <option value="approved" ${r.status === 'approved' ? 'selected' : ''}>Approved</option>
+                        <option value="paid" ${r.status === 'paid' ? 'selected' : ''}>Paid</option>
+                        <option value="rejected" ${r.status === 'rejected' ? 'selected' : ''}>Rejected</option>
+                    </select>
+                </td>
+            </tr>
+        `).join('');
+    } catch (err) {
+        console.error('Error loading guest referrals:', err);
+        showToast('Error loading guest referrals: ' + err.message, 'error');
+    }
+}
+
+async function updateGuestReferralStatus(id, status) {
+    try {
+        const response = await fetch(`/api/guest-referrals/${id}`, {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ status })
+        });
+
+        const result = await response.json();
+
+        if (!response.ok) {
+            throw new Error(result.error || 'Failed to update guest referral');
+        }
+
+        showToast('Guest referral updated successfully', 'success');
+        loadGuestReferrals();
+    } catch (err) {
+        console.error('Error updating guest referral:', err);
+        showToast('Error updating guest referral: ' + err.message, 'error');
+        loadGuestReferrals();
     }
 }
 
