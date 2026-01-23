@@ -768,7 +768,7 @@ async function updateStatus(id, newStatus) {
     }
 }
 
-function showTaskModal(submission) {
+async function showTaskModal(submission) {
     pendingTaskSubmission = submission;
     const details = document.getElementById('taskDetails');
     const amount = parseFloat(submission.award_amount) || getAwardAmount(submission.id);
@@ -786,8 +786,32 @@ function showTaskModal(submission) {
             <span style="font-weight: 500;">$${Number(amount).toFixed(2)}</span>
         </div>
     `;
+    
+    const assigneeSelect = document.getElementById('taskAssignee');
+    assigneeSelect.innerHTML = '<option value="">Loading users...</option>';
+    
     document.getElementById('taskModal').classList.add('active');
     openModal();
+    
+    try {
+        const response = await fetch('/api/tasks/options');
+        if (response.ok) {
+            const data = await response.json();
+            const users = data.userOptions || [];
+            assigneeSelect.innerHTML = '<option value="">-- Select Assignee --</option>';
+            users.forEach(user => {
+                const option = document.createElement('option');
+                option.value = user.value;
+                option.textContent = user.label;
+                assigneeSelect.appendChild(option);
+            });
+        } else {
+            assigneeSelect.innerHTML = '<option value="">Failed to load users</option>';
+        }
+    } catch (err) {
+        console.error('Failed to load user options:', err);
+        assigneeSelect.innerHTML = '<option value="">Failed to load users</option>';
+    }
 }
 
 async function skipTask() {
@@ -803,6 +827,7 @@ async function createTask() {
     const amount = parseFloat(submission.award_amount) || getAwardAmount(submission.id);
     const giftType = (submission.payment_method || 'gift').toUpperCase();
     const email = submission.payment_handle;
+    const assigneeId = document.getElementById('taskAssignee').value;
 
     const createBtn = document.querySelector('#taskModal .btn-primary');
     const skipBtn = document.querySelector('#taskModal .btn-secondary');
@@ -840,21 +865,27 @@ async function createTask() {
             }
         }
 
+        const taskPayload = {
+            name: `Send $${amount} ${giftType} gift card to ${email}`,
+            category: 'guest_satisfaction',
+            priority: 'medium',
+            description: `Guest appreciation gift - ${giftType} $${amount}\nRecipient: ${email}\nSubmission ID: ${submission.id}`,
+            external_id: `reward-${submission.id}`,
+            subcategory: 'gift_card',
+            tags: ['Giftly'],
+            due_date: new Date().toISOString(),
+            task_parent: taskParent,
+            link_id: linkId
+        };
+
+        if (assigneeId) {
+            taskPayload.assignee = assigneeId;
+        }
+
         const response = await fetch('/api/tasks', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                name: `Send $${amount} ${giftType} gift card to ${email}`,
-                category: 'guest_satisfaction',
-                priority: 'medium',
-                description: `Guest appreciation gift - ${giftType} $${amount}\nRecipient: ${email}\nSubmission ID: ${submission.id}`,
-                external_id: `reward-${submission.id}`,
-                subcategory: 'gift_card',
-                tags: ['Giftly'],
-                due_date: new Date().toISOString(),
-                task_parent: taskParent,
-                link_id: linkId
-            })
+            body: JSON.stringify(taskPayload)
         });
 
         const result = await response.json();

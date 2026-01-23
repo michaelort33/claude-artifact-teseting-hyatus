@@ -1249,6 +1249,31 @@ function handleTasksHealth(req, res) {
     sendJson(res, 200, { status: 'ok', tasksApiConfigured: hasCredentials });
 }
 
+async function handleTasksOptions(req, res) {
+    try {
+        const token = await getTasksApiToken();
+        
+        const response = await fetch(`${TASKS_API_BASE}/users/all-users`, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Accept': 'application/json',
+            },
+        });
+
+        if (!response.ok) {
+            const errorText = await response.text();
+            return sendJson(res, response.status, { error: `Tasks API error: ${response.status}`, details: errorText });
+        }
+
+        const users = await response.json();
+        sendJson(res, 200, { userOptions: users });
+    } catch (err) {
+        console.error('Tasks options error:', err);
+        sendJson(res, 500, { error: err.message });
+    }
+}
+
 async function handleSendEmail(req, res) {
     try {
         if (!process.env.SENDGRID_API_KEY) {
@@ -1503,6 +1528,9 @@ const server = http.createServer(async (req, res) => {
     }
     if (pathname === '/api/tasks/health' && method === 'GET') {
         return handleTasksHealth(req, res);
+    }
+    if (pathname === '/api/tasks/options' && method === 'GET') {
+        return handleTasksOptions(req, res);
     }
     if (pathname === '/api/reservations/lookup-by-email' && method === 'POST') {
         return handleReservationLookup(req, res);
