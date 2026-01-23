@@ -787,8 +787,13 @@ async function showTaskModal(submission) {
         </div>
     `;
     
-    const assigneeSelect = document.getElementById('taskAssignee');
-    assigneeSelect.innerHTML = '<option value="">Loading users...</option>';
+    const searchInput = document.getElementById('taskAssigneeSearch');
+    const hiddenInput = document.getElementById('taskAssignee');
+    const optionsContainer = document.getElementById('assigneeOptions');
+    
+    searchInput.value = '';
+    hiddenInput.value = '';
+    optionsContainer.innerHTML = '<div class="no-results">Loading...</div>';
     
     document.getElementById('taskModal').classList.add('active');
     openModal();
@@ -797,20 +802,93 @@ async function showTaskModal(submission) {
         const response = await fetch('/api/tasks/options');
         if (response.ok) {
             const data = await response.json();
-            const users = data.userOptions || [];
-            assigneeSelect.innerHTML = '<option value="">-- Select Assignee --</option>';
-            users.forEach(user => {
-                const option = document.createElement('option');
-                option.value = user.value;
-                option.textContent = user.label;
-                assigneeSelect.appendChild(option);
-            });
+            const allUsers = data.userOptions || [];
+            const adminUsers = allUsers.filter(u => u.role === 'admin' || u.role === 'super_admin');
+            
+            window.assigneeUsers = adminUsers;
+            renderAssigneeOptions(adminUsers, '');
+            setupAssigneeSearch();
         } else {
-            assigneeSelect.innerHTML = '<option value="">Failed to load users</option>';
+            optionsContainer.innerHTML = '<div class="no-results">Failed to load users</div>';
         }
     } catch (err) {
         console.error('Failed to load user options:', err);
-        assigneeSelect.innerHTML = '<option value="">Failed to load users</option>';
+        optionsContainer.innerHTML = '<div class="no-results">Failed to load users</div>';
+    }
+}
+
+function renderAssigneeOptions(users, filter) {
+    const optionsContainer = document.getElementById('assigneeOptions');
+    const hiddenInput = document.getElementById('taskAssignee');
+    const filterLower = filter.toLowerCase();
+    
+    const filtered = users.filter(u => 
+        u.label.toLowerCase().includes(filterLower) || 
+        (u.email && u.email.toLowerCase().includes(filterLower))
+    );
+    
+    if (filtered.length === 0) {
+        optionsContainer.innerHTML = '<div class="no-results">No admins found</div>';
+        return;
+    }
+    
+    optionsContainer.innerHTML = '';
+    filtered.forEach(user => {
+        const div = document.createElement('div');
+        div.className = 'option-item' + (hiddenInput.value === user.value ? ' selected' : '');
+        div.dataset.value = user.value;
+        div.innerHTML = `${user.email || user.label}<span class="option-role">${user.role}</span>`;
+        div.addEventListener('click', () => selectAssignee(user));
+        optionsContainer.appendChild(div);
+    });
+}
+
+function selectAssignee(user) {
+    const searchInput = document.getElementById('taskAssigneeSearch');
+    const hiddenInput = document.getElementById('taskAssignee');
+    const optionsContainer = document.getElementById('assigneeOptions');
+    
+    hiddenInput.value = user.value;
+    searchInput.value = user.email || user.label;
+    optionsContainer.style.display = 'none';
+    
+    document.querySelectorAll('#assigneeOptions .option-item').forEach(el => {
+        el.classList.toggle('selected', el.dataset.value === user.value);
+    });
+}
+
+function setupAssigneeSearch() {
+    const searchInput = document.getElementById('taskAssigneeSearch');
+    const optionsContainer = document.getElementById('assigneeOptions');
+    
+    searchInput.removeEventListener('focus', handleAssigneeFocus);
+    searchInput.removeEventListener('input', handleAssigneeInput);
+    document.removeEventListener('click', handleAssigneeClickOutside);
+    
+    searchInput.addEventListener('focus', handleAssigneeFocus);
+    searchInput.addEventListener('input', handleAssigneeInput);
+    document.addEventListener('click', handleAssigneeClickOutside);
+}
+
+function handleAssigneeFocus() {
+    document.getElementById('assigneeOptions').style.display = 'block';
+}
+
+function handleAssigneeInput(e) {
+    const filter = e.target.value;
+    document.getElementById('assigneeOptions').style.display = 'block';
+    if (window.assigneeUsers) {
+        renderAssigneeOptions(window.assigneeUsers, filter);
+    }
+    if (!filter) {
+        document.getElementById('taskAssignee').value = '';
+    }
+}
+
+function handleAssigneeClickOutside(e) {
+    const dropdown = document.getElementById('assigneeDropdown');
+    if (dropdown && !dropdown.contains(e.target)) {
+        document.getElementById('assigneeOptions').style.display = 'none';
     }
 }
 
