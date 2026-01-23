@@ -26,15 +26,18 @@ A web application that allows guests to receive thank-you gifts for sharing thei
 - `sessions` - Session management (user_id, token, expires_at)
 - `admins` - Admin email whitelist
 - `review_rewards` - Submission data (payment_method, payment_handle, status, etc.)
-- `referrals` - Referral program submissions (referrer info, company info, contact info, status, reward_paid)
+- `referrals` - Company referral program submissions (referrer info, company info, contact info, status, reward_paid)
+- `guest_referrals` - Friends & family referral program (referrer info, friend info, city, timeframe, status, reward)
+- `settings` - Configurable app settings (key/value pairs for referral rewards and limits)
 - `task_logs` - Task API audit logs (request/response payloads, status, timestamps)
 
 ### Frontend Files
 - `index.html` - Main user-facing page for submitting reward claims
-- `admin.html` - Admin dashboard for managing submissions with analytics
-- `referral.html` - Hyatus Connect Rewards referral program page
+- `admin.html` - Admin dashboard for managing submissions with analytics and settings
+- `referral.html` - Hyatus Connect Rewards company referral program page
+- `guest-referral.html` - Friends & Family referral program page
 - `js/index.js` - Main application logic, form handling, authentication
-- `js/admin.js` - Admin dashboard logic, submission management
+- `js/admin.js` - Admin dashboard logic, submission management, settings
 
 ### Design System
 The application uses a Warm Editorial aesthetic inspired by high-end architectural magazines:
@@ -74,11 +77,22 @@ The application uses a Warm Editorial aesthetic inspired by high-end architectur
 - POST `/api/tasks` - Create payment task
 - GET `/api/tasks/health` - Check task API configuration
 
-**Referrals:**
+**Company Referrals:**
 - GET `/api/referrals/my` - Get authenticated user's referrals with summary metrics
 - GET `/api/referrals` - List all referrals (admin only, with status filter and pagination)
 - POST `/api/referrals` - Submit new referral (with duplicate company check and 5-referral limit)
 - PATCH `/api/referrals/:id` - Update referral status/reward/notes (admin only)
+
+**Guest Referrals:**
+- GET `/api/guest-referrals/my` - Get authenticated user's guest referrals with summary metrics
+- GET `/api/guest-referrals` - List all guest referrals (admin only, with status filter)
+- POST `/api/guest-referrals` - Submit new guest referral (with duplicate check and 10-referral limit)
+- PATCH `/api/guest-referrals/:id` - Update guest referral status/reward/notes (admin only)
+
+**Settings:**
+- GET `/api/settings` - Get all settings (admin only)
+- PATCH `/api/settings` - Update settings (admin only)
+- GET `/api/settings/public` - Get public referral settings (reward amounts and limits)
 
 **Translation:**
 - POST `/api/translate` - Translate texts to target language (rate limited: 30 req/min per IP)
@@ -115,6 +129,13 @@ The application is served via Node.js server on port 5000.
 - **Password resets**: Sent to user's email address
 
 ## Recent Changes
+- **2026-01-23**: Added Friends & Family referral program and admin settings
+  - New guest-referral.html page for referring friends/family ($50 reward, max 10 referrals)
+  - Admin Settings tab for configuring referral reward amounts and limits
+  - Settings stored in database for admin configurability (company_referral_reward, company_referral_max, guest_referral_reward, guest_referral_max)
+  - Guest referral API endpoints: GET/POST /api/guest-referrals, PATCH /api/guest-referrals/:id
+  - Settings API endpoints: GET/PATCH /api/settings (admin), GET /api/settings/public (public)
+  - Updated referral.html wording to clarify rewards earned when company makes first stay
 - **2026-01-19**: Added multilingual support
   - Google Cloud Translation API integration with server-side caching and rate limiting (30 req/min per IP)
   - Language dropdown with 9 languages: English, Arabic, Portuguese, Chinese, Japanese, Korean, Spanish, Russian, German
