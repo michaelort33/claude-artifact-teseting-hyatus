@@ -1418,20 +1418,25 @@
             const listEl = document.getElementById('referralList');
             
             try {
-                const response = await fetch('/api/referrals/my');
-                const result = await response.json();
+                const [referralsRes, settingsRes] = await Promise.all([
+                    fetch('/api/referrals/my'),
+                    fetch('/api/settings/public')
+                ]);
+                const result = await referralsRes.json();
+                const settingsResult = await settingsRes.json();
                 
-                if (!response.ok) {
+                if (!referralsRes.ok) {
                     throw new Error(result.error || 'Failed to load referrals');
                 }
                 
-                const referrals = result.data || [];
-                const summary = result.summary || {};
+                const referrals = result.data?.referrals || [];
+                const summary = result.data?.summary || {};
+                const maxReferrals = settingsResult.company_referral_max || 5;
                 
-                document.getElementById('totalReferrals').textContent = summary.total || referrals.length;
-                document.getElementById('approvedCount').textContent = summary.approved || 0;
-                document.getElementById('totalEarned').textContent = '$' + (summary.total_earned || 0);
-                document.getElementById('remainingSlots').textContent = Math.max(0, 5 - referrals.length);
+                document.getElementById('totalReferrals').textContent = summary.total_submitted || referrals.length;
+                document.getElementById('approvedCount').textContent = summary.total_approved || 0;
+                document.getElementById('totalEarned').textContent = '$' + (summary.total_earnings || 0);
+                document.getElementById('remainingSlots').textContent = Math.max(0, maxReferrals - referrals.length);
                 
                 if (referrals.length === 0) {
                     listEl.innerHTML = '<div class="no-referrals">' + (currentTranslations.noReferrals || 'You haven\'t submitted any referrals yet.') + '</div>';
