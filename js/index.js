@@ -680,6 +680,8 @@ function updateAuthUI() {
 
         if (userAuthLink) userAuthLink.innerHTML = userHTML;
         if (userAuthLinkMobileEl) userAuthLinkMobileEl.innerHTML = userHTML;
+        if (userAuthLink) userAuthLink.classList.add('auth-ready');
+        if (userAuthLinkMobileEl) userAuthLinkMobileEl.classList.add('auth-ready');
         closeAuthModal();
         closeProfilePopover();
         loadMySubmissions();
@@ -693,6 +695,8 @@ function updateAuthUI() {
         `;
         if (userAuthLink) userAuthLink.innerHTML = signInHTML;
         if (userAuthLinkMobileEl) userAuthLinkMobileEl.innerHTML = signInHTML;
+        if (userAuthLink) userAuthLink.classList.add('auth-ready');
+        if (userAuthLinkMobileEl) userAuthLinkMobileEl.classList.add('auth-ready');
         closeProfilePopover();
     }
 }

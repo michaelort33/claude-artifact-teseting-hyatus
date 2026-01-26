@@ -414,6 +414,11 @@
             font-size: 13px;
             font-family: 'Inter', sans-serif;
             transition: all 0.3s ease-out;
+            opacity: 0;
+        }
+
+        .auth-button.auth-ready {
+            opacity: 1;
         }
 
         .auth-button:hover {
@@ -1816,7 +1821,6 @@
 
         function renderAuthButton() {
             const authBtn = document.getElementById('userAuthLink');
-            const authBtnText = authBtn.querySelector('.auth-button-text');
             
             if (currentUser) {
                 const initial = currentUser.email ? currentUser.email.charAt(0).toUpperCase() : 'U';
@@ -1832,6 +1836,7 @@
                     <span class="auth-button-text" data-i18n="signIn">${currentTranslations.signIn || 'Sign In'}</span>
                 `;
             }
+            authBtn.classList.add('auth-ready');
         }
 
         function renderProfileDropdown() {
