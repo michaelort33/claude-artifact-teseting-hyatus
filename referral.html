@@ -1706,7 +1706,7 @@
 
         async function checkAuthAndLoadReferrals() {
             try {
-                const response = await fetch('/api/auth/session');
+                const response = await fetch('/api/auth/session', { credentials: 'include' });
                 const data = await response.json();
                 
                 if (response.ok && data.user) {
@@ -1796,7 +1796,7 @@
 
         async function checkSession() {
             try {
-                const response = await fetch('/api/auth/session');
+                const response = await fetch('/api/auth/session', { credentials: 'include' });
                 const data = await response.json();
                 
                 if (response.ok && data.user) {
@@ -1862,6 +1862,7 @@
                 const response = await fetch('/api/auth/signin', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
+                    credentials: 'include',
                     body: JSON.stringify({ email, password })
                 });
                 
@@ -1888,6 +1889,7 @@
                 const response = await fetch('/api/auth/signup', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
+                    credentials: 'include',
                     body: JSON.stringify({ email, password })
                 });
                 
@@ -1911,7 +1913,7 @@
 
         async function handleSignOut() {
             try {
-                await fetch('/api/auth/signout', { method: 'POST' });
+                await fetch('/api/auth/signout', { method: 'POST', credentials: 'include' });
                 currentUser = null;
                 renderAuthButton();
                 document.getElementById('userProfileDropdown').classList.remove('active');

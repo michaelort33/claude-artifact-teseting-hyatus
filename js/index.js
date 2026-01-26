@@ -519,6 +519,7 @@ async function handleAuthSubmit() {
         const response = await fetch(endpoint, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
+            credentials: 'include',
             body: JSON.stringify({ email, password })
         });
 
@@ -624,6 +625,7 @@ if (sendResetBtn) {
             const response = await fetch('/api/auth/reset-password-request', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
+                credentials: 'include',
                 body: JSON.stringify({ email })
             });
 
@@ -798,7 +800,7 @@ function renderProfilePopover() {
     if (openBtn) openBtn.onclick = () => openSubmissionsModal();
     if (openReferralsBtn) openReferralsBtn.onclick = () => openReferralDashboard();
     if (signOutBtn) signOutBtn.onclick = async () => {
-        await fetch('/api/auth/signout', { method: 'POST' });
+        await fetch('/api/auth/signout', { method: 'POST', credentials: 'include' });
         currentUser = null;
         mySubmissions = [];
         myReferrals = [];
@@ -912,6 +914,7 @@ async function resetPassword() {
         const response = await fetch('/api/auth/reset-password', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
+            credentials: 'include',
             body: JSON.stringify({ token: resetToken, password: newPassword })
         });
 
@@ -945,7 +948,7 @@ function closeResetModal() {
 
 async function initAuth() {
     try {
-        const response = await fetch('/api/auth/session');
+        const response = await fetch('/api/auth/session', { credentials: 'include' });
         const result = await response.json();
         if (result.user) {
             currentUser = result.user;
