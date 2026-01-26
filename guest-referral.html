@@ -1804,21 +1804,35 @@
         let authMode = 'login';
 
         async function checkSession() {
+            const cachedUser = localStorage.getItem('hyatus_user');
+            if (cachedUser) {
+                try {
+                    currentUser = JSON.parse(cachedUser);
+                    renderAuthButton();
+                    renderProfileDropdown();
+                } catch (e) {
+                    localStorage.removeItem('hyatus_user');
+                }
+            }
+            
             try {
                 const response = await fetch('/api/auth/session', { credentials: 'include' });
                 const data = await response.json();
                 
                 if (response.ok && data.user) {
                     currentUser = data.user;
+                    localStorage.setItem('hyatus_user', JSON.stringify(data.user));
                     renderAuthButton();
                     renderProfileDropdown();
                 } else {
                     currentUser = null;
+                    localStorage.removeItem('hyatus_user');
                     renderAuthButton();
                 }
             } catch (err) {
                 console.log('Session check failed');
                 currentUser = null;
+                localStorage.removeItem('hyatus_user');
                 renderAuthButton();
             }
         }
@@ -1882,6 +1896,7 @@
                 }
                 
                 currentUser = data.user;
+                localStorage.setItem('hyatus_user', JSON.stringify(data.user));
                 closeAuthModal();
                 renderAuthButton();
                 renderProfileDropdown();
@@ -1909,6 +1924,7 @@
                 }
                 
                 currentUser = data.user;
+                localStorage.setItem('hyatus_user', JSON.stringify(data.user));
                 closeAuthModal();
                 renderAuthButton();
                 renderProfileDropdown();
@@ -1924,6 +1940,7 @@
             try {
                 await fetch('/api/auth/signout', { method: 'POST', credentials: 'include' });
                 currentUser = null;
+                localStorage.removeItem('hyatus_user');
                 renderAuthButton();
                 document.getElementById('userProfileDropdown').classList.remove('active');
                 document.getElementById('myReferralsSection').classList.remove('show');

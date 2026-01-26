@@ -536,10 +536,12 @@ async function handleAuthSubmit() {
             authError.style.display = 'block';
             
             currentUser = result.user;
+            localStorage.setItem('hyatus_user', JSON.stringify(result.user));
             updateAuthUI();
             setTimeout(() => closeAuthModal(), 1500);
         } else {
             currentUser = result.user;
+            localStorage.setItem('hyatus_user', JSON.stringify(result.user));
             updateAuthUI();
             closeAuthModal();
         }
@@ -793,6 +795,7 @@ function renderProfilePopover() {
     if (signOutBtn) signOutBtn.onclick = async () => {
         await fetch('/api/auth/signout', { method: 'POST', credentials: 'include' });
         currentUser = null;
+        localStorage.removeItem('hyatus_user');
         mySubmissions = [];
         myReferrals = [];
         referralSummary = { total: 0, approved: 0, total_earned: 0, remaining_eligible: 0, max_eligible: 1000 };
@@ -938,14 +941,30 @@ function closeResetModal() {
 }
 
 async function initAuth() {
+    const cachedUser = localStorage.getItem('hyatus_user');
+    if (cachedUser) {
+        try {
+            currentUser = JSON.parse(cachedUser);
+            updateAuthUI();
+        } catch (e) {
+            localStorage.removeItem('hyatus_user');
+        }
+    }
+    
     try {
         const response = await fetch('/api/auth/session', { credentials: 'include' });
         const result = await response.json();
         if (result.user) {
             currentUser = result.user;
+            localStorage.setItem('hyatus_user', JSON.stringify(result.user));
+        } else {
+            currentUser = null;
+            localStorage.removeItem('hyatus_user');
         }
     } catch (err) {
         console.error('Error checking session:', err);
+        currentUser = null;
+        localStorage.removeItem('hyatus_user');
     }
     updateAuthUI();
 }
