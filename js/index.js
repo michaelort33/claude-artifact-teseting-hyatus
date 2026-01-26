@@ -672,40 +672,27 @@ function updateAuthUI() {
     const userAuthLinkMobileEl = document.getElementById('userAuthLinkMobile');
     if (currentUser) {
         const email = currentUser.email;
-        const emailPrefix = email.split('@')[0];
-        const initials = emailPrefix.charAt(0).toUpperCase();
+        const initial = email ? email.charAt(0).toUpperCase() : 'U';
 
         const userHTML = `
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-        <circle cx="12" cy="7" r="4"></circle>
-      </svg>
-      <span class="auth-button-text">${currentUser.email}</span>
-    `;
-
-        const userHTMLMobile = `
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-        <circle cx="12" cy="7" r="4"></circle>
-      </svg>
-      <span class="auth-button-text-mobile">${initials}</span>
-    `;
+            <div style="width: 28px; height: 28px; background: linear-gradient(135deg, var(--moss) 0%, var(--moss-soft) 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 12px; font-weight: 600;">${initial}</div>
+        `;
 
         if (userAuthLink) userAuthLink.innerHTML = userHTML;
-        if (userAuthLinkMobileEl) userAuthLinkMobileEl.innerHTML = userHTMLMobile;
+        if (userAuthLinkMobileEl) userAuthLinkMobileEl.innerHTML = userHTML;
         closeAuthModal();
         closeProfilePopover();
         loadMySubmissions();
     } else {
         const signInHTML = `
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-        <circle cx="12" cy="7" r="4"></circle>
-      </svg>
-      <span class="auth-button-text">Sign In</span>
-    `;
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                <circle cx="12" cy="7" r="4"></circle>
+            </svg>
+            <span class="auth-button-text" data-i18n="signIn">Sign In</span>
+        `;
         if (userAuthLink) userAuthLink.innerHTML = signInHTML;
-        if (userAuthLinkMobileEl) userAuthLinkMobileEl.innerHTML = signInHTML.replace('auth-button-text', 'auth-button-text-mobile');
+        if (userAuthLinkMobileEl) userAuthLinkMobileEl.innerHTML = signInHTML;
         closeProfilePopover();
     }
 }
