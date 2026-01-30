@@ -1070,6 +1070,8 @@ function switchTab(tabName) {
     
     if (tabName === 'overview') {
         loadOverviewStats();
+    } else if (tabName === 'submissions') {
+        loadSubmissions();
     } else if (tabName === 'referrals') {
         loadReferrals();
     } else if (tabName === 'guestReferrals') {
