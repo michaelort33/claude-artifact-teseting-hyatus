@@ -1,0 +1,8 @@
+uploads = []
+generated = []
+
+[[outputs]]
+id = "pstcB5PrVL2GQK5fJNhIr"
+uri = "file://INFRASTRUCTURE.md"
+type = "text"
+title = "Infrastructure Summary"
