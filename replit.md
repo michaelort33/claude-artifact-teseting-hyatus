@@ -128,7 +128,10 @@ The application is served via Node.js server on port 5000.
 - **Password resets**: Sent to user's email address
 
 ## Recent Changes
-- **2026-04-10**: Security hardening for all form endpoints
+- **2026-04-10**: Comprehensive security hardening
+  - **Static file serving**: Allowlist-based — only serves root HTML files and `/js/` directory; all server files, configs, node_modules, .env, etc. return 404
+  - **Security headers**: Full CSP (default-src 'self', whitelisted script/style/font sources), HSTS, X-Frame-Options: DENY, Referrer-Policy, Permissions-Policy, X-XSS-Protection — applied to ALL responses including auth, redirects, and proxied API calls
+  - **Path traversal protection**: Resolves paths against project root, blocks dot-prefixed segments and sensitive directories at any depth
   - Rate limiting: 5 submissions per minute per IP across all forms (submissions, referrals, guest referrals)
   - SQL injection / XSS pattern detection blocks malicious payloads in all text fields
   - Honeypot fields catch automated bots (silent fake-success response)
@@ -137,6 +140,7 @@ The application is served via Node.js server on port 5000.
   - Payment method whitelist validation on submissions
   - Tasks API switched from username/password to x-api-key authentication
   - Fixed primary key sequence sync on server startup to prevent duplicate key errors
+  - Sanitized all error responses to prevent internal information leakage
 - **2026-01-23**: Added Friends & Family referral program and admin settings
   - New guest-referral.html page for referring friends/family ($50 reward, max 10 referrals)
   - Admin Settings tab for configuring referral reward amounts and limits

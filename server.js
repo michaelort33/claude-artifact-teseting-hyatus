@@ -196,8 +196,7 @@ function parseBody(req) {
 function sendJson(res, statusCode, data) {
     res.writeHead(statusCode, { 
         'Content-Type': 'application/json',
-        'Content-Security-Policy': 'upgrade-insecure-requests',
-        'Strict-Transport-Security': 'max-age=31536000; includeSubDomains'
+        ...securityHeaders
     });
     res.end(JSON.stringify(data));
 }
@@ -235,7 +234,8 @@ async function handleSignup(req, res) {
 
         res.writeHead(200, {
             'Content-Type': 'application/json',
-            'Set-Cookie': `session_token=${token}; Path=/; HttpOnly; SameSite=Lax; Max-Age=${SESSION_EXPIRY_DAYS * 24 * 60 * 60}`
+            'Set-Cookie': `session_token=${token}; Path=/; HttpOnly; SameSite=Lax; Max-Age=${SESSION_EXPIRY_DAYS * 24 * 60 * 60}`,
+            ...securityHeaders
         });
         res.end(JSON.stringify({ user: { id: user.id, email: user.email } }));
 
@@ -276,7 +276,8 @@ async function handleSignin(req, res) {
 
         res.writeHead(200, {
             'Content-Type': 'application/json',
-            'Set-Cookie': `session_token=${token}; Path=/; HttpOnly; SameSite=Lax${COOKIE_SECURE}; Max-Age=${SESSION_EXPIRY_DAYS * 24 * 60 * 60}`
+            'Set-Cookie': `session_token=${token}; Path=/; HttpOnly; SameSite=Lax${COOKIE_SECURE}; Max-Age=${SESSION_EXPIRY_DAYS * 24 * 60 * 60}`,
+            ...securityHeaders
         });
         res.end(JSON.stringify({ user: { id: user.id, email: user.email, is_admin: admin } }));
 
@@ -297,7 +298,8 @@ async function handleSignout(req, res) {
 
         res.writeHead(200, {
             'Content-Type': 'application/json',
-            'Set-Cookie': `session_token=; Path=/; HttpOnly; SameSite=Lax${COOKIE_SECURE}; Max-Age=0`
+            'Set-Cookie': `session_token=; Path=/; HttpOnly; SameSite=Lax${COOKIE_SECURE}; Max-Age=0`,
+            ...securityHeaders
         });
         res.end(JSON.stringify({ success: true }));
 
@@ -1479,7 +1481,7 @@ async function handleReservationLookup(req, res) {
         }
 
         // API returns string | null directly
-        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.writeHead(200, { 'Content-Type': 'application/json', ...securityHeaders });
         res.end(responseText);
     } catch (err) {
         console.error('Reservation lookup error:', err);
@@ -1549,7 +1551,7 @@ async function handleTasksApi(req, res) {
             console.error('Failed to log task API call:', logErr);
         }
 
-        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.writeHead(200, { 'Content-Type': 'application/json', ...securityHeaders });
         res.end(responseText);
 
     } catch (err) {
@@ -1878,10 +1880,13 @@ async function handleTranslateHealth(req, res) {
 }
 
 const securityHeaders = {
-    'Content-Security-Policy': "upgrade-insecure-requests",
+    'Content-Security-Policy': "default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; upgrade-insecure-requests",
     'Strict-Transport-Security': 'max-age=31536000; includeSubDomains',
     'X-Content-Type-Options': 'nosniff',
-    'X-Frame-Options': 'SAMEORIGIN'
+    'X-Frame-Options': 'DENY',
+    'Referrer-Policy': 'strict-origin-when-cross-origin',
+    'Permissions-Policy': 'camera=(), microphone=(), geolocation=()',
+    'X-XSS-Protection': '1; mode=block'
 };
 
 function serveStaticFile(filePath, res) {
@@ -2032,27 +2037,64 @@ const server = http.createServer(async (req, res) => {
         }
     }
 
+    if (pathname === '/admin') {
+        return serveStaticFile('./admin.html', res);
+    } else if (pathname === '/referral') {
+        return serveStaticFile('./referral.html', res);
+    } else if (pathname === '/guest-referral') {
+        return serveStaticFile('./guest-referral.html', res);
+    }
+
+    if (pathname.endsWith('.html') && pathname !== '/index.html') {
+        const cleanPath = pathname.replace('.html', '');
+        res.writeHead(301, { 'Location': cleanPath, ...securityHeaders });
+        return res.end();
+    }
+
+    const allowedDirs = ['js'];
+    const allowedExtensions = ['.html', '.css', '.js', '.png', '.jpg', '.jpeg', '.gif', '.svg', '.ico', '.woff', '.woff2', '.ttf', '.eot'];
+
     let filePath = '.' + pathname;
     if (filePath === './') {
         filePath = './index.html';
     }
-    
-    // Clean URL routing - serve HTML files without .html extension
-    if (pathname === '/admin') {
-        filePath = './admin.html';
-    } else if (pathname === '/referral') {
-        filePath = './referral.html';
-    } else if (pathname === '/guest-referral') {
-        filePath = './guest-referral.html';
+
+    const resolvedPath = path.resolve(filePath);
+    const projectRoot = path.resolve('.');
+
+    if (!resolvedPath.startsWith(projectRoot)) {
+        res.writeHead(404, { 'Content-Type': 'text/html', ...securityHeaders });
+        return res.end('<h1>404 Not Found</h1>', 'utf-8');
     }
-    
-    // Redirect .html URLs to clean versions (optional but professional)
-    if (pathname.endsWith('.html') && pathname !== '/index.html') {
-        const cleanPath = pathname.replace('.html', '');
-        res.writeHead(301, { 'Location': cleanPath });
-        return res.end();
+
+    const ext = path.extname(filePath).toLowerCase();
+    const relativePath = path.relative(projectRoot, resolvedPath);
+    const topDir = relativePath.split(path.sep)[0];
+
+    const pathSegments = relativePath.split(path.sep);
+    const blockedSegments = ['node_modules', 'attached_assets', '.local', '.config', '.cache', '.git'];
+    const blockedFiles = ['server.js', 'package.json', 'package-lock.json', 'replit.md', 'INFRASTRUCTURE.md', '.replit', '.env', '.gitignore'];
+    const hasBlockedSegment = pathSegments.some(seg => blockedSegments.includes(seg) || seg.startsWith('.'));
+    const isBlockedFile = blockedFiles.includes(relativePath);
+
+    if (hasBlockedSegment || isBlockedFile) {
+        res.writeHead(404, { 'Content-Type': 'text/html', ...securityHeaders });
+        return res.end('<h1>404 Not Found</h1>', 'utf-8');
     }
-    
+
+    if (!allowedExtensions.includes(ext)) {
+        res.writeHead(404, { 'Content-Type': 'text/html', ...securityHeaders });
+        return res.end('<h1>404 Not Found</h1>', 'utf-8');
+    }
+
+    const isRootHtml = relativePath.endsWith('.html') && !relativePath.includes(path.sep);
+    const isAllowedDir = allowedDirs.includes(topDir);
+
+    if (!isRootHtml && !isAllowedDir) {
+        res.writeHead(404, { 'Content-Type': 'text/html', ...securityHeaders });
+        return res.end('<h1>404 Not Found</h1>', 'utf-8');
+    }
+
     serveStaticFile(filePath, res);
 });
 
