@@ -2099,6 +2099,18 @@ server.listen(PORT, HOST, async () => {
                 } catch (e) {}
             }
             console.log('Primary key sequences synchronized');
+
+            const r1 = await pool.query(`DELETE FROM referrals WHERE created_at >= '2026-04-10' AND (
+                LOWER(referrer_email) LIKE '%test%'
+                OR (LOWER(referrer_email) NOT LIKE '%.com' AND LOWER(referrer_email) NOT LIKE '%.org' AND LOWER(referrer_email) NOT LIKE '%.net')
+            ) RETURNING id`);
+            const r2 = await pool.query(`DELETE FROM guest_referrals WHERE created_at >= '2026-04-10' AND (
+                LOWER(referrer_email) LIKE '%test%'
+                OR LOWER(friend_email) LIKE '%test%'
+                OR (LOWER(referrer_email) NOT LIKE '%.com' AND LOWER(referrer_email) NOT LIKE '%.org' AND LOWER(referrer_email) NOT LIKE '%.net')
+                OR (LOWER(friend_email) NOT LIKE '%.com' AND LOWER(friend_email) NOT LIKE '%.org' AND LOWER(friend_email) NOT LIKE '%.net')
+            ) RETURNING id`);
+            console.log(`Spam cleanup: removed ${r1.rowCount} referrals, ${r2.rowCount} guest referrals`);
         } catch (err) {
             console.error('Failed to sync sequences:', err.message);
         }
