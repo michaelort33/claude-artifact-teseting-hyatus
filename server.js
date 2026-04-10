@@ -1658,7 +1658,11 @@ async function handleGetTaskLog(req, res, id) {
     }
 }
 
-function handleTasksHealth(req, res) {
+async function handleTasksHealth(req, res) {
+    const user = await getSessionUser(req);
+    if (!user) return sendJson(res, 401, { error: 'Authentication required' });
+    const admin = await isAdmin(user.email);
+    if (!admin) return sendJson(res, 403, { error: 'Admin access required' });
     const hasApiKey = !!process.env.GPTGPTBACKEND_X_API_KEY;
     sendJson(res, 200, { status: 'ok', tasksApiConfigured: hasApiKey });
 }
@@ -1720,7 +1724,11 @@ async function handleSendEmail(req, res) {
     }
 }
 
-function handleEmailHealth(req, res) {
+async function handleEmailHealth(req, res) {
+    const user = await getSessionUser(req);
+    if (!user) return sendJson(res, 401, { error: 'Authentication required' });
+    const admin = await isAdmin(user.email);
+    if (!admin) return sendJson(res, 403, { error: 'Admin access required' });
     sendJson(res, 200, { 
         status: 'ok', 
         sendgridConfigured: !!process.env.SENDGRID_API_KEY,
@@ -1857,7 +1865,11 @@ async function handleTranslate(req, res) {
     }
 }
 
-function handleTranslateHealth(req, res) {
+async function handleTranslateHealth(req, res) {
+    const user = await getSessionUser(req);
+    if (!user) return sendJson(res, 401, { error: 'Authentication required' });
+    const admin = await isAdmin(user.email);
+    if (!admin) return sendJson(res, 403, { error: 'Admin access required' });
     sendJson(res, 200, { 
         status: 'ok', 
         configured: !!translateClient,
