@@ -744,7 +744,7 @@ async function handleCreateSubmission(req, res) {
 
     } catch (err) {
         console.error('Create submission error:', err.message, err.stack);
-        sendJson(res, 500, { error: 'Server error: ' + err.message });
+        sendJson(res, 500, { error: 'Something went wrong. Please try again.' });
     }
 }
 
@@ -942,7 +942,7 @@ async function handleCreateReferral(req, res) {
 
     } catch (err) {
         console.error('Create referral error:', err.message, err.stack);
-        sendJson(res, 500, { error: 'Server error: ' + err.message });
+        sendJson(res, 500, { error: 'Something went wrong. Please try again.' });
     }
 }
 
@@ -1475,7 +1475,7 @@ async function handleReservationLookup(req, res) {
 
         if (!response.ok) {
             console.error('Reservation lookup failed:', response.status, data);
-            return sendJson(res, response.status, { error: 'Reservation lookup failed', details: data });
+            return sendJson(res, 502, { error: 'Reservation lookup failed. Please try again.' });
         }
 
         // API returns string | null directly
@@ -1483,7 +1483,7 @@ async function handleReservationLookup(req, res) {
         res.end(responseText);
     } catch (err) {
         console.error('Reservation lookup error:', err);
-        sendJson(res, 500, { error: 'Server error: ' + err.message });
+        sendJson(res, 500, { error: 'Reservation lookup failed. Please try again.' });
     }
 }
 
@@ -1536,12 +1536,7 @@ async function handleTasksApi(req, res) {
             if (isDuplicate) {
                 return sendJson(res, 200, { duplicate: true });
             }
-            res.writeHead(response.status, { 'Content-Type': 'application/json' });
-            res.end(JSON.stringify({ 
-                error: `Task API error: ${response.status}`,
-                details: responseText 
-            }));
-            return;
+            return sendJson(res, 502, { error: 'Failed to create task. Please try again.' });
         }
 
         try {
@@ -1570,7 +1565,7 @@ async function handleTasksApi(req, res) {
             console.error('Failed to log task API error:', logErr);
         }
         
-        sendJson(res, 500, { error: err.message });
+        sendJson(res, 500, { error: 'Failed to create task. Please try again.' });
     }
 }
 
@@ -1682,14 +1677,15 @@ async function handleTasksOptions(req, res) {
 
         if (!response.ok) {
             const errorText = await response.text();
-            return sendJson(res, response.status, { error: `Tasks API error: ${response.status}`, details: errorText });
+            console.error('Tasks options API error:', response.status, errorText);
+            return sendJson(res, 502, { error: 'Failed to load task options. Please try again.' });
         }
 
         const options = await response.json();
         sendJson(res, 200, options);
     } catch (err) {
         console.error('Tasks options error:', err);
-        sendJson(res, 500, { error: err.message });
+        sendJson(res, 500, { error: 'Failed to load task options. Please try again.' });
     }
 }
 
@@ -1719,7 +1715,8 @@ async function handleSendEmail(req, res) {
         
     } catch (err) {
         console.error('SendGrid error:', err);
-        sendJson(res, 500, { error: 'Failed to send email', details: err.message });
+        console.error('Email send error details:', err.message);
+        sendJson(res, 500, { error: 'Failed to send email. Please try again.' });
     }
 }
 
@@ -1855,7 +1852,8 @@ async function handleTranslate(req, res) {
         
     } catch (err) {
         console.error('Translation error:', err);
-        sendJson(res, 500, { error: 'Translation failed', details: err.message });
+        console.error('Translation error details:', err.message);
+        sendJson(res, 500, { error: 'Translation failed. Please try again.' });
     }
 }
 
@@ -1885,7 +1883,7 @@ function serveStaticFile(filePath, res) {
                 res.end('<h1>404 Not Found</h1>', 'utf-8');
             } else {
                 res.writeHead(500, securityHeaders);
-                res.end('Server Error: ' + error.code, 'utf-8');
+                res.end('Server Error', 'utf-8');
             }
         } else {
             res.writeHead(200, { 
