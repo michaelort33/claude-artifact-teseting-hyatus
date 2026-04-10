@@ -1993,6 +1993,25 @@ const server = http.createServer(async (req, res) => {
         }
     }
 
+    if (pathname === '/api/admin/cleanup-spam' && method === 'POST') {
+        try {
+            const user = await getSessionUser(req);
+            if (!user) return sendJson(res, 401, { error: 'Authentication required' });
+            const admin = await isAdmin(user.email);
+            if (!admin) return sendJson(res, 403, { error: 'Admin access required' });
+
+            const r1 = await pool.query("DELETE FROM referrals WHERE referrer_email = 'sample@email.tst' RETURNING id");
+            const r2 = await pool.query("DELETE FROM guest_referrals WHERE friend_email LIKE 'sample@email.tst%' RETURNING id");
+            return sendJson(res, 200, { 
+                deleted_referrals: r1.rowCount, 
+                deleted_guest_referrals: r2.rowCount 
+            });
+        } catch (err) {
+            console.error('Cleanup error:', err);
+            return sendJson(res, 500, { error: 'Cleanup failed' });
+        }
+    }
+
     if (pathname === '/api/settings' && method === 'GET') {
         return handleGetSettings(req, res);
     }
