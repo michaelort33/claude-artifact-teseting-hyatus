@@ -56,6 +56,84 @@ const mimeTypes = {
     '.txt': 'text/plain'
 };
 
+const formRateLimit = new Map();
+const FORM_RATE_LIMIT = 5;
+const FORM_RATE_WINDOW = 60000;
+
+function checkFormRateLimit(ip) {
+    const now = Date.now();
+    const entry = formRateLimit.get(ip);
+    if (!entry) {
+        formRateLimit.set(ip, { count: 1, start: now });
+        return true;
+    }
+    if (now - entry.start > FORM_RATE_WINDOW) {
+        formRateLimit.set(ip, { count: 1, start: now });
+        return true;
+    }
+    entry.count++;
+    return entry.count <= FORM_RATE_LIMIT;
+}
+
+const SUSPICIOUS_PATTERNS = [
+    /(\bSELECT\b.*\bFROM\b)/i,
+    /(\bINSERT\b.*\bINTO\b)/i,
+    /(\bDROP\b.*\bTABLE\b)/i,
+    /(\bUNION\b.*\bSELECT\b)/i,
+    /(\bDELETE\b.*\bFROM\b)/i,
+    /(\bUPDATE\b.*\bSET\b)/i,
+    /SLEEP\s*\(/i,
+    /WAITFOR\s+DELAY/i,
+    /PG_SLEEP/i,
+    /DBMS_PIPE/i,
+    /xp_cmdshell/i,
+    /BENCHMARK\s*\(/i,
+    /LOAD_FILE/i,
+    /INTO\s+OUTFILE/i,
+    /<script[\s>]/i,
+    /javascript:/i,
+    /on(error|load|click|mouseover)\s*=/i,
+    /\'\s*(OR|AND)\s+\d+\s*=\s*\d+/i,
+    /\'\s*;\s*(DROP|SELECT|INSERT|UPDATE|DELETE)/i,
+    /CHAR\s*\(\s*\d+\s*\)/i,
+    /CHR\s*\(\s*\d+\s*\)/i,
+    /0x[0-9a-fA-F]{6,}/,
+    /\\x[0-9a-fA-F]{2}/,
+    /XOR\s*\(/i,
+    /\bDUAL\b/i,
+    /sysdate\s*\(/i,
+];
+
+function containsSuspiciousContent(value) {
+    if (typeof value !== 'string') return false;
+    return SUSPICIOUS_PATTERNS.some(pattern => pattern.test(value));
+}
+
+function sanitizeInput(value) {
+    if (typeof value !== 'string') return value;
+    return value.replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/g, '').trim();
+}
+
+function validateFormFields(fields) {
+    for (const [key, value] of Object.entries(fields)) {
+        if (typeof value === 'string' && containsSuspiciousContent(value)) {
+            return { valid: false, field: key };
+        }
+    }
+    return { valid: true };
+}
+
+function getClientIp(req) {
+    const socketIp = req.socket.remoteAddress;
+    const isFromProxy = socketIp === '127.0.0.1' || socketIp === '::1' || socketIp?.startsWith('10.') || socketIp?.startsWith('172.');
+    if (isFromProxy) {
+        return req.headers['x-forwarded-for']?.split(',')[0]?.trim() || 
+               req.headers['x-real-ip'] || 
+               socketIp;
+    }
+    return socketIp;
+}
+
 function generateToken() {
     return crypto.randomBytes(32).toString('hex');
 }
@@ -461,8 +539,40 @@ async function handleGetSubmission(req, res, id) {
 
 async function handleCreateSubmission(req, res) {
     try {
+        const clientIp = getClientIp(req);
+        if (!checkFormRateLimit(clientIp)) {
+            return sendJson(res, 429, { error: 'Too many submissions. Please try again later.' });
+        }
+
         const body = await parseBody(req);
+
+        if (body._hp_email || body.website_url || body.fax_number) {
+            console.log(`Honeypot triggered on submission from ${clientIp}`);
+            return sendJson(res, 200, { data: { id: 0, status: 'pending' } });
+        }
+
+        if (!body._form_token) {
+            console.log(`Missing form token on submission from ${clientIp}`);
+            return sendJson(res, 400, { error: 'Invalid form submission. Please reload the page and try again.' });
+        }
+        const elapsed = Date.now() - parseInt(body._form_token, 36);
+        if (isNaN(elapsed) || elapsed < 3000 || elapsed > 86400000) {
+            console.log(`Speed check failed on submission from ${clientIp}`);
+            return sendJson(res, 400, { error: 'Please take your time filling out the form.' });
+        }
+
         const { payment_method, payment_handle, review_link, screenshot_url, award_amount, previous_guest } = body;
+
+        const validation = validateFormFields({ payment_method, payment_handle, review_link, award_amount: String(award_amount || '') });
+        if (!validation.valid) {
+            console.log(`Suspicious content blocked in submission field "${validation.field}" from ${clientIp}`);
+            return sendJson(res, 400, { error: 'Invalid input detected. Please use only standard text.' });
+        }
+
+        const validMethods = ['amazon', 'starbucks', 'surprise'];
+        if (payment_method && !validMethods.includes(payment_method)) {
+            return sendJson(res, 400, { error: 'Invalid gift selection' });
+        }
 
         const user = await getSessionUser(req);
         const userId = user?.id || null;
@@ -472,7 +582,7 @@ async function handleCreateSubmission(req, res) {
              (payment_method, payment_handle, review_link, screenshot_url, status, user_id, award_amount, previous_guest)
              VALUES ($1, $2, $3, $4, 'pending', $5, $6, $7)
              RETURNING *`,
-            [payment_method, payment_handle, review_link || null, screenshot_url || null, userId, award_amount || null, previous_guest || false]
+            [sanitizeInput(payment_method), sanitizeInput(payment_handle), sanitizeInput(review_link) || null, screenshot_url || null, userId, award_amount || null, previous_guest || false]
         );
 
         const submission = result.rows[0];
@@ -700,7 +810,28 @@ async function handleUpdateSubmission(req, res, id) {
 
 async function handleCreateReferral(req, res) {
     try {
+        const clientIp = getClientIp(req);
+        if (!checkFormRateLimit(clientIp)) {
+            return sendJson(res, 429, { error: 'Too many submissions. Please try again later.' });
+        }
+
         const body = await parseBody(req);
+
+        if (body._hp_email || body.website_url || body.fax_number) {
+            console.log(`Honeypot triggered on referral from ${clientIp}`);
+            return sendJson(res, 201, { data: { id: 0 }, message: 'Referral submitted successfully' });
+        }
+
+        if (!body._form_token) {
+            console.log(`Missing form token on referral from ${clientIp}`);
+            return sendJson(res, 400, { error: 'Invalid form submission. Please reload the page and try again.' });
+        }
+        const elapsed = Date.now() - parseInt(body._form_token, 36);
+        if (isNaN(elapsed) || elapsed < 3000 || elapsed > 86400000) {
+            console.log(`Speed check failed on referral from ${clientIp}`);
+            return sendJson(res, 400, { error: 'Please take your time filling out the form.' });
+        }
+
         const {
             referrer_name,
             referrer_email,
@@ -714,8 +845,18 @@ async function handleCreateReferral(req, res) {
             notes
         } = body;
 
+        const validation = validateFormFields({ referrer_name, referrer_email, company_name, org_type, contact_name, contact_role, contact_email, contact_phone, relationship, notes });
+        if (!validation.valid) {
+            console.log(`Suspicious content blocked in referral field "${validation.field}" from ${clientIp}`);
+            return sendJson(res, 400, { error: 'Invalid input detected. Please use only standard text.' });
+        }
+
         if (!referrer_name || !referrer_email || !company_name || !org_type || !contact_name || !contact_email) {
             return sendJson(res, 400, { error: 'Missing required fields' });
+        }
+
+        if (referrer_name.length > 200 || company_name.length > 300 || contact_name.length > 200) {
+            return sendJson(res, 400, { error: 'Input exceeds maximum length' });
         }
 
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -747,7 +888,7 @@ async function handleCreateReferral(req, res) {
             `INSERT INTO referrals (referrer_name, referrer_email, company_name, org_type, contact_name, contact_role, contact_email, contact_phone, relationship, notes)
              VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
              RETURNING *`,
-            [referrer_name, referrer_email, company_name, org_type, contact_name, contact_role || null, contact_email, contact_phone || null, relationship || null, notes || null]
+            [sanitizeInput(referrer_name), sanitizeInput(referrer_email), sanitizeInput(company_name), sanitizeInput(org_type), sanitizeInput(contact_name), sanitizeInput(contact_role) || null, sanitizeInput(contact_email), sanitizeInput(contact_phone) || null, sanitizeInput(relationship) || null, sanitizeInput(notes) || null]
         );
 
         const referral = result.rows[0];
@@ -1140,11 +1281,42 @@ async function handleGetGuestReferrals(req, res) {
 
 async function handleCreateGuestReferral(req, res) {
     try {
+        const clientIp = getClientIp(req);
+        if (!checkFormRateLimit(clientIp)) {
+            return sendJson(res, 429, { error: 'Too many submissions. Please try again later.' });
+        }
+
         const body = await parseBody(req);
+
+        if (body._hp_email || body.website_url || body.fax_number) {
+            console.log(`Honeypot triggered on guest referral from ${clientIp}`);
+            return sendJson(res, 201, { data: { id: 0 } });
+        }
+
+        if (!body._form_token) {
+            console.log(`Missing form token on guest referral from ${clientIp}`);
+            return sendJson(res, 400, { error: 'Invalid form submission. Please reload the page and try again.' });
+        }
+        const grElapsed = Date.now() - parseInt(body._form_token, 36);
+        if (isNaN(grElapsed) || grElapsed < 3000 || grElapsed > 86400000) {
+            console.log(`Speed check failed on guest referral from ${clientIp}`);
+            return sendJson(res, 400, { error: 'Please take your time filling out the form.' });
+        }
+
         const { referrer_name, referrer_email, friend_name, friend_email, friend_phone, city, timeframe, notes } = body;
+
+        const validation = validateFormFields({ referrer_name, referrer_email, friend_name, friend_email, friend_phone, city, timeframe, notes });
+        if (!validation.valid) {
+            console.log(`Suspicious content blocked in guest referral field "${validation.field}" from ${clientIp}`);
+            return sendJson(res, 400, { error: 'Invalid input detected. Please use only standard text.' });
+        }
 
         if (!referrer_name || !referrer_email || !friend_name || !friend_email) {
             return sendJson(res, 400, { error: 'Missing required fields' });
+        }
+
+        if (referrer_name.length > 200 || friend_name.length > 200) {
+            return sendJson(res, 400, { error: 'Input exceeds maximum length' });
         }
 
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -1176,7 +1348,7 @@ async function handleCreateGuestReferral(req, res) {
         const result = await pool.query(
             `INSERT INTO guest_referrals (referrer_name, referrer_email, friend_name, friend_email, friend_phone, city, timeframe, notes)
              VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *`,
-            [referrer_name, referrer_email, friend_name, friend_email, friend_phone || null, city || null, timeframe || null, notes || null]
+            [sanitizeInput(referrer_name), sanitizeInput(referrer_email), sanitizeInput(friend_name), sanitizeInput(friend_email), sanitizeInput(friend_phone) || null, sanitizeInput(city) || null, sanitizeInput(timeframe) || null, sanitizeInput(notes) || null]
         );
 
         if (process.env.SENDGRID_API_KEY && process.env.ADMIN_EMAIL) {

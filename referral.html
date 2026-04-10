@@ -1386,6 +1386,7 @@
 
     <script>
         document.getElementById('copyrightYear').textContent = new Date().getFullYear();
+        const _formLoadTime = Date.now();
 
         const translations = {
             en: {
@@ -1672,7 +1673,8 @@
                 contact_email: document.getElementById('contactEmail').value.trim(),
                 contact_phone: document.getElementById('contactPhone').value.trim(),
                 relationship: document.getElementById('relationship').value,
-                notes: document.getElementById('notes').value.trim()
+                notes: document.getElementById('notes').value.trim(),
+                _form_token: _formLoadTime.toString(36)
             };
 
             if (!data.referrer_name || !data.referrer_email || !data.company_name || 

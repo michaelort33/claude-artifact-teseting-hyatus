@@ -253,6 +253,7 @@ const form = document.getElementById('rewardForm');
 const formContainer = document.getElementById('formContainer');
 const successMessage = document.getElementById('successMessage');
 const submitButton = document.getElementById('submitButton');
+const _formLoadTime = Date.now();
 
 async function handleFormSubmit(e) {
     if (e) e.preventDefault();
@@ -286,6 +287,7 @@ async function handleFormSubmit(e) {
                 screenshot_url: screenshotData,
                 award_amount: rewardAmount,
                 previous_guest: isPreviousGuest,
+                _form_token: _formLoadTime.toString(36),
             })
         });
 

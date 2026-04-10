@@ -128,6 +128,15 @@ The application is served via Node.js server on port 5000.
 - **Password resets**: Sent to user's email address
 
 ## Recent Changes
+- **2026-04-10**: Security hardening for all form endpoints
+  - Rate limiting: 5 submissions per minute per IP across all forms (submissions, referrals, guest referrals)
+  - SQL injection / XSS pattern detection blocks malicious payloads in all text fields
+  - Honeypot fields catch automated bots (silent fake-success response)
+  - Form timing token: submissions faster than 3 seconds after page load are rejected
+  - Input length limits on name/company fields
+  - Payment method whitelist validation on submissions
+  - Tasks API switched from username/password to x-api-key authentication
+  - Fixed primary key sequence sync on server startup to prevent duplicate key errors
 - **2026-01-23**: Added Friends & Family referral program and admin settings
   - New guest-referral.html page for referring friends/family ($50 reward, max 10 referrals)
   - Admin Settings tab for configuring referral reward amounts and limits
