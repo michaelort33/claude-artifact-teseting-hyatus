@@ -1898,10 +1898,24 @@ const server = http.createServer(async (req, res) => {
     serveStaticFile(filePath, res);
 });
 
-server.listen(PORT, HOST, () => {
+server.listen(PORT, HOST, async () => {
     console.log(`Server running at http://${HOST}:${PORT}/`);
     console.log(`Database configured: ${!!process.env.DATABASE_URL}`);
     console.log(`Tasks API configured: ${!!(process.env.TASKS_API_EMAIL && process.env.TASKS_API_PASSWORD)}`);
     console.log(`Admin email configured: ${!!process.env.ADMIN_EMAIL}`);
     console.log(`Translation API configured: ${!!translateClient}`);
+
+    if (process.env.DATABASE_URL) {
+        try {
+            const tables = ['review_rewards', 'referrals', 'guest_referrals', 'users', 'sessions', 'task_logs'];
+            for (const table of tables) {
+                try {
+                    await pool.query(`SELECT setval('${table}_id_seq', COALESCE((SELECT MAX(id) FROM ${table}), 0) + 1, false)`);
+                } catch (e) {}
+            }
+            console.log('Primary key sequences synchronized');
+        } catch (err) {
+            console.error('Failed to sync sequences:', err.message);
+        }
+    }
 });
