@@ -67,8 +67,7 @@
 | `DATABASE_URL` | PostgreSQL connection string |
 | `SENDGRID_API_KEY` | SendGrid email service |
 | `GOOGLE_TRANSLATE` | Google Cloud Translation API key |
-| `TASKS_API_EMAIL` | Task API authentication email |
-| `TASKS_API_PASSWORD` | Task API authentication password |
+| `GPTGPTBACKEND_X_API_KEY` | Task API key (x-api-key header) |
 | `ADMIN_EMAIL` | Admin notification recipient |
 | `GUEST_PORTAL_API_KEY` | Reservation lookup API key |
 

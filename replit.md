@@ -100,8 +100,7 @@ The application uses a Warm Editorial aesthetic inspired by high-end architectur
 
 ## Environment Variables
 - `DATABASE_URL` - PostgreSQL connection string
-- `TASKS_API_EMAIL` - Email for task API authentication
-- `TASKS_API_PASSWORD` - Password for task API authentication
+- `GPTGPTBACKEND_X_API_KEY` - API key for task API authentication (x-api-key header)
 - `SENDGRID_API_KEY` - SendGrid API key for sending emails
 - `ADMIN_EMAIL` - Admin email address for notifications
 - `GUEST_PORTAL_API_KEY` - API key for looking up reservation IDs by guest email

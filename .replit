@@ -37,3 +37,8 @@ externalPort = 80
 deploymentTarget = "autoscale"
 run = ["sh", "-c", "node server.js"]
 build = ["sh", "-c", "npm run build"]
+
+[userenv]
+
+[userenv.shared]
+GPTGPTBACKEND_X_API_KEY = "a4c15deef7eb43sdjbjahsdbd69a533ccedbc"

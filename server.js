@@ -41,8 +41,6 @@ if (process.env.SENDGRID_API_KEY) {
     sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 }
 
-let cachedToken = null;
-let tokenExpiry = null;
 
 const mimeTypes = {
     '.html': 'text/html',
@@ -1266,34 +1264,12 @@ async function handleUpdateGuestReferral(req, res, id) {
     }
 }
 
-async function getTasksApiToken() {
-    if (cachedToken && tokenExpiry && Date.now() < tokenExpiry) {
-        return cachedToken;
+function getTasksApiKey() {
+    const apiKey = process.env.GPTGPTBACKEND_X_API_KEY;
+    if (!apiKey) {
+        throw new Error('Tasks API key not configured (GPTGPTBACKEND_X_API_KEY)');
     }
-
-    const email = process.env.TASKS_API_EMAIL;
-    const password = process.env.TASKS_API_PASSWORD;
-
-    if (!email || !password) {
-        throw new Error('Task API credentials not configured');
-    }
-
-    const response = await fetch(`${TASKS_API_BASE}/auth/login`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password })
-    });
-
-    if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(`Auth failed: ${response.status} ${errorText}`);
-    }
-
-    const data = await response.json();
-    cachedToken = data.accessToken || data.data?.access_token || data.access_token;
-    tokenExpiry = Date.now() + (55 * 60 * 1000);
-    console.log('Tasks API authenticated successfully');
-    return cachedToken;
+    return apiKey;
 }
 
 async function handleReservationLookup(req, res) {
@@ -1350,12 +1326,12 @@ async function handleTasksApi(req, res) {
             submissionId = parseInt(body.external_id.replace('reward-', ''), 10) || null;
         }
         
-        const token = await getTasksApiToken();
+        const apiKey = getTasksApiKey();
         
         const response = await fetch(`${TASKS_API_BASE}/tasks`, {
             method: 'POST',
             headers: {
-                'Authorization': `Bearer ${token}`,
+                'x-api-key': apiKey,
                 'Content-Type': 'application/json',
                 'Accept': 'application/json',
             },
@@ -1516,18 +1492,18 @@ async function handleGetTaskLog(req, res, id) {
 }
 
 function handleTasksHealth(req, res) {
-    const hasCredentials = !!(process.env.TASKS_API_EMAIL && process.env.TASKS_API_PASSWORD);
-    sendJson(res, 200, { status: 'ok', tasksApiConfigured: hasCredentials });
+    const hasApiKey = !!process.env.GPTGPTBACKEND_X_API_KEY;
+    sendJson(res, 200, { status: 'ok', tasksApiConfigured: hasApiKey });
 }
 
 async function handleTasksOptions(req, res) {
     try {
-        const token = await getTasksApiToken();
+        const apiKey = getTasksApiKey();
         
         const response = await fetch(`${TASKS_API_BASE}/tasks/options/dropdown`, {
             method: 'GET',
             headers: {
-                'Authorization': `Bearer ${token}`,
+                'x-api-key': apiKey,
                 'Accept': 'application/json',
             },
         });
