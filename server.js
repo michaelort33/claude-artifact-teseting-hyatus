@@ -579,12 +579,32 @@ async function handleCreateSubmission(req, res) {
         const user = await getSessionUser(req);
         const userId = user?.id || null;
 
+        let reservationId = null;
+        if (payment_handle) {
+            try {
+                const apiKey = process.env.GUEST_PORTAL_API_KEY;
+                if (apiKey) {
+                    const lookupRes = await fetch(`${GUEST_PORTAL_API_BASE}/reservations/id-by-email`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json', 'x-api-key': apiKey },
+                        body: JSON.stringify({ email: payment_handle })
+                    });
+                    if (lookupRes.ok) {
+                        const lookupData = await lookupRes.json();
+                        if (lookupData) reservationId = String(lookupData);
+                    }
+                }
+            } catch (e) {
+                console.error('Reservation lookup during submission:', e.message);
+            }
+        }
+
         const result = await pool.query(
             `INSERT INTO review_rewards 
-             (payment_method, payment_handle, review_link, screenshot_url, status, user_id, award_amount, previous_guest)
-             VALUES ($1, $2, $3, $4, 'pending', $5, $6, $7)
+             (payment_method, payment_handle, review_link, screenshot_url, status, user_id, award_amount, previous_guest, reservation_id)
+             VALUES ($1, $2, $3, $4, 'pending', $5, $6, $7, $8)
              RETURNING *`,
-            [sanitizeInput(payment_method), sanitizeInput(payment_handle), sanitizeInput(review_link) || null, screenshot_url || null, userId, award_amount || null, previous_guest || false]
+            [sanitizeInput(payment_method), sanitizeInput(payment_handle), sanitizeInput(review_link) || null, screenshot_url || null, userId, award_amount || null, previous_guest || false, reservationId]
         );
 
         const submission = result.rows[0];
@@ -2114,6 +2134,9 @@ server.listen(PORT, HOST, async () => {
                 } catch (e) {}
             }
             console.log('Primary key sequences synchronized');
+
+            await pool.query(`ALTER TABLE review_rewards ADD COLUMN IF NOT EXISTS reservation_id TEXT`);
+            console.log('Schema migration complete');
         } catch (err) {
             console.error('Failed to sync sequences:', err.message);
         }

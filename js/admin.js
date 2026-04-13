@@ -356,6 +356,10 @@ function renderSubmissions(data) {
         const reviewType = submission.review_link ? 'Link' : 'Screenshot';
         const amount = parseFloat(submission.award_amount) || getAwardAmount(submission.id);
 
+        const reservationCell = submission.reservation_id 
+            ? `<a href="https://www.gptguest.com/dashboard/reservations/${submission.reservation_id}" target="_blank" style="color: var(--info); text-decoration: none;">${submission.reservation_id}</a>`
+            : '<span style="color: var(--warm-gray-dark);">—</span>';
+
         row.innerHTML = `
             <td><input type="checkbox" class="submission-checkbox" data-id="${submission.id}" onchange="updateSelection()"></td>
             <td>#${submission.id || 'N/A'}</td>
@@ -364,7 +368,7 @@ function renderSubmissions(data) {
             <td>${submission.payment_handle || ''}</td>
             <td>${reviewType}</td>
             <td>$${Number(amount).toFixed(2)}</td>
-            <td>${submission.previous_guest ? 'Yes' : 'No'}</td>
+            <td>${reservationCell}</td>
             <td><span class="status-badge status-${submission.status || 'pending'}">${(submission.status || 'pending').toUpperCase()}</span></td>
             <td>
                 <div class="action-buttons">
@@ -661,6 +665,10 @@ async function viewDetails(id) {
                 <div class="detail-value">$${(parseFloat(data.award_amount) || getAwardAmount(data.id)).toFixed(2)}</div>
                 <div class="detail-label">Previous Guest</div>
                 <div class="detail-value">${data.previous_guest ? 'Yes' : 'No'}</div>
+                <div class="detail-label">Reservation</div>
+                <div class="detail-value">${data.reservation_id 
+                    ? `<a href="https://www.gptguest.com/dashboard/reservations/${data.reservation_id}" target="_blank" style="color: var(--info);">${data.reservation_id}</a>` 
+                    : 'No reservation found'}</div>
                 <div class="detail-label">Status</div>
                 <div class="detail-value"><span class="status-badge status-${data.status || 'pending'}">${(data.status || 'pending').toUpperCase()}</span></div>
                 ${data.review_link ? `
