@@ -2071,8 +2071,8 @@ const server = http.createServer(async (req, res) => {
         return res.end();
     }
 
-    const allowedDirs = ['js'];
-    const allowedExtensions = ['.html', '.css', '.js', '.png', '.jpg', '.jpeg', '.gif', '.svg', '.ico', '.woff', '.woff2', '.ttf', '.eot'];
+    const allowedDirs = ['js', 'images'];
+    const allowedExtensions = ['.html', '.css', '.js', '.png', '.jpg', '.jpeg', '.gif', '.svg', '.ico', '.webp', '.woff', '.woff2', '.ttf', '.eot'];
 
     let filePath = '.' + pathname;
     if (filePath === './') {
