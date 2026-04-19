@@ -375,6 +375,7 @@ function renderSubmissions(data) {
                     <button class="action-btn btn-view" onclick="viewDetails(${submission.id})">View</button>
                     <button class="action-btn btn-edit" onclick="editAward(${submission.id})">Edit</button>
                     ${(submission.status || 'pending') === 'pending' ? `
+                        <button class="action-btn btn-followup" onclick="requestProof(${submission.id})" title="${submission.followup_sent_at ? 'Follow-up sent ' + new Date(submission.followup_sent_at).toLocaleDateString() : 'Request proof of review'}">${submission.followup_sent_at ? '📧 Sent' : '📧 Request Proof'}</button>
                         <button class="action-btn btn-award" onclick="updateStatus(${submission.id}, 'awarded')">Award</button>
                         <button class="action-btn btn-reject" onclick="updateStatus(${submission.id}, 'rejected')">Reject</button>
                     ` : (submission.status === 'awarded' ? `
@@ -669,6 +670,10 @@ async function viewDetails(id) {
                 <div class="detail-value">${data.reservation_id 
                     ? `<a href="https://www.gptguest.com/dashboard/reservations/${data.reservation_id}" target="_blank" style="color: var(--info);">${data.reservation_id}</a>` 
                     : 'No reservation found'}</div>
+                <div class="detail-label">Follow-up</div>
+                <div class="detail-value">${data.followup_sent_at 
+                    ? `Proof requested ${new Date(data.followup_sent_at).toLocaleString()}`
+                    : (data.status === 'pending' ? `<button class="action-btn btn-followup" onclick="requestProof(${data.id})" style="margin: 0;">📧 Request Proof</button>` : 'N/A')}</div>
                 <div class="detail-label">Status</div>
                 <div class="detail-value"><span class="status-badge status-${data.status || 'pending'}">${(data.status || 'pending').toUpperCase()}</span></div>
                 ${data.review_link ? `
@@ -693,6 +698,40 @@ async function viewDetails(id) {
 function closeDetailModal() {
     document.getElementById('detailModal').classList.remove('active');
     closeModal();
+}
+
+async function requestProof(id) {
+    const submission = submissions.find(s => s.id === id);
+    const email = submission?.payment_handle || 'this guest';
+    
+    if (!confirm(`Send a follow-up email to ${email} requesting proof of their review?`)) {
+        return;
+    }
+
+    try {
+        const response = await fetch('/api/submissions/request-proof', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ submission_id: id })
+        });
+        const result = await response.json();
+
+        if (!response.ok) {
+            throw new Error(result.error || 'Failed to send email');
+        }
+
+        showToast('Follow-up email sent successfully', 'success');
+        if (submission) {
+            submission.followup_sent_at = new Date().toISOString();
+        }
+        renderSubmissions(submissions);
+
+        if (document.getElementById('detailModal').classList.contains('active')) {
+            viewDetails(id);
+        }
+    } catch (err) {
+        showToast('Error: ' + err.message, 'error');
+    }
 }
 
 let currentEditSubmissionId = null;
