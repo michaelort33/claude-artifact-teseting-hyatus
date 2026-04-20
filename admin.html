@@ -1474,17 +1474,17 @@
         <p class="page-subtitle">Manage submissions and referrals</p>
 
         <div class="admin-tabs">
-            <button class="admin-tab active" data-tab="overview" onclick="switchTab('overview')">Overview</button>
-            <button class="admin-tab" data-tab="submissions" onclick="switchTab('submissions')">Submissions</button>
-            <button class="admin-tab" data-tab="referrals" onclick="switchTab('referrals')">Company Referrals</button>
-            <button class="admin-tab" data-tab="guestReferrals" onclick="switchTab('guestReferrals')">Guest Referrals</button>
-            <button class="admin-tab" data-tab="taskLogs" onclick="switchTab('taskLogs')">Task Logs</button>
-            <button class="admin-tab" data-tab="settings" onclick="switchTab('settings')">Settings</button>
+            <button class="admin-tab active" data-tab="overview" data-click="switchTab" data-arg="overview">Overview</button>
+            <button class="admin-tab" data-tab="submissions" data-click="switchTab" data-arg="submissions">Submissions</button>
+            <button class="admin-tab" data-tab="referrals" data-click="switchTab" data-arg="referrals">Company Referrals</button>
+            <button class="admin-tab" data-tab="guestReferrals" data-click="switchTab" data-arg="guestReferrals">Guest Referrals</button>
+            <button class="admin-tab" data-tab="taskLogs" data-click="switchTab" data-arg="taskLogs">Task Logs</button>
+            <button class="admin-tab" data-tab="settings" data-click="switchTab" data-arg="settings">Settings</button>
         </div>
 
         <div id="overviewSection" class="tab-content active">
             <div class="overview-grid">
-                <div class="overview-card" onclick="switchTab('submissions')">
+                <div class="overview-card" data-click="switchTab" data-arg="submissions">
                     <div class="overview-card-icon">
                         <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
                             <path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
@@ -1505,7 +1505,7 @@
                     </div>
                 </div>
 
-                <div class="overview-card" onclick="switchTab('referrals')">
+                <div class="overview-card" data-click="switchTab" data-arg="referrals">
                     <div class="overview-card-icon">
                         <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
                             <path d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
@@ -1526,7 +1526,7 @@
                     </div>
                 </div>
 
-                <div class="overview-card" onclick="switchTab('guestReferrals')">
+                <div class="overview-card" data-click="switchTab" data-arg="guestReferrals">
                     <div class="overview-card-icon">
                         <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
                             <path d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
@@ -1547,7 +1547,7 @@
                     </div>
                 </div>
 
-                <div class="overview-card" onclick="switchTab('taskLogs')">
+                <div class="overview-card" data-click="switchTab" data-arg="taskLogs">
                     <div class="overview-card-icon">
                         <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
                             <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/>
@@ -1567,7 +1567,7 @@
                     </div>
                 </div>
 
-                <div class="overview-card" onclick="switchTab('settings')">
+                <div class="overview-card" data-click="switchTab" data-arg="settings">
                     <div class="overview-card-icon">
                         <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
                             <path d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
@@ -1609,7 +1609,7 @@
                             </div>
                             <div class="link-url-row">
                                 <code class="link-url" id="linkReturningGuest10"></code>
-                                <button class="copy-btn" onclick="copyLink('linkReturningGuest10')">Copy</button>
+                                <button class="copy-btn" data-click="copyLink" data-arg="linkReturningGuest10">Copy</button>
                             </div>
                         </div>
                         <div class="link-item">
@@ -1619,7 +1619,7 @@
                             </div>
                             <div class="link-url-row">
                                 <code class="link-url" id="linkReturningGuest20"></code>
-                                <button class="copy-btn" onclick="copyLink('linkReturningGuest20')">Copy</button>
+                                <button class="copy-btn" data-click="copyLink" data-arg="linkReturningGuest20">Copy</button>
                             </div>
                         </div>
                     </div>
@@ -1633,7 +1633,7 @@
                             </div>
                             <div class="link-url-row">
                                 <code class="link-url" id="linkCompanyReferral"></code>
-                                <button class="copy-btn" onclick="copyLink('linkCompanyReferral')">Copy</button>
+                                <button class="copy-btn" data-click="copyLink" data-arg="linkCompanyReferral">Copy</button>
                             </div>
                         </div>
                         <div class="link-item">
@@ -1643,7 +1643,7 @@
                             </div>
                             <div class="link-url-row">
                                 <code class="link-url" id="linkGuestReferral"></code>
-                                <button class="copy-btn" onclick="copyLink('linkGuestReferral')">Copy</button>
+                                <button class="copy-btn" data-click="copyLink" data-arg="linkGuestReferral">Copy</button>
                             </div>
                         </div>
                     </div>
@@ -1734,7 +1734,7 @@
                 <option value="surprise">Surprise Me</option>
             </select>
             <div class="spacer"></div>
-            <button class="export-btn" onclick="exportCSV()">
+            <button class="export-btn" data-click="exportCSV">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
                     <polyline points="7 10 12 15 17 10"></polyline>
@@ -1742,7 +1742,7 @@
                 </svg>
                 Export CSV
             </button>
-            <button class="icon-btn" onclick="loadSubmissions()" title="Refresh">
+            <button class="icon-btn" data-click="loadSubmissions" title="Refresh">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <polyline points="23 4 23 10 17 10"></polyline>
                     <polyline points="1 20 1 14 7 14"></polyline>
@@ -1755,7 +1755,7 @@
             <table>
                 <thead>
                     <tr>
-                        <th><input type="checkbox" id="selectAll" onchange="toggleSelectAll()"></th>
+                        <th><input type="checkbox" id="selectAll" data-change="toggleSelectAll"></th>
                         <th>ID</th>
                         <th>Date</th>
                         <th>Gift Type</th>
@@ -1789,7 +1789,7 @@
                     <option value="paid">Paid</option>
                 </select>
                 <div class="spacer"></div>
-                <button class="icon-btn" onclick="loadReferrals()" title="Refresh">
+                <button class="icon-btn" data-click="loadReferrals" title="Refresh">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <polyline points="23 4 23 10 17 10"></polyline>
                         <polyline points="1 20 1 14 7 14"></polyline>
@@ -1828,7 +1828,7 @@
                     <option value="duplicate">Duplicate</option>
                 </select>
                 <div class="spacer"></div>
-                <button class="icon-btn" onclick="loadTaskLogs()" title="Refresh">
+                <button class="icon-btn" data-click="loadTaskLogs" title="Refresh">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <polyline points="23 4 23 10 17 10"></polyline>
                         <polyline points="1 20 1 14 7 14"></polyline>
@@ -1878,7 +1878,7 @@
             </div>
 
             <div class="filters">
-                <select id="guestReferralStatusFilter" onchange="loadGuestReferrals()">
+                <select id="guestReferralStatusFilter" data-change="loadGuestReferrals">
                     <option value="all">All Statuses</option>
                     <option value="pending">Pending</option>
                     <option value="approved">Approved</option>
@@ -1947,19 +1947,19 @@
 
     <div class="bulk-actions-bar" id="bulkActionsBar">
         <span id="selectedCount">0 selected</span>
-        <button class="btn-bulk-paid" onclick="bulkMarkPaid()">Mark as Paid</button>
-        <button class="btn-bulk-clear" onclick="clearSelection()">Clear</button>
+        <button class="btn-bulk-paid" data-click="bulkMarkPaid">Mark as Paid</button>
+        <button class="btn-bulk-clear" data-click="clearSelection">Clear</button>
     </div>
 
     <div class="modal" id="detailModal">
         <div class="modal-content">
             <div class="modal-header">
                 <h3>Submission Details</h3>
-                <button class="modal-close" onclick="closeDetailModal()">&times;</button>
+                <button class="modal-close" data-click="closeDetailModal">&times;</button>
             </div>
             <div class="modal-body" id="detailContent"></div>
             <div class="modal-footer">
-                <button class="btn btn-secondary" onclick="closeDetailModal()">Close</button>
+                <button class="btn btn-secondary" data-click="closeDetailModal">Close</button>
             </div>
         </div>
     </div>
@@ -1968,7 +1968,7 @@
         <div class="modal-content" style="max-width: 400px;">
             <div class="modal-header">
                 <h3>Edit Award Amount</h3>
-                <button class="modal-close" onclick="closeEditAwardModal()">&times;</button>
+                <button class="modal-close" data-click="closeEditAwardModal">&times;</button>
             </div>
             <div class="modal-body">
                 <div class="form-group">
@@ -1977,8 +1977,8 @@
                 </div>
             </div>
             <div class="modal-footer">
-                <button class="btn btn-secondary" onclick="closeEditAwardModal()">Cancel</button>
-                <button class="btn btn-primary" onclick="saveAwardAmount()">Save</button>
+                <button class="btn btn-secondary" data-click="closeEditAwardModal">Cancel</button>
+                <button class="btn btn-primary" data-click="saveAwardAmount">Save</button>
             </div>
         </div>
     </div>
@@ -2004,8 +2004,8 @@
                     </div>
                 </div>
                 <div class="task-buttons">
-                    <button class="btn btn-secondary" onclick="skipTask()">Skip</button>
-                    <button class="btn btn-primary" onclick="createTask()">Create Task</button>
+                    <button class="btn btn-secondary" data-click="skipTask">Skip</button>
+                    <button class="btn btn-primary" data-click="createTask">Create Task</button>
                 </div>
             </div>
         </div>
@@ -2015,7 +2015,7 @@
         <div class="modal-content" style="max-width: 600px;">
             <div class="modal-header">
                 <h3>Referral Details</h3>
-                <button class="modal-close" onclick="closeReferralModal()">&times;</button>
+                <button class="modal-close" data-click="closeReferralModal">&times;</button>
             </div>
             <div class="modal-body">
                 <div id="referralDetailContent"></div>
@@ -2044,8 +2044,8 @@
                 </div>
             </div>
             <div class="modal-footer">
-                <button class="btn btn-secondary" onclick="closeReferralModal()">Cancel</button>
-                <button class="btn btn-primary" onclick="saveReferral()">Save Changes</button>
+                <button class="btn btn-secondary" data-click="closeReferralModal">Cancel</button>
+                <button class="btn btn-primary" data-click="saveReferral">Save Changes</button>
             </div>
         </div>
     </div>
@@ -2054,16 +2054,17 @@
         <div class="modal-content" style="max-width: 700px;">
             <div class="modal-header">
                 <h3>Task Log Details</h3>
-                <button class="modal-close" onclick="closeTaskLogModal()">&times;</button>
+                <button class="modal-close" data-click="closeTaskLogModal">&times;</button>
             </div>
             <div class="modal-body" id="taskLogDetailContent"></div>
             <div class="modal-footer">
-                <button class="btn btn-secondary" onclick="closeTaskLogModal()">Close</button>
+                <button class="btn btn-secondary" data-click="closeTaskLogModal">Close</button>
             </div>
         </div>
     </div>
 
     <script src="js/admin.js"></script>
+    <script src="js/wire-actions.js"></script>
 </body>
 
 </html>
