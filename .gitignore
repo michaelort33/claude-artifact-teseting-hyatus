@@ -1,5 +1,6 @@
 # Node.js
 node_modules/
+public/
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
@@ -30,3 +31,7 @@ Thumbs.db
 .temp
 supabase/.branches
 supabase/.temp
+.vercel
+.env*.local
+.env.vercel
+.env.preview.vercel

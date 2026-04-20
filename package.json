@@ -1,16 +1,25 @@
 {
   "name": "hyatus-feedback",
   "version": "1.0.0",
+  "engines": {
+    "node": "20.x"
+  },
   "scripts": {
     "start": "node server.js",
-    "build": "echo 'No build step required'"
+    "build": "node scripts/prepare-static.js",
+    "vercel:dev": "vercel dev",
+    "db:clone": "./scripts/clone-neon-db.sh",
+    "db:validate": "./scripts/validate-db-clone.sh",
+    "blob:backfill": "node scripts/backfill-screenshots-to-blob.js"
   },
   "dependencies": {
     "@google-cloud/translate": "^9.3.0",
     "@sendgrid/mail": "^8.1.6",
+    "@vercel/blob": "^2.3.1",
     "bcryptjs": "^3.0.3",
     "crypto": "^1.0.1",
     "http-server": "^14.1.1",
-    "pg": "^8.16.3"
+    "pg": "^8.16.3",
+    "redis": "^5.12.1"
   }
 }

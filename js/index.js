@@ -196,6 +196,25 @@ function fileToBase64(file) {
     });
 }
 
+async function uploadScreenshot(file) {
+    const fileData = await fileToBase64(file);
+    const response = await fetch('/api/uploads/screenshot', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            filename: file.name,
+            fileData
+        })
+    });
+
+    const result = await response.json();
+    if (!response.ok) {
+        throw new Error(result.error || 'Failed to upload screenshot');
+    }
+
+    return result.url;
+}
+
 function showError(message) {
     console.log('Showing error:', message);
     const errorDiv = document.getElementById('errorMessage');
@@ -272,9 +291,9 @@ async function handleFormSubmit(e) {
     }
 
     try {
-        let screenshotData = null;
+        let screenshotUrl = null;
         if (hasScreenshot && uploadedFile) {
-            screenshotData = await fileToBase64(uploadedFile);
+            screenshotUrl = await uploadScreenshot(uploadedFile);
         }
 
         const response = await fetch('/api/submissions', {
@@ -284,7 +303,7 @@ async function handleFormSubmit(e) {
                 payment_method: selectedMethod,
                 payment_handle: paymentHandle.value,
                 review_link: reviewLink || null,
-                screenshot_url: screenshotData,
+                screenshot_url: screenshotUrl,
                 award_amount: rewardAmount,
                 previous_guest: isPreviousGuest,
                 _form_token: _formLoadTime.toString(36),
