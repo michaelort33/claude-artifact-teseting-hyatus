@@ -2,6 +2,7 @@ const http = require('http');
 const fs = require('fs');
 const path = require('path');
 const {
+    handleDevAdminSignin,
     handleGetSession,
     handlePasswordReset,
     handlePasswordResetRequest,
@@ -114,6 +115,9 @@ async function requestHandler(req, res) {
     }
     if (pathname === '/api/auth/signin' && method === 'POST') {
         return handleSignin(req, res);
+    }
+    if (pathname === '/api/auth/dev-admin' && method === 'POST') {
+        return handleDevAdminSignin(req, res);
     }
     if (pathname === '/api/auth/signout' && method === 'POST') {
         return handleSignout(req, res);
