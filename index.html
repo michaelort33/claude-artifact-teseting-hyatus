@@ -482,6 +482,8 @@
 
         input[type="text"],
         input[type="email"],
+        input[type="tel"],
+        input[type="date"],
         input[type="url"],
         input[type="password"],
         select {
@@ -514,6 +516,33 @@
 
         input::placeholder {
             color: var(--warm-gray);
+        }
+
+        .manual-verification {
+            display: none;
+        }
+
+        .manual-verification.show {
+            display: block;
+        }
+
+        .reservation-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        .reservation-contact-grid {
+            display: grid;
+            grid-template-columns: 140px 1fr;
+            gap: 16px;
+        }
+
+        @media (max-width: 560px) {
+            .reservation-grid,
+            .reservation-contact-grid {
+                grid-template-columns: 1fr;
+            }
         }
 
         .gift-options {
@@ -1857,11 +1886,45 @@
                         </div>
                     </div>
 
+                    <div class="divider manual-verification" id="reservationDivider">Your Stay</div>
+
+                    <div class="section manual-verification" id="reservationVerificationSection">
+                        <div class="section-header">
+                            <div class="step-indicator">2</div>
+                            <h3 class="section-title">Confirm Your Stay</h3>
+                        </div>
+
+                        <div class="reservation-contact-grid">
+                            <div class="form-group">
+                                <label for="reservationLookupType">Find By</label>
+                                <select id="reservationLookupType">
+                                    <option value="email">Email</option>
+                                    <option value="phone">Phone</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="reservationLookupValue" id="reservationLookupLabel">Guest Email</label>
+                                <input type="email" id="reservationLookupValue" placeholder="guest@example.com">
+                            </div>
+                        </div>
+
+                        <div class="reservation-grid">
+                            <div class="form-group">
+                                <label for="providedCheckin">Start Date</label>
+                                <input type="date" id="providedCheckin">
+                            </div>
+                            <div class="form-group">
+                                <label for="providedCheckout">End Date</label>
+                                <input type="date" id="providedCheckout">
+                            </div>
+                        </div>
+                    </div>
+
                     <div class="divider" data-i18n="yourFeedbackDivider">Your Feedback</div>
 
                     <div class="section">
                         <div class="section-header">
-                            <div class="step-indicator">2</div>
+                            <div class="step-indicator" id="feedbackStepIndicator">2</div>
                             <h3 class="section-title" data-i18n="shareFeedbackTitle">Share Your Feedback</h3>
                         </div>
 
