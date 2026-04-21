@@ -389,9 +389,10 @@ function renderSubmissions(data) {
         const date = new Date(submission.created_at || Date.now()).toLocaleDateString();
         const reviewType = submission.review_link ? 'Link' : 'Screenshot';
         const amount = parseFloat(submission.award_amount) || getAwardAmount(submission.id);
+        const reservationId = submission.verified_reservation_id || submission.reservation_id;
 
-        const reservationCell = submission.reservation_id 
-            ? `<a href="https://www.gptguest.com/dashboard/reservations/${submission.reservation_id}" target="_blank" style="color: var(--info); text-decoration: none;">${submission.reservation_id}</a>`
+        const reservationCell = reservationId
+            ? `<a href="https://www.gptguest.com/dashboard/reservations/${reservationId}" target="_blank" style="color: var(--info); text-decoration: none;">${reservationId}</a>`
             : '<span style="color: var(--warm-gray-dark);">—</span>';
 
         row.innerHTML = `
