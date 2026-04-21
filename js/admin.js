@@ -979,10 +979,12 @@ async function createTask() {
                 });
 
                 if (lookupResponse.ok) {
-                    const reservationId = await lookupResponse.json();
-                    if (reservationId) {
+                    // Response shape: [{reservation_id, date_from, date_to, reservation_status}, ...]
+                    // sorted by date_to DESC. Take the most recent reservation.
+                    const reservations = await lookupResponse.json();
+                    if (Array.isArray(reservations) && reservations.length > 0 && reservations[0].reservation_id) {
                         taskParent = 'reservation';
-                        linkId = String(reservationId);
+                        linkId = String(reservations[0].reservation_id);
                     }
                 }
             } catch (lookupError) {
