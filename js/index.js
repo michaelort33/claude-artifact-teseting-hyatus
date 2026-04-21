@@ -274,6 +274,39 @@ const successMessage = document.getElementById('successMessage');
 const submitButton = document.getElementById('submitButton');
 const _formLoadTime = Date.now();
 
+// ?token=<reservation-token> — when present and verified, we skip the manual
+// reservation-verification step. When absent or invalid we silently fall
+// through; PR 2 adds the manual phone/email + dates fallback UI.
+const _reservationToken = (() => {
+    try {
+        const t = new URLSearchParams(window.location.search).get('token');
+        return typeof t === 'string' && t.length > 0 && t.length <= 200 ? t : null;
+    } catch (_) {
+        return null;
+    }
+})();
+
+async function verifyReservationToken() {
+    if (!_reservationToken) return false;
+    try {
+        const res = await fetch('/api/reservations/verify-token', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ token: _reservationToken })
+        });
+        if (!res.ok) return false;
+        const data = await res.json();
+        return data && data.verified === true;
+    } catch (_) {
+        return false;
+    }
+}
+
+// Fire-and-cache a verification check on page load so the future manual-verify
+// UI (PR 2) knows whether to render. The result isn't needed until PR 2, but
+// making the round trip now spreads latency off the submission's critical path.
+const _tokenVerifiedPromise = verifyReservationToken();
+
 async function handleFormSubmit(e) {
     if (e) e.preventDefault();
 
@@ -307,6 +340,7 @@ async function handleFormSubmit(e) {
                 award_amount: rewardAmount,
                 previous_guest: isPreviousGuest,
                 _form_token: _formLoadTime.toString(36),
+                reservation_token: _reservationToken,
             })
         });
 

@@ -34,7 +34,8 @@ const {
     handleUpdateGuestReferral
 } = require('./lib/guest-referral-handlers');
 const {
-    handleReservationLookup
+    handleReservationLookup,
+    handleVerifyToken
 } = require('./lib/reservations-handlers');
 const {
     handleGetTaskLog,
@@ -159,6 +160,9 @@ async function requestHandler(req, res) {
     }
     if (pathname === '/api/reservations/lookup-by-email' && method === 'POST') {
         return handleReservationLookup(req, res);
+    }
+    if (pathname === '/api/reservations/verify-token' && method === 'POST') {
+        return handleVerifyToken(req, res);
     }
     if (pathname === '/api/task-logs' && method === 'GET') {
         return handleGetTaskLogs(req, res);
@@ -305,6 +309,18 @@ async function runStartupMigrations() {
 
         await pool.query(`ALTER TABLE review_rewards ADD COLUMN IF NOT EXISTS reservation_id TEXT`);
         await pool.query(`ALTER TABLE review_rewards ADD COLUMN IF NOT EXISTS followup_sent_at TIMESTAMPTZ`);
+        await pool.query(`ALTER TABLE review_rewards
+            ADD COLUMN IF NOT EXISTS verification_method TEXT,
+            ADD COLUMN IF NOT EXISTS verification_status TEXT,
+            ADD COLUMN IF NOT EXISTS verified_reservation_id TEXT,
+            ADD COLUMN IF NOT EXISTS verified_previously_used BOOLEAN DEFAULT false,
+            ADD COLUMN IF NOT EXISTS provided_checkin DATE,
+            ADD COLUMN IF NOT EXISTS provided_checkout DATE,
+            ADD COLUMN IF NOT EXISTS actual_checkin DATE,
+            ADD COLUMN IF NOT EXISTS actual_checkout DATE`);
+        await pool.query(`CREATE INDEX IF NOT EXISTS idx_review_rewards_verified_reservation
+            ON review_rewards (verified_reservation_id)
+            WHERE verified_reservation_id IS NOT NULL`);
         console.log('Schema migration complete');
     } catch (err) {
         console.error('Failed to sync sequences:', err.message);
