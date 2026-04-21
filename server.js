@@ -36,6 +36,7 @@ const {
 } = require('./lib/guest-referral-handlers');
 const {
     handleReservationLookup,
+    handleVerifyManual,
     handleVerifyToken
 } = require('./lib/reservations-handlers');
 const {
@@ -167,6 +168,9 @@ async function requestHandler(req, res) {
     }
     if (pathname === '/api/reservations/verify-token' && method === 'POST') {
         return handleVerifyToken(req, res);
+    }
+    if (pathname === '/api/reservations/verify-manual' && method === 'POST') {
+        return handleVerifyManual(req, res);
     }
     if (pathname === '/api/task-logs' && method === 'GET') {
         return handleGetTaskLogs(req, res);

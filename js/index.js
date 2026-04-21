@@ -272,11 +272,20 @@ const form = document.getElementById('rewardForm');
 const formContainer = document.getElementById('formContainer');
 const successMessage = document.getElementById('successMessage');
 const submitButton = document.getElementById('submitButton');
+const reservationDivider = document.getElementById('reservationDivider');
+const reservationVerificationSection = document.getElementById('reservationVerificationSection');
+const reservationLookupType = document.getElementById('reservationLookupType');
+const reservationLookupValue = document.getElementById('reservationLookupValue');
+const reservationLookupLabel = document.getElementById('reservationLookupLabel');
+const providedCheckin = document.getElementById('providedCheckin');
+const providedCheckout = document.getElementById('providedCheckout');
+const feedbackStepIndicator = document.getElementById('feedbackStepIndicator');
 const _formLoadTime = Date.now();
+let manualVerificationVisible = false;
 
 // ?token=<reservation-token> — when present and verified, we skip the manual
-// reservation-verification step. When absent or invalid we silently fall
-// through; PR 2 adds the manual phone/email + dates fallback UI.
+// reservation-verification step. When absent or invalid we show the manual
+// phone/email + dates fallback UI.
 const _reservationToken = (() => {
     try {
         const t = new URLSearchParams(window.location.search).get('token');
@@ -302,10 +311,74 @@ async function verifyReservationToken() {
     }
 }
 
-// Fire-and-cache a verification check on page load so the future manual-verify
-// UI (PR 2) knows whether to render. The result isn't needed until PR 2, but
-// making the round trip now spreads latency off the submission's critical path.
+// Fire-and-cache a verification check on page load so manual fallback rendering
+// does not add latency to the first visible interaction.
 const _tokenVerifiedPromise = verifyReservationToken();
+
+function updateReservationLookupInput() {
+    if (!reservationLookupType || !reservationLookupValue || !reservationLookupLabel) return;
+    if (reservationLookupType.value === 'phone') {
+        reservationLookupLabel.textContent = 'Guest Phone';
+        reservationLookupValue.type = 'tel';
+        reservationLookupValue.placeholder = '(555) 123-4567';
+        reservationLookupValue.value = '';
+    } else {
+        reservationLookupLabel.textContent = 'Guest Email';
+        reservationLookupValue.type = 'email';
+        reservationLookupValue.placeholder = 'guest@example.com';
+        if (!reservationLookupValue.value && paymentHandle?.value) {
+            reservationLookupValue.value = paymentHandle.value;
+        }
+    }
+}
+
+function showManualReservationVerification(show) {
+    manualVerificationVisible = show;
+    reservationDivider?.classList.toggle('show', show);
+    reservationVerificationSection?.classList.toggle('show', show);
+    if (feedbackStepIndicator) feedbackStepIndicator.textContent = show ? '3' : '2';
+    if (show) updateReservationLookupInput();
+}
+
+function getManualReservationPayload() {
+    if (!manualVerificationVisible) return null;
+
+    const type = reservationLookupType?.value || 'email';
+    const value = reservationLookupValue?.value?.trim() || '';
+    const checkin = providedCheckin?.value || '';
+    const checkout = providedCheckout?.value || '';
+
+    if (!value || !checkin || !checkout) {
+        showError('Please enter your guest email or phone plus your stay start and end dates');
+        return false;
+    }
+
+    return {
+        email: type === 'email' ? value : null,
+        phone: type === 'phone' ? value : null,
+        checkin,
+        checkout
+    };
+}
+
+async function warmManualVerification(payload) {
+    if (!payload) return;
+    try {
+        await fetch('/api/reservations/verify-manual', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+    } catch (_) {}
+}
+
+if (reservationLookupType) {
+    reservationLookupType.addEventListener('change', updateReservationLookupInput);
+}
+
+_tokenVerifiedPromise.then((verified) => {
+    showManualReservationVerification(!verified);
+});
 
 async function handleFormSubmit(e) {
     if (e) e.preventDefault();
@@ -318,6 +391,9 @@ async function handleFormSubmit(e) {
     if (!paymentHandle || !paymentHandle.value) return showError('Please enter your email so we can send your gift');
     if (!reviewLink && !hasScreenshot) return showError('Please share either a link to your feedback or upload a screenshot');
 
+    const manualReservationPayload = getManualReservationPayload();
+    if (manualReservationPayload === false) return;
+
     if (submitButton) {
         submitButton.textContent = 'Submitting...';
         submitButton.disabled = true;
@@ -328,6 +404,8 @@ async function handleFormSubmit(e) {
         if (hasScreenshot && uploadedFile) {
             screenshotUrl = await uploadScreenshot(uploadedFile);
         }
+
+        await warmManualVerification(manualReservationPayload);
 
         const response = await fetch('/api/submissions', {
             method: 'POST',
@@ -341,6 +419,10 @@ async function handleFormSubmit(e) {
                 previous_guest: isPreviousGuest,
                 _form_token: _formLoadTime.toString(36),
                 reservation_token: _reservationToken,
+                reservation_email: manualReservationPayload?.email || null,
+                reservation_phone: manualReservationPayload?.phone || null,
+                provided_checkin: manualReservationPayload?.checkin || null,
+                provided_checkout: manualReservationPayload?.checkout || null,
             })
         });
 
