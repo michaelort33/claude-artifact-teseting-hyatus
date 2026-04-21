@@ -1,4 +1,5 @@
 const {
+    handleDevAdminSignin,
     handleGetSession,
     handlePasswordReset,
     handlePasswordResetRequest,
@@ -12,6 +13,7 @@ module.exports = async (req, res) => {
 
     if (action === 'signup' && req.method === 'POST') return handleSignup(req, res);
     if (action === 'signin' && req.method === 'POST') return handleSignin(req, res);
+    if (action === 'dev-admin' && req.method === 'POST') return handleDevAdminSignin(req, res);
     if (action === 'signout' && req.method === 'POST') return handleSignout(req, res);
     if (action === 'session' && req.method === 'GET') return handleGetSession(req, res);
     if (action === 'reset-password-request' && req.method === 'POST') return handlePasswordResetRequest(req, res);

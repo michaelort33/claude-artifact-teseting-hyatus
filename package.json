@@ -6,6 +6,7 @@
   },
   "scripts": {
     "start": "node server.js",
+    "dev:admin": "node scripts/start-local-admin.js",
     "build": "node scripts/prepare-static.js",
     "vercel:dev": "vercel dev",
     "db:clone": "./scripts/clone-neon-db.sh",

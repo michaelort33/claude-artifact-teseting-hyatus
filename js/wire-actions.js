@@ -15,6 +15,12 @@
         'loadTaskLogs',
         'loadGuestReferrals',
         'toggleSelectAll',
+        'updateSelection',
+        'viewDetails',
+        'editAward',
+        'requestProof',
+        'updateStatus',
+        'updateGuestReferralStatus',
         'bulkMarkPaid',
         'clearSelection',
         'closeDetailModal',
@@ -39,9 +45,15 @@
         if (!name) return;
         const fn = lookup(name);
         if (!fn) { console.warn('[wire-actions] blocked or unknown action:', name); return; }
+        const args = el.getAttribute('data-args');
         const arg = el.getAttribute('data-arg');
         try {
-            if (arg !== null) fn(arg);
+            if (args !== null) {
+                const parsedArgs = JSON.parse(args);
+                if (el.getAttribute('data-value-arg') === 'true') parsedArgs.push(el.value);
+                fn(...parsedArgs);
+            }
+            else if (arg !== null) fn(arg);
             else fn();
         } catch (err) {
             console.error('[wire-actions] error in', name, err);
