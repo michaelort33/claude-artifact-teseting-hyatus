@@ -986,6 +986,9 @@ async function showTaskModal(submission) {
             <span style="font-weight: 500;">$${Number(amount).toFixed(2)}</span>
         </div>
     `;
+
+    const amountInput = document.getElementById('taskAwardAmount');
+    if (amountInput) amountInput.value = Number(amount).toFixed(2);
     
     const searchInput = document.getElementById('taskAssigneeSearch');
     const hiddenInput = document.getElementById('taskAssignee');
@@ -1098,11 +1101,23 @@ async function skipTask() {
     pendingTaskSubmission = null;
 }
 
+function getTaskAwardAmount() {
+    const input = document.getElementById('taskAwardAmount');
+    const amount = parseFloat(input?.value || '');
+    if (isNaN(amount) || amount < 0) return null;
+    return Number(amount).toFixed(2);
+}
+
 async function createTask() {
     if (!pendingTaskSubmission) return;
 
     const submission = pendingTaskSubmission;
-    const amount = parseFloat(submission.award_amount) || getAwardAmount(submission.id);
+    const amount = getTaskAwardAmount();
+    if (amount === null) {
+        showToast('Please enter a valid task amount', 'error');
+        return;
+    }
+
     const giftType = (submission.payment_method || 'gift').toUpperCase();
     const email = submission.payment_handle;
     const assigneeId = document.getElementById('taskAssignee').value;

@@ -1996,6 +1996,10 @@
                 <p class="task-desc">Would you like to create a task to send the gift card to this guest?</p>
                 <div class="task-details" id="taskDetails"></div>
                 <div class="form-group" style="margin: 20px 0; text-align: left;">
+                    <label for="taskAwardAmount" style="display: block; margin-bottom: 8px; font-weight: 500; color: var(--charcoal);">Task Amount ($)</label>
+                    <input type="number" id="taskAwardAmount" step="0.01" min="0" placeholder="10.00" style="width: 100%; padding: 10px 12px; border: 1px solid var(--stone); border-radius: var(--radius-sm); font-size: 14px; background: white; box-sizing: border-box;">
+                </div>
+                <div class="form-group" style="margin: 20px 0; text-align: left;">
                     <label for="taskAssigneeSearch" style="display: block; margin-bottom: 8px; font-weight: 500; color: var(--charcoal);">Assign To <span style="font-weight: 400; color: var(--stone);">(optional)</span></label>
                     <div class="searchable-select" id="assigneeDropdown">
                         <input type="text" id="taskAssigneeSearch" placeholder="Search or select assignee..." autocomplete="off" style="width: 100%; padding: 10px 12px; border: 1px solid var(--stone); border-radius: var(--radius-sm); font-size: 14px; background: white; box-sizing: border-box;">
