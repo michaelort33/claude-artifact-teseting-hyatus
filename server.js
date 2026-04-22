@@ -317,6 +317,7 @@ async function runStartupMigrations() {
 
         await pool.query(`ALTER TABLE review_rewards ADD COLUMN IF NOT EXISTS reservation_id TEXT`);
         await pool.query(`ALTER TABLE review_rewards ADD COLUMN IF NOT EXISTS followup_sent_at TIMESTAMPTZ`);
+        await pool.query(`ALTER TABLE review_rewards ADD COLUMN IF NOT EXISTS source_url TEXT`);
         await pool.query(`ALTER TABLE review_rewards
             ADD COLUMN IF NOT EXISTS verification_method TEXT,
             ADD COLUMN IF NOT EXISTS verification_status TEXT,
