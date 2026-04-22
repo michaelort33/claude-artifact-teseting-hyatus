@@ -372,6 +372,12 @@ async function warmManualVerification(payload) {
     } catch (_) {}
 }
 
+function getSubmissionSourceUrl() {
+    const url = new URL(window.location.href);
+    url.hash = '';
+    return url.toString();
+}
+
 if (reservationLookupType) {
     reservationLookupType.addEventListener('change', updateReservationLookupInput);
 }
@@ -423,6 +429,7 @@ async function handleFormSubmit(e) {
                 reservation_phone: manualReservationPayload?.phone || null,
                 provided_checkin: manualReservationPayload?.checkin || null,
                 provided_checkout: manualReservationPayload?.checkout || null,
+                source_url: getSubmissionSourceUrl(),
             })
         });
 

@@ -79,6 +79,17 @@ function getAwardAmount(submissionId) {
     return submissionId <= 95 ? 20.00 : 10.00;
 }
 
+function escapeHtml(value) {
+    if (value === null || value === undefined) return '';
+    return String(value).replace(/[&<>"']/g, (ch) => ({
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#39;'
+    }[ch]));
+}
+
 function formatDateOnly(value) {
     if (!value) return 'N/A';
     const raw = String(value);
@@ -808,6 +819,10 @@ async function viewDetails(id) {
                 <div class="detail-value">${matchedStay}</div>
                 <div class="detail-label">Previously Used</div>
                 <div class="detail-value">${previouslyUsed}</div>
+                ${data.source_url ? `
+                    <div class="detail-label">Source URL</div>
+                    <div class="detail-value"><a href="${escapeHtml(data.source_url)}" target="_blank" rel="noopener noreferrer" style="color: var(--info); overflow-wrap: anywhere;">${escapeHtml(data.source_url)}</a></div>
+                ` : ''}
                 <div class="detail-label">Follow-up</div>
                 <div class="detail-value">${data.followup_sent_at 
                     ? `Proof requested ${new Date(data.followup_sent_at).toLocaleString()}`
