@@ -79,6 +79,58 @@ function getAwardAmount(submissionId) {
     return submissionId <= 95 ? 20.00 : 10.00;
 }
 
+function formatDateOnly(value) {
+    if (!value) return 'N/A';
+    const raw = String(value);
+    if (/^\d{4}-\d{2}-\d{2}/.test(raw)) return raw.slice(0, 10);
+    return new Date(raw).toLocaleDateString();
+}
+
+function formatStayDates(start, end) {
+    if (!start && !end) return 'N/A';
+    return `${formatDateOnly(start)} to ${formatDateOnly(end)}`;
+}
+
+function getVerificationLabel(submission) {
+    const method = submission.verification_method || 'none';
+    const status = submission.verification_status || 'unverified';
+
+    if (method === 'token' && status === 'verified') return 'Token verified';
+    if (method === 'token') return 'Token unverified';
+    if (method === 'manual' && status === 'verified') return 'Manual match';
+    if (method === 'manual' && status === 'mismatch') return 'Manual mismatch';
+    return 'Unverified';
+}
+
+function getVerificationClass(submission) {
+    const method = submission.verification_method || 'none';
+    const status = submission.verification_status || 'unverified';
+
+    if (status === 'verified') return 'status-awarded';
+    if (method === 'manual' && status === 'mismatch') return 'status-rejected';
+    if (method === 'token') return 'status-pending';
+    return 'status-pending';
+}
+
+function getReservationCellDetails(submission) {
+    if (submission.verification_method === 'manual') {
+        return `
+            <div style="margin-top: 4px; font-size: 12px; color: var(--warm-gray-dark);">Provided: ${formatStayDates(submission.provided_checkin, submission.provided_checkout)}</div>
+            <div style="margin-top: 2px; font-size: 12px; color: var(--warm-gray-dark);">Portal: ${formatStayDates(submission.actual_checkin, submission.actual_checkout)}</div>
+        `;
+    }
+
+    if (submission.verification_method === 'token' && submission.actual_checkin && submission.actual_checkout) {
+        return `<div style="margin-top: 4px; font-size: 12px; color: var(--warm-gray-dark);">Stay: ${formatStayDates(submission.actual_checkin, submission.actual_checkout)}</div>`;
+    }
+
+    return '';
+}
+
+function shouldShowVerificationBadge(submission) {
+    return submission.verification_method && submission.verification_method !== 'none';
+}
+
 async function checkAuth() {
     const urlParams = new URLSearchParams(window.location.search);
     if (urlParams.get('reset_expired') === 'true') {
@@ -390,10 +442,15 @@ function renderSubmissions(data) {
         const reviewType = submission.review_link ? 'Link' : 'Screenshot';
         const amount = parseFloat(submission.award_amount) || getAwardAmount(submission.id);
         const reservationId = submission.verified_reservation_id || submission.reservation_id;
-
-        const reservationCell = reservationId
+        const verificationLabel = getVerificationLabel(submission);
+        const reservationLink = reservationId
             ? `<a href="https://www.gptguest.com/dashboard/reservations/${reservationId}" target="_blank" style="color: var(--info); text-decoration: none;">${reservationId}</a>`
             : '<span style="color: var(--warm-gray-dark);">—</span>';
+        const verificationBadge = shouldShowVerificationBadge(submission)
+            ? `<div style="margin-top: 6px;"><span class="status-badge ${getVerificationClass(submission)}">${verificationLabel}</span></div>`
+            : '';
+
+        const reservationCell = `<div>${reservationLink}</div>${verificationBadge}${getReservationCellDetails(submission)}`;
 
         row.innerHTML = `
             <td><input type="checkbox" class="submission-checkbox" data-id="${submission.id}" data-change="updateSelection"></td>
@@ -717,6 +774,13 @@ async function viewDetails(id) {
         }
 
         const data = result.data;
+        const reservationId = data.verified_reservation_id || data.reservation_id;
+        const verificationLabel = getVerificationLabel(data);
+        const providedStay = formatStayDates(data.provided_checkin, data.provided_checkout);
+        const matchedStay = formatStayDates(data.actual_checkin, data.actual_checkout);
+        const previouslyUsed = data.verification_method && data.verification_method !== 'none'
+            ? (data.verified_previously_used ? 'Yes' : 'No')
+            : 'N/A';
         const content = document.getElementById('detailContent');
         content.innerHTML = `
             <div class="detail-grid">
@@ -733,9 +797,17 @@ async function viewDetails(id) {
                 <div class="detail-label">Previous Guest</div>
                 <div class="detail-value">${data.previous_guest ? 'Yes' : 'No'}</div>
                 <div class="detail-label">Reservation</div>
-                <div class="detail-value">${data.reservation_id 
-                    ? `<a href="https://www.gptguest.com/dashboard/reservations/${data.reservation_id}" target="_blank" style="color: var(--info);">${data.reservation_id}</a>` 
+                <div class="detail-value">${reservationId
+                    ? `<a href="https://www.gptguest.com/dashboard/reservations/${reservationId}" target="_blank" style="color: var(--info);">${reservationId}</a>`
                     : 'No reservation found'}</div>
+                <div class="detail-label">Verification</div>
+                <div class="detail-value"><span class="status-badge ${getVerificationClass(data)}">${verificationLabel}</span></div>
+                <div class="detail-label">Provided Stay</div>
+                <div class="detail-value">${providedStay}</div>
+                <div class="detail-label">Matched Stay</div>
+                <div class="detail-value">${matchedStay}</div>
+                <div class="detail-label">Previously Used</div>
+                <div class="detail-value">${previouslyUsed}</div>
                 <div class="detail-label">Follow-up</div>
                 <div class="detail-value">${data.followup_sent_at 
                     ? `Proof requested ${new Date(data.followup_sent_at).toLocaleString()}`

@@ -377,7 +377,7 @@ if (reservationLookupType) {
 }
 
 _tokenVerifiedPromise.then((verified) => {
-    showManualReservationVerification(!verified);
+    showManualReservationVerification(!_reservationToken && !verified);
 });
 
 async function handleFormSubmit(e) {
